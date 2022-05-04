@@ -1,44 +1,10 @@
 import type { NextPage } from 'next'
-import { GetServerSideProps } from 'next'
-import { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import {Client} from '@notionhq/client';
 
 
-const client = new Client({
-    auth: process.env.NOTION_ACCESS_TOKEN,
-});
-
-
-async function posts() {
-    const myPosts = await client.databases.query({
-        database_id: `${process.env.NOTION_EVENT_DATABASE_ID}`,
-    });
-    return myPosts;
-}
-
-
-export async function getServerSideProps() {
-   // Get the posts
-   let { results } = await posts();
-   // Return the result
-   return {
-     props: {
-       posts: results
-     }
-   }
-}
-
-
-interface Props {
-    posts: [any]
-}
-
-
-const CalendarForm: NextPage<Props> = (props ) => {
-  console.log(props)
+const CalendarForm: NextPage = () => {
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
       <div className="md:col-span-3">
