@@ -12,17 +12,33 @@ const CalendarForm: NextPage = () => {
   const { register, handleSubmit, reset, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  function validateForm(formData: object) {
-      console.debug(formData)
-      // display form data on success
-      alert('SUCCESS!! :-)\n\n' + JSON.stringify(formData, null, 4));
+  function submitForm(formData: object) {
+      const endpoint = '/api/calendar/event'
+      const data = eventSchema.cast(formData)
+      const JSONdata = JSON.stringify(data)
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSONdata,
+      }
+      const response = fetch(endpoint, options)
+        .then(response => {
+          console.debug(response)
+          if (response.ok) {
+            reset()
+            alert("Event created")
+          }
+        })
       return false;
   }
 
   return (
     <div className="md:grid md:grid-cols-3 md:gap-4">
       <div className="md:col-span-3">
-        <form onSubmit={handleSubmit(validateForm)} method="POST">
+        <form onSubmit={handleSubmit(submitForm)} method="POST">
           <div className="shadow sm:rounded-md sm:overflow-hidden">
             <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
               <div className="grid grid-cols-4 gap-4">

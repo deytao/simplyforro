@@ -9,9 +9,9 @@ export default function handler(
   try {
     console.debug(body)
     const page = CreateEvent(body)
-    res.redirect(307, '/calendar/form')
+    res.status(201).json({})
   } catch (err) {
     console.debug(err)
-    res.status(500).send({ error: 'failed to fetch data' })
+    res.status(500).send({ error: 'failed to create page' })
   }
 }
