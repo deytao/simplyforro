@@ -20,13 +20,13 @@ const CalendarForm: NextPage = () => {
   }
 
   return (
-    <div className="md:grid md:grid-cols-3 md:gap-6">
+    <div className="md:grid md:grid-cols-3 md:gap-4">
       <div className="md:col-span-3">
         <form onSubmit={handleSubmit(validateForm)} method="POST">
           <div className="shadow sm:rounded-md sm:overflow-hidden">
             <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-              <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-3 sm:col-span-2">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-2">
                   <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">Title</label>
                   <div className="mt-1 flex rounded-md shadow-sm">
                     <input type="text" {...register("title")} id="event-title" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.title ? 'border-red-500' : ''}`} placeholder="Untitled" />
@@ -34,15 +34,7 @@ const CalendarForm: NextPage = () => {
                   <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
                 </div>
 
-                <div className="col-span-3 sm:col-span-2">
-                  <label htmlFor="event-date" className="block text-sm font-medium text-gray-700">Date</label>
-                  <div className="mt-1 flex rounded-md shadow-sm">
-                    <input type="date" {...register("date")} id="event-date" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.date ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
-                  </div>
-                  <p className="text-red-500 text-xs italic">{errors.date?.message}</p>
-                </div>
-
-                <div className="col-span-3 sm:col-span-2">
+                <div className="col-span-4">
                   <label htmlFor="event-link" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                   <div className="mt-1 flex rounded-md shadow-sm">
                     <input type="text" {...register("link")} id="event-link" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.link ? 'border-red-500' : ''}`} placeholder="https://www.example.com" />
@@ -50,20 +42,30 @@ const CalendarForm: NextPage = () => {
                   <p className="text-red-500 text-xs italic">{errors.link?.message}</p>
                 </div>
 
-                <div className="col-span-3 sm:col-span-2">
-                  <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
+                <div className="col-span-1">
+                  <label htmlFor="event-date" className="block text-sm font-medium text-gray-700">Date</label>
                   <div className="mt-1 flex rounded-md shadow-sm">
-                    <input type="text" {...register("city")} id="event-city" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.city ? 'border-red-500' : ''}`} placeholder="Itaunas" />
+                    <input type="date" {...register("date")} id="event-date" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.date ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
                   </div>
-                  <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
+                  <p className="text-red-500 text-xs italic">{errors.date?.message}</p>
                 </div>
 
-                <div className="col-span-3 sm:col-span-2">
-                  <label htmlFor="event-country" className="block text-sm font-medium text-gray-700">Country</label>
-                  <div className="mt-1 flex rounded-md shadow-sm">
-                    <input type="text" {...register("country")} id="event-country" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.country ? 'border-red-500' : ''}`} placeholder="Brazil" />
+                <div className="col-span-4 grid grid-cols-2 gap-4">
+                  <div className="col-span-1">
+                    <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
+                    <div className="mt-1 flex rounded-md shadow-sm">
+                      <input type="text" {...register("city")} id="event-city" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.city ? 'border-red-500' : ''}`} placeholder="Itaunas" />
+                    </div>
+                    <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
                   </div>
-                  <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
+
+                  <div className="col-span-1">
+                    <label htmlFor="event-country" className="block text-sm font-medium text-gray-700">Country</label>
+                    <div className="mt-1 flex rounded-md shadow-sm">
+                      <input type="text" {...register("country")} id="event-country" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.country ? 'border-red-500' : ''}`} placeholder="Brazil" />
+                    </div>
+                    <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
+                  </div>
                 </div>
               </div>
 
