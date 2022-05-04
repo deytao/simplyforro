@@ -7,6 +7,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { eventSchema } from 'schemas/event';
 
 
+function jsonReplacer(key: string, value: any) {
+    if (key === "date")
+        return value.split('T')[0]
+    return value
+}
+
+
 const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
   const { register, handleSubmit, reset, formState } = useForm(formOptions);
@@ -15,7 +22,7 @@ const CalendarForm: NextPage = () => {
   function submitForm(formData: object) {
       const endpoint = '/api/calendar/event'
       const data = eventSchema.cast(formData)
-      const JSONdata = JSON.stringify(data)
+      const JSONdata = JSON.stringify(data, jsonReplacer)
 
       const options = {
         method: 'POST',
