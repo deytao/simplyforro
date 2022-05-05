@@ -3,11 +3,15 @@ import * as yup from 'yup';
 const tags = ["party", "pratica", "class", "workshop", "festival"]
 export const eventSchema = yup.object({
   title: yup.string().required("A title is required"),
-  date: yup
+  startDate: yup
   .date()
   .nullable()
   .transform((curr, orig) => orig === '' ? null : curr)
   .required("A date is required"),
+  endDate: yup
+  .date()
+  .nullable()
+  .transform((curr, orig) => orig === '' ? null : curr),
   city: yup.string().required("A city is required"),
   country: yup.string().required("A country is required"),
   tags: yup

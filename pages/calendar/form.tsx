@@ -8,8 +8,9 @@ import { eventSchema } from 'schemas/event';
 
 
 function jsonReplacer(key: string, value: any) {
-    if (key === "date")
+    if (["startDate", "endDate"].includes(key)) {
         return value.split('T')[0]
+    }
     return value
 }
 
@@ -66,11 +67,19 @@ const CalendarForm: NextPage = () => {
                 </div>
 
                 <div className="col-span-1">
-                  <label htmlFor="event-date" className="block text-sm font-medium text-gray-700">Date</label>
+                  <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                   <div className="mt-1 flex rounded-md shadow-sm">
-                    <input type="date" {...register("date")} id="event-date" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.date ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                    <input type="date" {...register("startDate")} id="event-start-date" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.startDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
                   </div>
-                  <p className="text-red-500 text-xs italic">{errors.date?.message}</p>
+                  <p className="text-red-500 text-xs italic">{errors.startDate?.message}</p>
+                </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <input type="date" {...register("endDate")} id="event-end-date" className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300 ${errors.endDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                  </div>
+                  <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
                 </div>
 
                 <div className="col-span-4 grid grid-cols-2 gap-4">

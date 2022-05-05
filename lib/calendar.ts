@@ -24,7 +24,8 @@ export async function CreateEvent(event: Event) {
             },
             Date: {
                 date: {
-                    start: event.date,
+                    start: event.startDate,
+                    end: event.endDate === event.startDate ? null : event.endDate,
                 },
             },
             'Tickets / Infos': {
