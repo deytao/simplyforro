@@ -7,13 +7,13 @@ const toDateOrNull = (currentValue: string, originalValue: string) => {
     return date.isValid() ? date : null
 }
 
-
 const toISODate = (currentValue: any, originalValue: string) => {
     return currentValue === null ? null : currentValue.format("YYYY-MM-DD")
 }
 
+export const tags = ["party", "pratica", "class", "workshop", "festival"]
+export const frequencies = ["", "daily", "weekly", "biweekly", "monthly"]
 
-const tags = ["party", "pratica", "class", "workshop", "festival"]
 export const eventSchema = yup.object({
   title: yup.string().required("A title is required"),
   startDate: yup
@@ -28,7 +28,10 @@ export const eventSchema = yup.object({
   .transform(toDateOrNull)
   .test((value: any) => {
       if (value === null) {
-          return true
+          if (yup.ref("frequency") !== null) {
+              return true
+          }
+          return false
       }
       const endDate = moment(value)
       const startDate = moment(yup.ref("startDate"))
@@ -38,6 +41,10 @@ export const eventSchema = yup.object({
       return false
   })
   .transform(toISODate),
+  frequency: yup
+    .string()
+    .nullable()
+    .oneOf(frequencies),
   city: yup.string().required("A city is required"),
   country: yup.string().required("A country is required"),
   tags: yup

@@ -8,7 +8,7 @@ export default function handler(
   const body = req.body
   try {
     console.debug(body)
-    const page = CreateEvent(body)
+    const result = CreateEvent(body)
     res.status(201).json({})
   } catch (err) {
     console.debug(err)

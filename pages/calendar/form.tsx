@@ -74,6 +74,20 @@ const CalendarForm: NextPage = () => {
                   <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
                 </div>
 
+                <div className="col-span-2">
+                  <label htmlFor="event-frequency" className="block text-sm font-medium text-gray-700">Frequency</label>
+                  <div className="mt-1 flex rounded-md shadow-sm">
+                    <select {...register("frequency")} id="event-frequency" className="w-full">
+                        <option value=""></option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Biweekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+                  <p className="text-red-500 text-xs italic">{errors.frequency?.message}</p>
+                </div>
+
                 <div className="col-span-4 grid grid-cols-2 gap-4">
                   <div className="col-span-1">
                     <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
