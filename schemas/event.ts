@@ -1,17 +1,43 @@
 import * as yup from 'yup';
+import moment from 'moment';
+
+
+const toDateOrNull = (currentValue: string, originalValue: string) => {
+    const date = moment(originalValue)
+    return date.isValid() ? date : null
+}
+
+
+const toISODate = (currentValue: any, originalValue: string) => {
+    return currentValue === null ? null : currentValue.format("YYYY-MM-DD")
+}
+
 
 const tags = ["party", "pratica", "class", "workshop", "festival"]
 export const eventSchema = yup.object({
   title: yup.string().required("A title is required"),
   startDate: yup
-  .date()
+  .string()
   .nullable()
-  .transform((curr, orig) => orig === '' ? null : curr)
-  .required("A date is required"),
+  .transform(toDateOrNull)
+  .required("A date is required")
+  .transform(toISODate),
   endDate: yup
-  .date()
+  .string()
   .nullable()
-  .transform((curr, orig) => orig === '' ? null : curr),
+  .transform(toDateOrNull)
+  .test((value: any) => {
+      if (value === null) {
+          return true
+      }
+      const endDate = moment(value)
+      const startDate = moment(yup.ref("startDate"))
+      if (endDate.isAfter(startDate)) {
+          return true
+      }
+      return false
+  })
+  .transform(toISODate),
   city: yup.string().required("A city is required"),
   country: yup.string().required("A country is required"),
   tags: yup
