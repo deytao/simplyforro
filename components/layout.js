@@ -9,11 +9,11 @@ export default function Layout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center py-2">
-        <Link href="/">
-            <a>
-              <h1 className="text-6xl font-bold">SimplyForro</h1>
-            </a>
-        </Link>
+        <h1 className="text-6xl font-bold py-4">
+          <Link href="/">
+              <a>SimplyForro</a>
+          </Link>
+        </h1>
         {children}
       </main>
       <footer className="flex h-24 w-full items-center justify-center border-t">
