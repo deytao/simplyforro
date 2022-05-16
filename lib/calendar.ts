@@ -8,9 +8,7 @@ const client = new Client({
 });
 
 
-const frequencyIntervals = {
-    null: false,
-    "": false,
+const frequencyIntervals: {[key: string]: object} = {
     "daily": {"days": 1},
     "weekly": {"weeks": 1},
     "biweekly": {"weeks": 2},
@@ -21,9 +19,9 @@ const frequencyIntervals = {
 export async function CreateEvent(event: Event) {
     let startDate: moment.Moment = moment(event.startDate)
     let endDate: moment.Moment = moment(event.endDate)
-    let interval = frequencyIntervals[event.frequency]
-    let dates: any = {}
-    dates[startDate.format("YYYY-MM-DD")] = endDate.format("YYYY-MM-DD")
+    let interval = event.frequency != null ? frequencyIntervals[event.frequency] : false
+    let dates: {[key: string]: string | null} = {}
+    dates[startDate.format("YYYY-MM-DD")] = endDate.isValid() ? endDate.format("YYYY-MM-DD") : null
     while (interval && startDate.isSameOrBefore(endDate) && endDate.isValid()) {
         dates[startDate.format("YYYY-MM-DD")] = null
         startDate.add(interval)
@@ -34,43 +32,43 @@ export async function CreateEvent(event: Event) {
                 database_id: `${process.env.NOTION_EVENT_DATABASE_ID}`,
             },
             properties: {
-                Name: {
-                    title: [
+                "Name": {
+                    "title": [
                         {
-                            text: {
-                                content: event.title,
+                            "text": {
+                                "content": event.title,
                             },
                         },
                     ],
                 },
-                Date: {
-                    date: {
-                        start: startDate,
-                        end: endDate === startDate ? null : endDate,
+                "Date": {
+                    "date": {
+                        "start": startDate,
+                        "end": endDate === startDate ? null : endDate,
                     },
                 },
                 'Tickets / Infos': {
-                    url: event.link ? event.link : null,
+                    "url": event.link ? event.link : null,
                 },
-                Tags: {
-                    multi_select: event.tags.map((currentElement: string) => {
+                "Tags": {
+                    "multi_select": event.tags.map((currentElement: any) => {
                         return {name: currentElement};
                     })
                 },
-                City: {
-                    rich_text: [
+                "City": {
+                    "rich_text": [
                         {
-                            text: {
-                                content: event.city,
+                            "text": {
+                                "content": event.city,
                             },
                         },
                     ],
                 },
-                Country: {
-                    rich_text: [
+                "Country": {
+                    "rich_text": [
                         {
-                            text: {
-                                content: event.country,
+                            "text": {
+                                "content": event.country,
                             },
                         },
                     ],
