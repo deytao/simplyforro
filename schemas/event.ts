@@ -17,7 +17,7 @@ export const eventSchema = yup.object({
   .string()
   .nullable()
   .transform(toISODateOrNull)
-  .required("A date is required"),
+  .required("A valid date is required"),
   endDate: yup
   .string()
   .nullable()
@@ -30,15 +30,15 @@ export const eventSchema = yup.object({
           if (endDate.isSameOrAfter(startDate)) {
               return true
           }
-          return false
+          return context.createError({ message: "The date needs to be later than the start" })
       }
       if (frequency !== "") {
-          return false
+          return context.createError({ message: "An end date is mandatory with frequency" })
       }
       if (value === null) {
           return true
       }
-      return false
+      return context.createError({ message: "A valid date is required" })
   }),
   frequency: yup
     .string()
