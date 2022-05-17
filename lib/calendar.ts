@@ -26,6 +26,7 @@ export async function CreateEvent(event: Event) {
         dates[startDate.format("YYYY-MM-DD")] = null
         startDate.add(interval)
     }
+    let pagesCount = 0
     for (let [startDate, endDate] of Object.entries(dates)) {
         let page = await client.pages.create({
             parent: {
@@ -75,7 +76,7 @@ export async function CreateEvent(event: Event) {
                 },
             },
         });
-        console.debug(page)
+        pagesCount = pagesCount + 1
     }
-    return true
+    return pagesCount
 }
