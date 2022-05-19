@@ -22,6 +22,7 @@ const CalendarForm: NextPage = () => {
   const { errors } = formState;
   const [ messageDialogState, setMessageDialogState ] = useState({
     isOpen: false,
+    status: "",
     title: "",
     message: "",
   });
@@ -34,19 +35,23 @@ const CalendarForm: NextPage = () => {
       const options = {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSONdata,
       }
       reset()
       await fetch(endpoint, options)
         .then(response => {
-          return response.json()
+            if (!response.ok) {
+                throw new Error("An error occured, please try again later.")
+            }
+            return response.json()
         })
         .then(data => {
             setMessageDialogState({
               isOpen: true,
-              title: "Success",
+              status: "success",
+              title: "Thank you!",
               message: `
                 You have created ${data.pagesCount} ${data.pagesCount > 1 ? "events" : "event"}.
                 ${data.pagesCount > 1 ? "They" : "It"} will be validated and added to the calendar soon.
@@ -54,12 +59,13 @@ const CalendarForm: NextPage = () => {
             })
         })
         .catch(error => {
-          reset(formData)
-          setMessageDialogState({
-            isOpen: true,
-            title: "Error",
-            message: "An error occured, please try again later.",
-          })
+            reset(formData)
+            setMessageDialogState({
+                isOpen: true,
+                status: "error",
+                title: "Error",
+                message: error.message,
+            })
         })
       return false;
   }
