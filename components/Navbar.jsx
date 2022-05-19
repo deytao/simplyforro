@@ -26,14 +26,6 @@ function Navbar() {
       </div>
       <div className={`w-full block ${isNavbarOpen ? "flex" : "hidden"} flex-grow items-center lg:flex lg:w-auto`}>
         <div className="text-sm lg:flex-grow flex-row-reverse">
-          <Link href="/school">
-              <a className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4">
-                The school
-              </a>
-          </Link>
-          <a className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4">
-            Blog
-          </a>
           <a href="https://simplyforro.notion.site/42f9fe6ead9544338eb4d5ee5c85e13e" className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4" target="_blank">
             Calendar
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-0.5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">

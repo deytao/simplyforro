@@ -28,17 +28,6 @@ const Home: NextPage<Props> = ({ events }) => {
   return (
     <div className="mt-6 grid grid-cols-2 gap-4 max-w-4xl sm:w-full">
 
-      <Link href="/school">
-        <a
-          className="col-span-2 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-        >
-          <h3 className="text-2xl font-bold">The school &rarr;</h3>
-          <p className="mt-4 text-xl">
-              Understand what
-          </p>
-        </a>
-      </Link>
-
       <div className="rounded-xl border p-6 text-left">
         <h3 className="text-2xl font-bold">Next events</h3>
         <div className="overflow-y-auto h-60 rounded p-2 border bg-gray-100">
