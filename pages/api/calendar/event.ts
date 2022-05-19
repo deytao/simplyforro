@@ -6,11 +6,15 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const body = req.body
+  let status: number, content: object;
   try {
     const pagesCount = await CreateEvent(body)
-    res.status(201).json({pagesCount: pagesCount})
+    status = 201
+    content = {pagesCount: pagesCount}
   } catch (err) {
-    console.debug(err)
-    res.status(500).send({ error: 'failed to create page' })
+    console.error(err)
+    status = 500
+    content = { error: 'failed to create page' }
   }
+  res.status(status).json(content)
 }

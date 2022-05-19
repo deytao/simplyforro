@@ -1,11 +1,7 @@
-import { Client } from '@notionhq/client';
 import moment from 'moment';
+
 import { Event } from 'schemas/event';
-
-
-const client = new Client({
-    auth: process.env.NOTION_ACCESS_TOKEN,
-});
+import { createPage } from './notion';
 
 
 const frequencyIntervals: {[key: string]: object} = {
@@ -28,11 +24,9 @@ export async function CreateEvent(event: Event) {
     }
     let pagesCount = 0
     for (let [startDate, endDate] of Object.entries(dates)) {
-        let page = await client.pages.create({
-            parent: {
-                database_id: `${process.env.NOTION_EVENT_DATABASE_ID}`,
-            },
-            properties: {
+        let page = await createPage(
+            `${process.env.NOTION_PENDINGS_DATABASE_ID}`,
+            {
                 "Name": {
                     "title": [
                         {
@@ -75,7 +69,7 @@ export async function CreateEvent(event: Event) {
                     ],
                 },
             },
-        });
+        );
         pagesCount = pagesCount + 1
     }
     return pagesCount
