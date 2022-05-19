@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import { useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { Alert } from 'components/Alert'
+import { MessageDialog } from 'components/MessageDialog'
 import { alertService } from 'lib/alert';
 import { eventSchema } from 'schemas/event';
 
@@ -18,6 +20,11 @@ const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
   const { register, handleSubmit, reset, formState } = useForm(formOptions);
   const { errors } = formState;
+  const [ messageDialogState, setMessageDialogState ] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
 
   async function submitForm(formData: object) {
       const endpoint = '/api/calendar/event'
@@ -37,14 +44,22 @@ const CalendarForm: NextPage = () => {
           return response.json()
         })
         .then(data => {
-            alertService.success(`
+            setMessageDialogState({
+              isOpen: true,
+              title: "Success",
+              message: `
                 You have created ${data.pagesCount} ${data.pagesCount > 1 ? "events" : "event"}.
                 ${data.pagesCount > 1 ? "They" : "It"} will be validated and added to the calendar soon.
-            `)
+              `,
+            })
         })
         .catch(error => {
           reset(formData)
-          alertService.error("An error occured, please try again later.")
+          setMessageDialogState({
+            isOpen: true,
+            title: "Error",
+            message: "An error occured, please try again later.",
+          })
         })
       return false;
   }
@@ -56,7 +71,7 @@ const CalendarForm: NextPage = () => {
       </h1>
       <div className="md:grid md:grid-cols-3 md:gap-4">
         <div className="md:col-span-3">
-          <Alert />
+          <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
           <form onSubmit={handleSubmit(submitForm)} method="POST">
             <div className="shadow sm:rounded-md sm:overflow-hidden">
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
