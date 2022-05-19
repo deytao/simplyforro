@@ -29,7 +29,7 @@ const Home: NextPage<Props> = ({ events }) => {
     <div className="mt-6 grid grid-cols-2 gap-4 max-w-4xl sm:w-full">
 
       <div className="rounded-xl border p-6 text-left">
-        <h3 className="text-2xl font-bold">Next events</h3>
+        <h3 className="text-2xl font-bold">Next week events</h3>
         <div className="overflow-y-auto h-60 rounded p-2 border bg-gray-100">
             {events.map((event: any) => (
               <div className="p-2 rounded hover:bg-gray-200 focus:bg-gray-200">
