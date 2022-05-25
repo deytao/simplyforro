@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { Alert } from 'components/Alert'
+import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
 import { alertService } from 'lib/alert';
 import { eventSchema } from 'schemas/event';
@@ -78,9 +79,11 @@ const CalendarForm: NextPage = () => {
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
         New event
       </h1>
-      <div className="md:grid md:grid-cols-3 md:gap-4">
-        <div className="md:col-span-3">
-          <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+
+      <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+
+      <div className="md:grid md:grid-cols-4 md:gap-4">
+        <div className="md:col-span-2">
           <form onSubmit={handleSubmit(submitForm)} method="POST">
             <div className="shadow sm:rounded-md sm:overflow-hidden">
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
@@ -217,6 +220,7 @@ const CalendarForm: NextPage = () => {
             </div>
           </form>
         </div>
+        <EventPreview />
       </div>
     </>
   )
