@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useState } from 'react'
 
 
@@ -11,51 +12,58 @@ const tagClasses = {
 
 
 export const EventPreview = ({eventData}) => {
+  let startDate = moment(eventData.startDate)
+  let endDate = moment(eventData.endDate)
   return (
     <div className="md:col-span-2">
       <h2 className="text-2xl font-bold py-4">Preview</h2>
 
       {/* UNIQUE */}
-      <div className="flex gap-2">
-        <div className="w-1/3">
-          <span className="text-sm">{eventData.startDate}</span>
-          <div className="shadow rounded-md p-2">
+      {(startDate == endDate || !endDate.isValid()) && 
+        <div className="flex gap-2">
+          <div className="w-1/3">
+            <span className="text-sm inline-block w-full">{startDate.format("DD MMM")}</span>
+            <div className="shadow rounded-md p-2">
+              <div className="font-bold">{eventData.title}</div>
+              <div className="text-sm">{eventData.city}, {eventData.country}</div>
+              {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
+            </div>
+          </div>
+        </div>}
+
+      {/* REPEAT */}
+      {startDate.isBefore(endDate) && eventData.frequency && 
+        <div className="flex gap-2">
+          <div className="shadow rounded-md w-1/3 p-2">
+            <span className="text-sm inline-block w-full text-right">{startDate.format("DD MMM")}</span>
             <div className="font-bold">{eventData.title}</div>
             <div>{eventData.city}, {eventData.country}</div>
             {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
           </div>
-        </div>
-      </div>
-
-      {/* REPEAT */}
-      <div className="flex gap-2">
-        <div className="shadow rounded-md w-1/3 p-2">
-          <span className="text-sm">{eventData.startDate}</span>
-          <div className="font-bold">{eventData.title}</div>
-          <div>{eventData.city}, {eventData.country}</div>
-          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
-        </div>
-        <div className="shadow rounded-md w-1/3 p-2">
-          <span className="text-sm">date</span>
-          <div className="font-bold">{eventData.title}</div>
-          <div>{eventData.city}, {eventData.country}</div>
-          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
-        </div>
-        <div className="shadow rounded-md w-1/3 p-2">
-          <span className="text-sm">{eventData.endDate}</span>
-          <div className="font-bold">{eventData.title}</div>
-          <div>{eventData.city}, {eventData.country}</div>
-          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
-        </div>
-      </div>
+          <div className="shadow rounded-md w-1/3 p-2">
+            <span className="text-sm inline-block w-full text-right">...</span>
+            <div className="font-bold">{eventData.title}</div>
+            <div>{eventData.city}, {eventData.country}</div>
+            {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
+          </div>
+          <div className="shadow rounded-md w-1/3 p-2">
+            <span className="text-sm inline-block w-full text-right">{endDate.format("DD MMM")}</span>
+            <div className="font-bold">{eventData.title}</div>
+            <div>{eventData.city}, {eventData.country}</div>
+            {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
+          </div>
+        </div>}
 
       {/* RANGE */}
-      <div className="shadow rounded-md w-full p-2">
-        <span className="text-sm">{eventData.startDate}</span>
-        <div className="font-bold">{eventData.title}</div>
-        <div>{eventData.city}, {eventData.country}</div>
-        {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
-      </div>
+      {startDate.isBefore(endDate) && !eventData.frequency && 
+        <div className="shadow rounded-md w-full p-2">
+          <span className="text-sm inline-block w-1/3 text-right pr-2">{startDate.format("DD MMM")}</span>
+          <span className="text-sm inline-block w-1/3 text-right pr-2">...</span>
+          <span className="text-sm inline-block w-1/3 text-right pr-2">{endDate.format("DD MMM")}</span>
+          <div className="font-bold">{eventData.title}</div>
+          <div>{eventData.city}, {eventData.country}</div>
+          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
+        </div>}
 
     </div>
   )

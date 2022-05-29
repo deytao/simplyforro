@@ -29,10 +29,11 @@ const CalendarForm: NextPage = () => {
     message: "",
   });
   const event = {
-      title: "Untitled",
+      title: "FENFIT",
       link: "https://www.example.com",
-      startDate: "23.04.2022",
-      endDate: "23.04.2022",
+      startDate: "2022-04-23",
+      endDate: "",
+      frequency: "",
       city: "Itaunas",
       country: "Brazil",
       tags: [
@@ -43,11 +44,12 @@ const CalendarForm: NextPage = () => {
   const [ previewState, setPreviewState ] = useState(event);
 
   watch((data: any, options) => {
-      let newEvent = {
+      const newEvent = {
           title: data.title|| event.title,
           link: data.link || event.link,
           startDate: data.startDate || event.startDate,
           endDate: data.endDate || event.endDate,
+          frequency: data.frequency || event.frequency,
           city: data.city || event.city,
           country: data.country || event.country,
           tags: data.tags || event.tags,
