@@ -42,7 +42,18 @@ const CalendarForm: NextPage = () => {
   }
   const [ previewState, setPreviewState ] = useState(event);
 
-  watch((data: any, options) => setPreviewState(data))
+  watch((data: any, options) => {
+      let newEvent = {
+          title: data.title|| event.title,
+          link: data.link || event.link,
+          startDate: data.startDate || event.startDate,
+          endDate: data.endDate || event.endDate,
+          city: data.city || event.city,
+          country: data.country || event.country,
+          tags: data.tags || event.tags,
+      }
+      setPreviewState(newEvent)
+  })
 
   async function submitForm(formData: object) {
       if (isSubmitted) return false
