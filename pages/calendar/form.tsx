@@ -19,7 +19,7 @@ const checkboxClassnames = "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border
 
 const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
-  const { register, handleSubmit, reset, formState } = useForm(formOptions);
+  const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
   const { errors } = formState;
   const [ isSubmitted, setIsSubmitted ] = useState(false)
   const [ messageDialogState, setMessageDialogState ] = useState({
@@ -28,6 +28,20 @@ const CalendarForm: NextPage = () => {
     title: "",
     message: "",
   });
+  const event = {
+      title: "Untitled",
+      link: "https://www.example.com",
+      startDate: "23.04.2022",
+      endDate: "23.04.2022",
+      city: "Itaunas",
+      country: "Brazil",
+      tags: "",
+  }
+  const [ previewState, setPreviewState ] = useState(event);
+
+  watch((data: any, options) => {
+      setPreviewState(data)
+  })
 
   async function submitForm(formData: object) {
       if (isSubmitted) return false
@@ -91,7 +105,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4 md:col-span-2">
                     <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">Title</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder="Untitled" />
+                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder={`${event.title}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
                   </div>
@@ -99,7 +113,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4">
                     <label htmlFor="event-link" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder="https://www.example.com" />
+                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder={`${event.link}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.link?.message}</p>
                   </div>
@@ -107,7 +121,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder={`${event.startDate}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.startDate?.message}</p>
                   </div>
@@ -115,7 +129,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder={`${event.endDate}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
                   </div>
@@ -138,7 +152,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder="Itaunas" />
+                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder={`${event.city}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
                     </div>
@@ -146,7 +160,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-country" className="block text-sm font-medium text-gray-700">Country</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder="Brazil" />
+                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder={`${event.country}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
                     </div>
@@ -220,7 +234,7 @@ const CalendarForm: NextPage = () => {
             </div>
           </form>
         </div>
-        <EventPreview />
+        <EventPreview eventData={previewState} />
       </div>
     </>
   )

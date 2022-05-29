@@ -9,7 +9,7 @@ const statusClasses = {
 }
 
 
-export const EventPreview = () => {
+export const EventPreview = ({eventData}) => {
   return (
     <div className="md:col-span-2">
       <h2 className="text-2xl font-bold py-4">Preview</h2>
@@ -19,8 +19,8 @@ export const EventPreview = () => {
         <div className="w-1/3">
           <span className="text-sm">date</span>
           <div className="shadow rounded-md p-2">
-            <div className="font-bold">Title</div>
-            <div>Location</div>
+            <div className="font-bold">{eventData.title}</div>
+            <div>{eventData.city}, {eventData.country}</div>
             <span className="text-xs inline-block px-2 lowercase rounded text-pink-600 bg-pink-200">pink</span>
           </div>
         </div>
@@ -29,26 +29,26 @@ export const EventPreview = () => {
       {/* REPEAT */}
       <div className="flex gap-2">
         <div className="shadow rounded-md w-1/3 p-2">
-          <div className="font-bold">Title</div>
-          <div>Location</div>
+          <div className="font-bold">{eventData.title}</div>
+          <div>{eventData.city}, {eventData.country}</div>
           <div>Categories</div>
         </div>
         <div className="shadow rounded-md w-1/3 p-2">
-          <div className="font-bold">Title</div>
-          <div>Location</div>
+          <div className="font-bold">{eventData.title}</div>
+          <div>{eventData.city}, {eventData.country}</div>
           <div>Categories</div>
         </div>
         <div className="shadow rounded-md w-1/3 p-2">
-          <div className="font-bold">Title</div>
-          <div>Location</div>
+          <div className="font-bold">{eventData.title}</div>
+          <div>{eventData.city}, {eventData.country}</div>
           <div>Categories</div>
         </div>
       </div>
 
       {/* RANGE */}
       <div className="shadow rounded-md w-full p-2">
-        <div className="font-bold">Title</div>
-        <div>Location</div>
+        <div className="font-bold">{eventData.title}</div>
+        <div>{eventData.city}, {eventData.country}</div>
         <div>Categories</div>
       </div>
 
