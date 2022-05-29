@@ -35,13 +35,14 @@ const CalendarForm: NextPage = () => {
       endDate: "23.04.2022",
       city: "Itaunas",
       country: "Brazil",
-      tags: "",
+      tags: [
+        "party",
+        "class",
+      ],
   }
   const [ previewState, setPreviewState ] = useState(event);
 
-  watch((data: any, options) => {
-      setPreviewState(data)
-  })
+  watch((data: any, options) => setPreviewState(data))
 
   async function submitForm(formData: object) {
       if (isSubmitted) return false

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 
 
-const statusClasses = {
-    "success": ["bg-green-100 border-green-700 text-green-700", "bg-green-700 hover:bg-green-900"],
-    "error": ["bg-red-100 border-red-700 text-red-700", "bg-red-700 hover:bg-red-900"],
-    "info": ["bg-teal-100 border-teal-700 text-teal-700", "bg-teal-700 hover:bg-teal-900"],
-    "warning": ["bg-orange-100 border-orange-700 text-orange-700", "bg-orange-700 hover:bg-orange-900"]
+const tagClasses = {
+    "party": "text-red-900 bg-red-100",
+    "pratica": "text-blue-900 bg-blue-100",
+    "class": "text-purple-900 bg-purple-100",
+    "workshop": "text-orange-900 bg-orange-100",
+    "festival": "text-green-900 bg-green-100",
 }
 
 
@@ -21,7 +22,7 @@ export const EventPreview = ({eventData}) => {
           <div className="shadow rounded-md p-2">
             <div className="font-bold">{eventData.title}</div>
             <div>{eventData.city}, {eventData.country}</div>
-            <span className="text-xs inline-block px-2 lowercase rounded text-pink-600 bg-pink-200">pink</span>
+            {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
           </div>
         </div>
       </div>
@@ -31,17 +32,17 @@ export const EventPreview = ({eventData}) => {
         <div className="shadow rounded-md w-1/3 p-2">
           <div className="font-bold">{eventData.title}</div>
           <div>{eventData.city}, {eventData.country}</div>
-          <div>Categories</div>
+          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
         </div>
         <div className="shadow rounded-md w-1/3 p-2">
           <div className="font-bold">{eventData.title}</div>
           <div>{eventData.city}, {eventData.country}</div>
-          <div>Categories</div>
+          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
         </div>
         <div className="shadow rounded-md w-1/3 p-2">
           <div className="font-bold">{eventData.title}</div>
           <div>{eventData.city}, {eventData.country}</div>
-          <div>Categories</div>
+          {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
         </div>
       </div>
 
@@ -49,7 +50,7 @@ export const EventPreview = ({eventData}) => {
       <div className="shadow rounded-md w-full p-2">
         <div className="font-bold">{eventData.title}</div>
         <div>{eventData.city}, {eventData.country}</div>
-        <div>Categories</div>
+        {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
       </div>
 
     </div>
