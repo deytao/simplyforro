@@ -5,8 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { XIcon } from '@heroicons/react/outline'
 
 import { Alert } from 'components/Alert'
+import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
 import { alertService } from 'lib/alert';
 import { eventSchema } from 'schemas/event';
@@ -18,7 +20,7 @@ const checkboxClassnames = "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border
 
 const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
-  const { register, handleSubmit, reset, formState } = useForm(formOptions);
+  const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
   const { errors } = formState;
   const [ isSubmitted, setIsSubmitted ] = useState(false)
   const [ messageDialogState, setMessageDialogState ] = useState({
@@ -27,6 +29,34 @@ const CalendarForm: NextPage = () => {
     title: "",
     message: "",
   });
+  const event = {
+      title: "FENFIT",
+      link: "https://www.example.com",
+      startDate: "2022-04-23",
+      endDate: "",
+      frequency: "",
+      city: "Itaunas",
+      country: "Brazil",
+      tags: [
+        "party",
+        "class",
+      ],
+  }
+  const [ previewState, setPreviewState ] = useState(event);
+
+  watch((data: any, options) => {
+      const newEvent = {
+          title: data.title|| event.title,
+          link: data.link || event.link,
+          startDate: data.startDate || event.startDate,
+          endDate: data.endDate || event.endDate,
+          frequency: data.frequency || event.frequency,
+          city: data.city || event.city,
+          country: data.country || event.country,
+          tags: data.tags || event.tags,
+      }
+      setPreviewState(newEvent)
+  })
 
   async function submitForm(formData: object) {
       if (isSubmitted) return false
@@ -73,14 +103,28 @@ const CalendarForm: NextPage = () => {
       return false;
   }
 
+  const togglePreview = (el: any) => {
+    const elements = document.querySelectorAll('[data-event-preview]');
+    for (let element of elements) {
+        if (element.offsetParent) {
+            element.classList.add("hidden")
+        }
+        else {
+            element.classList.remove("hidden")
+        }
+    }
+  }
+
   return (
     <>
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
         New event
       </h1>
-      <div className="md:grid md:grid-cols-3 md:gap-4">
-        <div className="md:col-span-3">
-          <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+
+      <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+
+      <div className="relative md:grid md:grid-cols-4 md:gap-4">
+        <div className="md:col-span-2">
           <form onSubmit={handleSubmit(submitForm)} method="POST">
             <div className="shadow sm:rounded-md sm:overflow-hidden">
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
@@ -88,7 +132,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4 md:col-span-2">
                     <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">Title</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder="Untitled" />
+                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder={`${event.title}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
                   </div>
@@ -96,7 +140,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4">
                     <label htmlFor="event-link" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder="https://www.example.com" />
+                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder={`${event.link}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.link?.message}</p>
                   </div>
@@ -104,7 +148,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder={`${event.startDate}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.startDate?.message}</p>
                   </div>
@@ -112,7 +156,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder="23.04.2022" />
+                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder={`${event.endDate}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
                   </div>
@@ -135,7 +179,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder="Itaunas" />
+                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder={`${event.city}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
                     </div>
@@ -143,7 +187,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-country" className="block text-sm font-medium text-gray-700">Country</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder="Brazil" />
+                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder={`${event.country}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
                     </div>
@@ -204,6 +248,7 @@ const CalendarForm: NextPage = () => {
               </div>
       
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <button type="button" onClick={togglePreview} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
                 <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitted && "cursor-not-allowed"}`} disabled={isSubmitted}>
                     {isSubmitted && 
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -211,11 +256,20 @@ const CalendarForm: NextPage = () => {
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     }
-                    {isSubmitted ? "Processing" : "Save" }
+                    {isSubmitted ? "Processing" : "Send" }
                 </button>
               </div>
             </div>
           </form>
+        </div>
+        <div className="hidden relative md:block md:col-span-2">
+          <EventPreview eventData={previewState} />
+        </div>
+
+        <div data-event-preview className="hidden fixed inset-0 bg-black/20" aria-hidden="true" onClick={togglePreview} />
+        <div data-event-preview className="hidden w-5/6 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl">
+          <XIcon className="h-8 w-8 absolute top-2 right-2 inline cursor-pointer" onClick={togglePreview} />
+          <EventPreview eventData={previewState} />
         </div>
       </div>
     </>
