@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { XIcon } from '@heroicons/react/outline'
 
 import { Alert } from 'components/Alert'
 import { EventPreview } from 'components/EventPreview'
@@ -102,6 +103,18 @@ const CalendarForm: NextPage = () => {
       return false;
   }
 
+  const togglePreview = (el: any) => {
+    const elements = document.querySelectorAll('[data-event-preview]');
+    for (let element of elements) {
+        if (element.offsetParent) {
+            element.classList.add("hidden")
+        }
+        else {
+            element.classList.remove("hidden")
+        }
+    }
+  }
+
   return (
     <>
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
@@ -110,7 +123,7 @@ const CalendarForm: NextPage = () => {
 
       <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
 
-      <div className="md:grid md:grid-cols-4 md:gap-4">
+      <div className="relative md:grid md:grid-cols-4 md:gap-4">
         <div className="md:col-span-2">
           <form onSubmit={handleSubmit(submitForm)} method="POST">
             <div className="shadow sm:rounded-md sm:overflow-hidden">
@@ -235,6 +248,7 @@ const CalendarForm: NextPage = () => {
               </div>
       
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <button type="button" onClick={togglePreview} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
                 <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitted && "cursor-not-allowed"}`} disabled={isSubmitted}>
                     {isSubmitted && 
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -242,13 +256,21 @@ const CalendarForm: NextPage = () => {
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     }
-                    {isSubmitted ? "Processing" : "Save" }
+                    {isSubmitted ? "Processing" : "Send" }
                 </button>
               </div>
             </div>
           </form>
         </div>
-        <EventPreview eventData={previewState} />
+        <div className="hidden relative md:block md:col-span-2">
+          <EventPreview eventData={previewState} />
+        </div>
+
+        <div data-event-preview className="hidden fixed inset-0 bg-black/20" aria-hidden="true" onClick={togglePreview} />
+        <div data-event-preview className="hidden w-5/6 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl">
+          <XIcon className="h-8 w-8 absolute top-2 right-2 inline cursor-pointer" onClick={togglePreview} />
+          <EventPreview eventData={previewState} />
+        </div>
       </div>
     </>
   )

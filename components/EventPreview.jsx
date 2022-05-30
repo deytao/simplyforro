@@ -15,25 +15,21 @@ export const EventPreview = ({eventData}) => {
   let startDate = moment(eventData.startDate)
   let endDate = moment(eventData.endDate)
   return (
-    <div className="md:col-span-2">
-      <h2 className="text-2xl font-bold py-4">Preview</h2>
-
+    <>
       {/* UNIQUE */}
       {(startDate == endDate || !endDate.isValid()) && 
-        <div className="flex gap-2">
-          <div className="w-1/3">
-            <span className="text-sm inline-block w-full">{startDate.format("DD MMM")}</span>
-            <div className="shadow rounded-md p-2">
-              <div className="font-bold">{eventData.title}</div>
-              <div className="text-sm">{eventData.city}, {eventData.country}</div>
-              {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
-            </div>
+        <div className="w-1/3 m-auto absolute top-1/2 -translate-y-1/2">
+          <span className="text-sm inline-block w-full">{startDate.format("DD MMM")}</span>
+          <div className="shadow rounded-md p-2">
+            <div className="font-bold">{eventData.title}</div>
+            <div className="text-sm">{eventData.city}, {eventData.country}</div>
+            {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
           </div>
         </div>}
 
       {/* REPEAT */}
       {startDate.isBefore(endDate) && eventData.frequency && 
-        <div className="flex gap-2">
+        <div className="flex gap-2 m-auto absolute top-1/2 -translate-y-1/2 w-full">
           <div className="shadow rounded-md w-1/3 p-2">
             <span className="text-sm inline-block w-full text-right">{startDate.format("DD MMM")}</span>
             <div className="font-bold">{eventData.title}</div>
@@ -56,7 +52,7 @@ export const EventPreview = ({eventData}) => {
 
       {/* RANGE */}
       {startDate.isBefore(endDate) && !eventData.frequency && 
-        <div className="shadow rounded-md w-full p-2">
+        <div className="shadow rounded-md w-full p-2 absolute top-1/2 -translate-y-1/2">
           <span className="text-sm inline-block w-1/3 text-right pr-2">{startDate.format("DD MMM")}</span>
           <span className="text-sm inline-block w-1/3 text-right pr-2">...</span>
           <span className="text-sm inline-block w-1/3 text-right pr-2">{endDate.format("DD MMM")}</span>
@@ -65,6 +61,6 @@ export const EventPreview = ({eventData}) => {
           {eventData.tags && eventData.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
         </div>}
 
-    </div>
+    </>
   )
 }
