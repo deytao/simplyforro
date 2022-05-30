@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -22,7 +22,7 @@ const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
   const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
   const { errors } = formState;
-  const [ isSubmitted, setIsSubmitted ] = useState(false)
+  const [ isSubmitting, setIsSubmitting ] = useState(false)
   const [ messageDialogState, setMessageDialogState ] = useState({
     isOpen: false,
     status: "",
@@ -58,9 +58,13 @@ const CalendarForm: NextPage = () => {
       setPreviewState(newEvent)
   })
 
+  useEffect(() => {
+      reset()
+  }, [isSubmitting])
+
   async function submitForm(formData: object) {
-      if (isSubmitted) return false
-      setIsSubmitted(true)
+      if (isSubmitting) return false
+      setIsSubmitting(true)
       const endpoint = '/api/calendar/event'
       const event = eventSchema.cast(formData)
       const JSONdata = JSON.stringify(event)
@@ -74,14 +78,13 @@ const CalendarForm: NextPage = () => {
       }
       await fetch(endpoint, options)
         .then(response => {
-            setIsSubmitted(false)
+            setIsSubmitting(false)
             if (!response.ok) {
                 throw new Error("An error occured, please try again later.")
             }
             return response.json()
         })
         .then(data => {
-            reset()
             setMessageDialogState({
               isOpen: true,
               status: "success",
@@ -203,8 +206,10 @@ const CalendarForm: NextPage = () => {
                         <input id="tags-party" {...register("tags")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="party" className="font-medium text-gray-700">Party</label>
-                        <p className="text-gray-500">Event where a DJ and/or a band is playing the music</p>
+                        <label htmlFor="tags-party" className="font-medium text-gray-700">
+                            Party
+                            <p className="text-gray-500 font-normal">Event where a DJ and/or a band is playing the music</p>
+                        </label>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -212,8 +217,10 @@ const CalendarForm: NextPage = () => {
                         <input id="tags-pratica" {...register("tags")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-pratica" className="font-medium text-gray-700">Pratica</label>
-                        <p className="text-gray-500">Event where participants are handling the music and practicing steps</p>
+                        <label htmlFor="tags-pratica" className="font-medium text-gray-700">
+                            Pratica
+                            <p className="text-gray-500 font-normal">Event where participants are handling the music and practicing steps</p>
+                        </label>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -221,8 +228,10 @@ const CalendarForm: NextPage = () => {
                         <input id="tags-class" {...register("tags")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-class" className="font-medium text-gray-700">Class</label>
-                        <p className="text-gray-500">Regular event where a teacher is showing new steps or concepts</p>
+                        <label htmlFor="tags-class" className="font-medium text-gray-700">
+                            Class
+                            <p className="text-gray-500 font-normal">Regular event where a teacher is showing new steps or concepts</p>
+                        </label>
                       </div>
                     </div>
                    <div className="flex items-start">
@@ -230,8 +239,10 @@ const CalendarForm: NextPage = () => {
                         <input id="tags-workshop" {...register("tags")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-workshop" className="font-medium text-gray-700">Workshop</label>
-                        <p className="text-gray-500">Ponctual event where a guest teacher is handling the class</p>
+                        <label htmlFor="tags-workshop" className="font-medium text-gray-700">
+                            Workshop
+                            <p className="text-gray-500 font-normal">Ponctual event where a guest teacher is handling the class</p>
+                        </label>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -239,8 +250,10 @@ const CalendarForm: NextPage = () => {
                         <input id="tags-festival" {...register("tags")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-festival" className="font-medium text-gray-700">Festival</label>
-                        <p className="text-gray-500">Event generally happening over few days with workshops and parties</p>
+                        <label htmlFor="tags-festival" className="font-medium text-gray-700">
+                            Festival
+                            <p className="text-gray-500 font-normal">Event generally happening over few days with workshops and parties</p>
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -249,14 +262,14 @@ const CalendarForm: NextPage = () => {
       
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                 <button type="button" onClick={togglePreview} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
-                <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitted && "cursor-not-allowed"}`} disabled={isSubmitted}>
-                    {isSubmitted && 
+                <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting && "cursor-not-allowed"}`} disabled={isSubmitting}>
+                    {isSubmitting && 
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     }
-                    {isSubmitted ? "Processing" : "Send" }
+                    {isSubmitting ? "Processing" : "Send" }
                 </button>
               </div>
             </div>
