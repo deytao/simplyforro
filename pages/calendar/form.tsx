@@ -104,15 +104,15 @@ const CalendarForm: NextPage = () => {
   }
 
   const togglePreview = (el: any) => {
-    const elements = document.querySelectorAll('[data-event-preview]');
-    for (let element of elements) {
-        if (element.offsetParent) {
-            element.classList.add("hidden")
+    const elements = document.querySelectorAll('[data-event-preview]') as NodeListOf<HTMLElement>;
+    elements.forEach((el) => {
+        if (el.offsetParent) {
+            el.classList.add("hidden")
         }
         else {
-            element.classList.remove("hidden")
+            el.classList.remove("hidden")
         }
-    }
+    })
   }
 
   return (
