@@ -275,13 +275,13 @@ const CalendarForm: NextPage = () => {
             </div>
           </form>
         </div>
-        <div className="hidden relative md:block md:col-span-2">
+        <div className="hidden relative shadow p-2 md:block md:col-span-2">
           <EventPreview eventData={previewState} />
         </div>
 
         <div data-event-preview className="hidden fixed inset-0 bg-black/20" aria-hidden="true" onClick={togglePreview} />
-        <div data-event-preview className="hidden w-5/6 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl">
-          <XIcon className="h-8 w-8 absolute top-2 right-2 inline cursor-pointer" onClick={togglePreview} />
+        <div data-event-preview className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl">
+          <XIcon className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer" onClick={togglePreview} />
           <EventPreview eventData={previewState} />
         </div>
       </div>

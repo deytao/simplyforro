@@ -2,17 +2,16 @@ import Link from 'next/link'
 import { useState } from "react"
 import { ExternalLinkIcon, MenuIcon } from '@heroicons/react/outline'
 
-export { Navbar }
 
-function Navbar() {
+export function Navbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-menu p-6">
-      <div className="flex items-center flex-shrink-0 text-white mr-6">
+    <nav className="flex items-center justify-between flex-wrap bg-menu p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
+      <div className="flex items-center flex-shrink-0 text-white md:mr-6">
         <Link href="/">
           <a>
-            <img src="/simplyforro.gif" alt="SimpyForró" title="SimpyForró" className="object-scale-down h-8 inline mr-2" />
+            <img src="/simplyforro.gif" alt="SimpyForró" title="SimpyForró" className="object-scale-down h-8 inline mr-2 -mt-1" />
             <span className="font-semibold text-xl tracking-tight">SimplyForró</span>
           </a>
         </Link>
