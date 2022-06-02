@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 
-import { alertService, AlertType } from '../lib/alert.js';
+import { alertService, AlertType } from 'lib/alert.js';
 
 export { Alert };
 

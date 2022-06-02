@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { Event } from 'schemas/event';
-import { createPage } from './notion';
+import { createPage } from 'lib/notion';
 
 
 const frequencyIntervals: {[key: string]: object} = {
