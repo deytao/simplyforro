@@ -18,6 +18,13 @@ enum Category {
     festival
 }
 
+enum Frequency {
+    daily
+    weekly
+    biweekly
+    monthly
+}
+
 model Event {
   id            Int         @id @default(autoincrement())
   createdAt     DateTime    @default(now())
@@ -25,6 +32,8 @@ model Event {
   title         String      @db.VarChar(255)
   start_at      DateTime    @db.Timestamptz
   end_at        DateTime?   @db.Timestamptz
+  frequency     Frequency?
+  excluded_on   DateTime[]  @db.Date
   url           String?
   city          String      @db.VarChar(255)
   country       String      @db.VarChar(255)
