@@ -1,7 +1,11 @@
 import moment from 'moment';
+import { PrismaClient } from '@prisma/client'
 
 import { Event } from 'schemas/event';
 import { createPage } from 'lib/notion';
+
+
+const prisma = new PrismaClient({})
 
 
 const frequencyIntervals: {[key: string]: object} = {
@@ -70,6 +74,17 @@ export async function CreateEvent(event: Event) {
                 },
             },
         );
+        let result = await prisma.event.create({
+            data: {
+                title: event.title,
+                url: event.link ? event.link : null,
+                start_at: moment(startDate).toDate(),
+                end_at: endDate === startDate ? null : moment(endDate).toDate(),
+                city: event.city,
+                country: event.country,
+                categories: event.tags,
+            }
+        })
         pagesCount = pagesCount + 1
     }
     return pagesCount

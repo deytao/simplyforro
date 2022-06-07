@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import { CreateEvent } from 'lib/calendar';
 
 export default async function handler(
