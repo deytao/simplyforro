@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import { ArrowSmRightIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+import { ArrowSmRightIcon } from '@heroicons/react/outline'
 
 import { getNextEvents } from 'lib/notion'
 
@@ -47,10 +47,11 @@ const Home: NextPage<Props> = ({ events }) => {
               </div>
             ))}
         </div>
-        <a href={`https://simplyforro.notion.site/${process.env.NOTION_CALENDAR_DATABASE_ID}`} className="mt-4 text-xl hover:text-blue-600 focus:text-blue-600" target="_blank">
-          See all
-          <ExternalLinkIcon className="h-4 w-4 ml-0.5 -mt-0.5 inline"/>
-        </a>
+        <Link href="/calendar">
+          <a className="mt-4 text-xl hover:text-blue-600 focus:text-blue-600">
+            See all
+          </a>
+        </Link>
       </div>
 
       <Link href="/calendar/form">
