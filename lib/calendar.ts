@@ -17,7 +17,7 @@ export async function CreateEvent(event: Event) {
             url: event.link ? event.link : null,
             start_at: startDate.toDate(),
             end_at: endDate.isValid() ? endDate.toDate() : null,
-            frequency: event.frequency,
+            frequency: event.frequency ? event.frequency : null,
             city: event.city,
             country: event.country,
             categories: event.tags,

@@ -2,9 +2,9 @@ import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
-import { ArrowSmRightIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 
-import { getNextEvents } from 'lib/notion'
+import prisma from 'lib/prisma'
 
 
 interface Props {
@@ -13,11 +13,18 @@ interface Props {
 
 
 export const getStaticProps = async () => {
-  const events = await getNextEvents(`${process.env.NOTION_CALENDAR_DATABASE_ID}`);
+  const events = await prisma.event.findMany()
 
   return {
     props: {
-      events: events,
+      events: events.map((event, idx) => {
+          return {
+            title: event.title,
+            url: event.url,
+            start_at: event.start_at.toString(),
+            end_at: event.end_at,
+          }
+      }),
     },
     // Next.js will attempt to re-generate the page:
     // - When a request comes in
@@ -39,12 +46,23 @@ const Calendar: NextPage<Props> = ({ events }) => {
         day.add(1, "day")
       }
   }
+
   return (
     <>
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
         Calendar
       </h1>
-      <div className="mt-6 grid grid-cols-7 w-full border-b border-r">
+
+      <div className="grid grid-cols-2 w-full">
+        <div className="text-left text-sm font-bold">{currentMonth.format("MMMM YYYY")}</div>
+        <div className="text-right">
+            <ChevronLeftIcon onClick={() => setCurrentMonth(moment(currentMonth).subtract(1, "month"))} className="inline-block px-1 rounded text-slate-500 h-6 hover:bg-slate-200 hover:cursor-pointer" />
+            <span onClick={() => setCurrentMonth(moment())} className="inline-block px-1 rounded hover:bg-slate-200 hover:cursor-pointer">Today</span>
+            <ChevronRightIcon onClick={() => setCurrentMonth(moment(currentMonth).add(1, "month"))} className="inline-block px-1 rounded text-slate-500 h-6 hover:bg-slate-200 hover:cursor-pointer" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-7 w-full border-b border-r">
         <div className="text-sm text-slate-500 text-center">Mon</div>
         <div className="text-sm text-slate-500 text-center">Tue</div>
         <div className="text-sm text-slate-500 text-center">Wed</div>
@@ -54,7 +72,7 @@ const Calendar: NextPage<Props> = ({ events }) => {
         <div className="text-sm text-slate-500 text-center">Sun</div>
 
         {monthDays.map((day, idx) => {
-            return <div key={`${idx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
+            return <div key={`${idx}`} className={`border border-b-0 border-r-0 text-right h-10 ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
         })}
       </div>
     </>
