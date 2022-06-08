@@ -23,3 +23,8 @@ export async function CreateEvent(event: Event) {
     })
     return result
 }
+
+export async function GetEvents() {
+    const events = await prisma.event.findMany()
+    return events
+}

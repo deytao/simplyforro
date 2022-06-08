@@ -1,28 +1,31 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 
-import prisma from 'lib/prisma'
+import { EventDetails } from 'components/EventPreview'
+import { GetEvents } from 'lib/calendar'
 
 
 interface Props {
-    events: any
+    staticEvents: any
 }
 
-
 export const getStaticProps = async () => {
-  const events = await prisma.event.findMany()
+  const events = await GetEvents()
 
   return {
     props: {
-      events: events.map((event, idx) => {
+      staticEvents: events.map((event: any, idx: number) => {
           return {
             title: event.title,
             url: event.url,
             start_at: event.start_at.toString(),
             end_at: event.end_at,
+            city: event.city,
+            country: event.country,
+            tags: event.categories,
           }
       }),
     },
@@ -34,7 +37,7 @@ export const getStaticProps = async () => {
 };
 
 
-const Calendar: NextPage<Props> = ({ events }) => {
+const Calendar: NextPage<Props> = ({ staticEvents }) => {
   const [ currentMonth, setCurrentMonth ] = useState(moment())
   const startOfMonth = moment(currentMonth).startOf("month")
   const endOfMonth = moment(currentMonth).endOf("month")
@@ -72,7 +75,12 @@ const Calendar: NextPage<Props> = ({ events }) => {
         <div className="text-sm text-slate-500 text-center">Sun</div>
 
         {monthDays.map((day, idx) => {
-            return <div key={`${idx}`} className={`border border-b-0 border-r-0 text-right h-10 ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
+            return (
+                <div key={`${idx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>
+                    {day.format("D") == "1" && day.format("MMM")} {day.format("D")}
+                    {idx % 2 == 0 && <EventDetails event={staticEvents[0]} /> }
+                </div>
+            )
         })}
       </div>
     </>
