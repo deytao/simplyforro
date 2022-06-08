@@ -12,7 +12,7 @@ export async function CreateEvent(event: Event) {
     let result = await prisma.event.create({
         data: {
             ...event,
-            url: event.link ? event.link : null,
+            url: event.url ? event.url : null,
             start_at: startDate.toDate(),
             end_at: endDate.isValid() ? endDate.toDate() : null,
             frequency: event.frequency ? event.frequency : null,

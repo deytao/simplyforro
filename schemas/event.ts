@@ -52,7 +52,7 @@ export const eventSchema = yup.object({
     .nullable()
     .transform((curr, orig) => orig === false ? null : curr)
     .required("You need to choose at least one category"),
-  link: yup.string().url().nullable(),
+  url: yup.string().url().nullable(),
 });
 
 export interface Event extends yup.InferType<typeof eventSchema> {}

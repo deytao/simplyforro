@@ -31,7 +31,7 @@ const CalendarForm: NextPage = () => {
   });
   const event = {
       title: "FENFIT",
-      link: "https://www.example.com",
+      url: "https://www.example.com",
       startDate: "2022-04-23",
       endDate: "",
       frequency: "",
@@ -47,7 +47,7 @@ const CalendarForm: NextPage = () => {
   watch((data: any, options) => {
       const newEvent = {
           title: data.title|| event.title,
-          link: data.link || event.link,
+          url: data.url || event.url,
           startDate: data.startDate || event.startDate,
           endDate: data.endDate || event.endDate,
           frequency: data.frequency || event.frequency,
@@ -57,10 +57,6 @@ const CalendarForm: NextPage = () => {
       }
       setPreviewState(newEvent)
   })
-
-  useEffect(() => {
-      reset()
-  }, [isSubmitting])
 
   async function submitForm(formData: object) {
       if (isSubmitting) return false
@@ -78,13 +74,13 @@ const CalendarForm: NextPage = () => {
       }
       await fetch(endpoint, options)
         .then(response => {
-            setIsSubmitting(false)
             if (!response.ok) {
                 throw new Error("An error occured, please try again later.")
             }
             return response.json()
         })
         .then(data => {
+            reset()
             setMessageDialogState({
               isOpen: true,
               status: "success",
@@ -141,11 +137,11 @@ const CalendarForm: NextPage = () => {
                   </div>
 
                   <div className="col-span-4">
-                    <label htmlFor="event-link" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
+                    <label htmlFor="event-url" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder={`${event.link}`} />
+                      <input type="text" {...register("url")} id="event-url" className={`${commonClassnames} ${errors.url ? 'border-red-500' : ''}`} placeholder={`${event.url}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.link?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
