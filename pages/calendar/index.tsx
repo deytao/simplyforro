@@ -81,8 +81,8 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
         {monthDays.map((day, dayIdx) => {
             let hasEvents = day.format("YYYY-MM-DD") in monthEvents
             return (
-                <div key={`${dayIdx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>
-                    <div>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
+                <div key={`${dayIdx}`} className={`${["6", "7"].includes(day.format("E")) ? "bg-slate-100 " : ""}border border-b-0 border-r-0 overflow-visible`}>
+                    <div className="text-right">{day.format("D") == "1" && day.format("MMM ")}{day.format("D")}</div>
                     {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event, eventIdx) => <EventDetails key={`${eventIdx}`} event={event} />)}
                 </div>
             )
