@@ -1,10 +1,8 @@
 import moment from 'moment';
 import { PrismaClient } from '@prisma/client'
 
+import prisma from 'lib/prisma';
 import { Event } from 'schemas/event';
-
-
-const prisma = new PrismaClient({})
 
 
 export async function CreateEvent(event: Event) {
