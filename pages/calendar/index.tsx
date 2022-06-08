@@ -46,6 +46,14 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
       }
   }
 
+  const monthEvents: {[k: string]: {}[]} = {}
+  staticEvents.forEach((event: any) => {
+      if (!(event.stat_at in monthEvents)) {
+          monthEvents[event.start_at] = []
+      }
+      monthEvents[event.start_at].push(event)
+  })
+
   return (
     <>
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
@@ -70,11 +78,12 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
         <div className="text-sm text-slate-500 text-center">Sat</div>
         <div className="text-sm text-slate-500 text-center">Sun</div>
 
-        {monthDays.map((day, idx) => {
+        {monthDays.map((day, dayIdx) => {
+            let hasEvents = day.format("YYYY-MM-DD") in monthEvents
             return (
-                <div key={`${idx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>
-                    {day.format("D") == "1" && day.format("MMM")} {day.format("D")}
-                    {idx % 2 == 0 && <EventDetails event={staticEvents[0]} /> }
+                <div key={`${dayIdx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>
+                    <div>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
+                    {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event, eventIdx) => <EventDetails key={`${eventIdx}`} event={staticEvents[0]} />)}
                 </div>
             )
         })}
