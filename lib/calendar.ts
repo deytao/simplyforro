@@ -11,20 +11,28 @@ export async function CreateEvent(event: Event) {
 
     let result = await prisma.event.create({
         data: {
-            title: event.title,
+            ...event,
             url: event.link ? event.link : null,
             start_at: startDate.toDate(),
             end_at: endDate.isValid() ? endDate.toDate() : null,
             frequency: event.frequency ? event.frequency : null,
-            city: event.city,
-            country: event.country,
-            categories: event.tags,
         }
     })
     return result
 }
 
 export async function GetEvents() {
-    const events = await prisma.event.findMany()
+    const events = await prisma.event.findMany({
+        select: {
+            title: true,
+            url: true,
+            start_at: true,
+            end_at: true,
+            frequency: true,
+            city: true,
+            country: true,
+            categories: true,
+        },
+    })
     return events
 }

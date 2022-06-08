@@ -19,13 +19,9 @@ export const getStaticProps = async () => {
     props: {
       staticEvents: events.map((event: any, idx: number) => {
           return {
-            title: event.title,
-            url: event.url,
-            start_at: event.start_at.toString(),
-            end_at: event.end_at,
-            city: event.city,
-            country: event.country,
-            tags: event.categories,
+            ...event,
+            start_at: moment(event.start_at).format("YYYY-MM-DD"),
+            end_at: moment(event.end_at).format("YYYY-MM-DD"),
           }
       }),
     },
