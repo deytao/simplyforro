@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useState } from 'react'
 
 
-const tagClasses = {
+const categoryClasses = {
     "party": "text-red-900 bg-red-100",
     "pratica": "text-blue-900 bg-blue-100",
     "class": "text-purple-900 bg-purple-100",
@@ -14,7 +14,7 @@ export const EventDetails = ({event}) => (
   <div className="shadow border rounded-md p-2 text-left m-1">
     <div className="text-sm font-bold">{event.title}</div>
     <div className="text-sm">{event.city}, {event.country}</div>
-    {event.tags && event.tags.map((tag, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${tagClasses[tag]}`}>{tag}</span>)}
+    {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${categoryClasses[category]}`}>{category}</span>)}
   </div>
 )
 

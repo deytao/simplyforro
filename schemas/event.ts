@@ -8,7 +8,7 @@ const toISODateOrNull = (currentValue: string, originalValue: string) => {
 }
 
 
-export const tags = ["party", "pratica", "class", "workshop", "festival"]
+export const categories = ["party", "pratica", "class", "workshop", "festival"]
 export const frequencies = ["", "daily", "weekly", "biweekly", "monthly"]
 
 export const eventSchema = yup.object({
@@ -46,9 +46,9 @@ export const eventSchema = yup.object({
     .oneOf(frequencies),
   city: yup.string().required("A city is required"),
   country: yup.string().required("A country is required"),
-  tags: yup
+  categories: yup
     .array()
-    .of(yup.string().oneOf(tags))
+    .of(yup.string().oneOf(categories))
     .nullable()
     .transform((curr, orig) => orig === false ? null : curr)
     .required("You need to choose at least one category"),

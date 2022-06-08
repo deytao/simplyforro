@@ -37,7 +37,7 @@ const CalendarForm: NextPage = () => {
       frequency: "",
       city: "Itaunas",
       country: "Brazil",
-      tags: [
+      categories: [
         "party",
         "class",
       ],
@@ -53,7 +53,7 @@ const CalendarForm: NextPage = () => {
           frequency: data.frequency || event.frequency,
           city: data.city || event.city,
           country: data.country || event.country,
-          tags: data.tags || event.tags,
+          categories: data.categories || event.categories,
       }
       setPreviewState(newEvent)
   })
@@ -199,14 +199,14 @@ const CalendarForm: NextPage = () => {
 
                 <fieldset>
                   <legend className="text-base font-medium text-gray-900">Category</legend>
-                  <p className="text-red-500 text-xs italic">{errors.tags?.message}</p>
+                  <p className="text-red-500 text-xs italic">{errors.categories?.message}</p>
                   <div className="mt-4 space-y-4">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-party" {...register("tags")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-party" {...register("categories")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-party" className="font-medium text-gray-700">
+                        <label htmlFor="categories-party" className="font-medium text-gray-700">
                             Party
                             <p className="text-gray-500 font-normal">Event where a DJ and/or a band is playing the music</p>
                         </label>
@@ -214,10 +214,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-pratica" {...register("tags")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-pratica" {...register("categories")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-pratica" className="font-medium text-gray-700">
+                        <label htmlFor="categories-pratica" className="font-medium text-gray-700">
                             Pratica
                             <p className="text-gray-500 font-normal">Event where participants are handling the music and practicing steps</p>
                         </label>
@@ -225,10 +225,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-class" {...register("tags")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-class" {...register("categories")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-class" className="font-medium text-gray-700">
+                        <label htmlFor="categories-class" className="font-medium text-gray-700">
                             Class
                             <p className="text-gray-500 font-normal">Regular event where a teacher is showing new steps or concepts</p>
                         </label>
@@ -236,10 +236,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                    <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-workshop" {...register("tags")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-workshop" {...register("categories")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-workshop" className="font-medium text-gray-700">
+                        <label htmlFor="categories-workshop" className="font-medium text-gray-700">
                             Workshop
                             <p className="text-gray-500 font-normal">Ponctual event where a guest teacher is handling the class</p>
                         </label>
@@ -247,10 +247,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-festival" {...register("tags")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-festival" {...register("categories")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-festival" className="font-medium text-gray-700">
+                        <label htmlFor="categories-festival" className="font-medium text-gray-700">
                             Festival
                             <p className="text-gray-500 font-normal">Event generally happening over few days with workshops and parties</p>
                         </label>
