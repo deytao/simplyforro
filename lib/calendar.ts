@@ -6,15 +6,15 @@ import { Event } from 'schemas/event';
 
 
 export async function CreateEvent(event: Event) {
-    let startDate: moment.Moment = moment(event.startDate)
-    let endDate: moment.Moment = moment(event.endDate)
+    let start_at: moment.Moment = moment(event.start_at)
+    let end_at: moment.Moment = moment(event.end_at)
 
     let result = await prisma.event.create({
         data: {
             ...event,
             url: event.url ? event.url : null,
-            start_at: startDate.toDate(),
-            end_at: endDate.isValid() ? endDate.toDate() : null,
+            start_at: start_at.toDate(),
+            end_at: end_at.isValid() ? end_at.toDate() : null,
             frequency: event.frequency ? event.frequency : null,
         }
     })

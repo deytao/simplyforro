@@ -32,8 +32,8 @@ const CalendarForm: NextPage = () => {
   const event = {
       title: "FENFIT",
       url: "https://www.example.com",
-      startDate: "2022-04-23",
-      endDate: "",
+      start_at: "2022-04-23",
+      end_at: "",
       frequency: "",
       city: "Itaunas",
       country: "Brazil",
@@ -48,8 +48,8 @@ const CalendarForm: NextPage = () => {
       const newEvent = {
           title: data.title|| event.title,
           url: data.url || event.url,
-          startDate: data.startDate || event.startDate,
-          endDate: data.endDate || event.endDate,
+          start_at: data.start_at || event.start_at,
+          end_at: data.end_at || event.end_at,
           frequency: data.frequency || event.frequency,
           city: data.city || event.city,
           country: data.country || event.country,
@@ -57,6 +57,10 @@ const CalendarForm: NextPage = () => {
       }
       setPreviewState(newEvent)
   })
+
+  useEffect(() => {
+      reset()
+  }, [isSubmitting])
 
   async function submitForm(formData: object) {
       if (isSubmitting) return false
@@ -80,7 +84,7 @@ const CalendarForm: NextPage = () => {
             return response.json()
         })
         .then(data => {
-            reset()
+            setIsSubmitting(false)
             setMessageDialogState({
               isOpen: true,
               status: "success",
@@ -147,17 +151,17 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder={`${event.startDate}`} />
+                      <input type="date" {...register("start_at")} id="event-start-date" className={`${commonClassnames} ${errors.start_at ? 'border-red-500' : ''}`} placeholder={`${event.start_at}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.startDate?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.start_at?.message}</p>
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder={`${event.endDate}`} />
+                      <input type="date" {...register("end_at")} id="event-end-date" className={`${commonClassnames} ${errors.end_at ? 'border-red-500' : ''}`} placeholder={`${event.end_at}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.end_at?.message}</p>
                   </div>
 
                   <div className="col-span-4 md:col-span-2">

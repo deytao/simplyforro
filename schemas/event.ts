@@ -13,21 +13,21 @@ export const frequencies = ["", "daily", "weekly", "biweekly", "monthly"]
 
 export const eventSchema = yup.object({
   title: yup.string().required("A title is required"),
-  startDate: yup
+  start_at: yup
   .string()
   .nullable()
   .transform(toISODateOrNull)
   .required("A valid date is required"),
-  endDate: yup
+  end_at: yup
   .string()
   .nullable()
   .transform(toISODateOrNull)
   .test((value: any, context) => {
-      let startDate = moment(context.parent.startDate)
-      let endDate = moment(value)
+      let start_at = moment(context.parent.start_at)
+      let end_at = moment(value)
       let frequency = context.parent.frequency
-      if (endDate.isValid()) {
-          if (endDate.isSameOrAfter(startDate)) {
+      if (end_at.isValid()) {
+          if (end_at.isSameOrAfter(start_at)) {
               return true
           }
           return context.createError({ message: "The date needs to be later than the start" })

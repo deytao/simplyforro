@@ -48,7 +48,7 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
 
   const monthEvents: {[k: string]: {}[]} = {}
   staticEvents.forEach((event: any) => {
-      if (!(event.stat_at in monthEvents)) {
+      if (!(event.start_at in monthEvents)) {
           monthEvents[event.start_at] = []
       }
       monthEvents[event.start_at].push(event)
@@ -83,7 +83,7 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
             return (
                 <div key={`${dayIdx}`} className={`border border-b-0 border-r-0 text-right ${["6", "7"].includes(day.format("E")) && "bg-slate-100"}`}>
                     <div>{day.format("D") == "1" && day.format("MMM")} {day.format("D")}</div>
-                    {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event, eventIdx) => <EventDetails key={`${eventIdx}`} event={staticEvents[0]} />)}
+                    {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event, eventIdx) => <EventDetails key={`${eventIdx}`} event={event} />)}
                 </div>
             )
         })}
