@@ -37,13 +37,15 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
   const [ currentMonth, setCurrentMonth ] = useState(moment())
   const startOfMonth = moment(currentMonth).startOf("month")
   const endOfMonth = moment(currentMonth).endOf("month")
-  const monthDays = []
-  for (let week = moment(startOfMonth); week.isSameOrBefore(endOfMonth); week.add(1, "week")) {
-      let day = moment(week).startOf("isoWeek")
+  const monthWeeks: moment.Moment[][] = []
+  for (let dayOfMonth = moment(startOfMonth); dayOfMonth.isSameOrBefore(endOfMonth); dayOfMonth.add(1, "week")) {
+      let dayOfWeek = moment(dayOfMonth).startOf("isoWeek")
+      let week = []
       for (let i = 0; i < 7; i++) {
-        monthDays.push(moment(day))
-        day.add(1, "day")
+        week.push(moment(dayOfWeek))
+        dayOfWeek.add(1, "day")
       }
+      monthWeeks.push(week)
   }
 
   const monthEvents: {[k: string]: {}[]} = {}
@@ -51,7 +53,11 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
       if (!(event.start_at in monthEvents)) {
           monthEvents[event.start_at] = []
       }
-      monthEvents[event.start_at].push(event)
+      monthEvents[event.start_at].push({
+          ...event,
+          start_at: moment(event.start_at),
+          end_at: moment(event.end_at),
+      })
   })
 
   return (
@@ -78,12 +84,27 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
         <div className="text-sm text-slate-500 text-center">Sat</div>
         <div className="text-sm text-slate-500 text-center">Sun</div>
 
-        {monthDays.map((day, dayIdx) => {
-            let hasEvents = day.format("YYYY-MM-DD") in monthEvents
+        {monthWeeks.map((week: moment.Moment[], weekIdx: number) => {
+            let maxEventPerDay = Math.max(...week.map((day, idx) => day.format("YYYY-MM-DD") in monthEvents ? monthEvents[day.format("YYYY-MM-DD")].length : 0))
             return (
-                <div key={`${dayIdx}`} className={`${["6", "7"].includes(day.format("E")) ? "bg-slate-100 " : ""}border border-b-0 border-r-0 overflow-visible`}>
-                    <div className="text-right">{day.format("D") == "1" && day.format("MMM ")}{day.format("D")}</div>
-                    {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event, eventIdx) => <EventDetails key={`${eventIdx}`} event={event} />)}
+                <div className="relative col-span-7 grid grid-cols-7 min-h-[130px]" style={{height: (17 + 87 * maxEventPerDay) + "px"}}>
+                  {week.map((day: moment.Moment, dayIdx: number) => {
+                      let hasEvents = day.format("YYYY-MM-DD") in monthEvents
+                      return (
+                          <>
+                            <div key={`${weekIdx}-${dayIdx}`} className={`${["6", "7"].includes(day.format("E")) ? "bg-slate-100 " : ""}border border-b-0 border-r-0 flex flex-col`}>
+                                <div className="text-right">{day.format("D") == "1" && day.format("MMM ")}{day.format("D")}</div>
+                                {hasEvents && monthEvents[day.format("YYYY-MM-DD")].map((event: any, eventIdx: number) => {
+                                    let numberOfDay = event.end_at.isValid() ? event.end_at.diff(event.start_at, "days") : 1
+                                    return <EventDetails key={`${eventIdx}`} event={event} extraClasses={`absolute mt-2 z-50 bg-white`} extraStyles={{
+                                        top: (17 + 84 * eventIdx) + "px",
+                                        width: (265.15 * numberOfDay) + "px",
+                                    }} />
+                                })}
+                            </div>
+                          </>
+                      )
+                  })}
                 </div>
             )
         })}
