@@ -10,12 +10,16 @@ const categoryClasses = {
     "festival": "text-green-900 bg-green-100",
 }
 
-export const EventDetails = ({ event, extraClasses = "", extraStyles = {} }) => (
-  <div className={`shadow border rounded-md p-2 text-left m-1 ${extraClasses}`} style={extraStyles}>
+export const EventDetailsSimple = ({ event, className = "", style = {} }) => (
+  <div className={className} style={style}>
     <div className="text-sm font-bold">{event.title}</div>
     <div className="text-sm">{event.city}, {event.country}</div>
     {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${categoryClasses[category]}`}>{category}</span>)}
   </div>
+)
+
+export const EventDetails = ({ event, extraClasses = "", extraStyles = {} }) => (
+  <EventDetailsSimple event={event} className={`shadow border rounded-md p-2 text-left m-1 ${extraClasses}`} style={extraStyles} />
 )
 
 
