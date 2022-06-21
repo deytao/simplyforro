@@ -1,7 +1,6 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
-import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import { EventDetailsSimple } from 'components/EventPreview'
 import { GetEvents } from 'lib/calendar'
@@ -46,18 +45,10 @@ const Calendar: NextPage<Props> = ({ staticEvents }) => {
           components={{
             event: EventDetailsSimple,
           }}
-          eventPropGetter={(event, start, end, isSelected) => ({
-            event,
-            start,
-            end,
-            isSelected,
-            className: "shadow",
-          })}
           defaultDate={new Date()}
           defaultView="month"
           events={staticEvents}
           localizer={localizer}
-          showAllEvents
           startAccessor="start_at"
           endAccessor="end_at"
           style={{ height: "100vh", width: "100%" }}
