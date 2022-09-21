@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { PrismaClient } from '@prisma/client'
 
 import prisma from 'lib/prisma';
 import { Event } from 'schemas/event';
@@ -21,7 +20,7 @@ export async function CreateEvent(event: Event) {
     return result
 }
 
-export async function GetEvents() {
+export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment) {
     const events = await prisma.event.findMany({
         select: {
             title: true,
@@ -32,6 +31,28 @@ export async function GetEvents() {
             city: true,
             country: true,
             categories: true,
+        },
+        where: {
+            OR: [{
+                start_at: {
+                    gte: lbound.toDate(),
+                    lte: ubound.toDate(),
+                },
+            }, {
+                end_at: {
+                    gte: lbound.toDate(),
+                    lte: ubound.toDate(),
+                },
+            }, {
+                AND: [{
+                    start_at: {
+                        lte: lbound.toDate(),
+                    },
+                    end_at: {
+                        gte: ubound.toDate(),
+                    },
+                }],
+            }],
         },
     })
     return events
