@@ -13,7 +13,7 @@ const categoryClasses = {
 export const EventDetailsSimple = ({ event, className = "", style = {} }) => (
   <div className={className} style={style}>
     <div className="text-sm font-bold">
-        <a href={event.url}>{event.title}</a>
+        <a href={event.url} target="_blank">{event.title}</a>
     </div>
     <div className="text-sm">{event.city}, {event.country}</div>
     {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${categoryClasses[category]}`}>{category}</span>)}
