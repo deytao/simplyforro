@@ -48,7 +48,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories}) => {
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
                           <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeFilters} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
-                          <label htmlFor={`categories-${category}`}className="font-medium text-gray-700 capitalize">{category}</label>
+                          <label htmlFor={`categories-${category}`}className={`event-tag-${category} px-2 rounded capitalize`}>{category}</label>
                       </div>
                     ))}
                 </div>

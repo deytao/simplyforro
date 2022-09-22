@@ -7,7 +7,7 @@ export function Navbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-menu p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
+    <nav className="bg-menu flex items-center justify-between flex-wrap p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
       <div className="flex items-center flex-shrink-0 text-white md:mr-6">
         <Link href="/">
           <a>

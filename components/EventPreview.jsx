@@ -2,21 +2,13 @@ import moment from 'moment';
 import { useState } from 'react'
 
 
-const categoryClasses = {
-    "party": "text-red-900 bg-red-100",
-    "pratica": "text-blue-900 bg-blue-100",
-    "class": "text-purple-900 bg-purple-100",
-    "workshop": "text-orange-900 bg-orange-100",
-    "festival": "text-green-900 bg-green-100",
-}
-
 export const EventDetailsSimple = ({ event, className = "", style = {} }) => (
   <div className={className} style={style}>
     <div className="text-sm font-bold">
         <a href={event.url} target="_blank">{event.title}</a>
     </div>
     <div className="text-sm">{event.city}, {event.country}</div>
-    {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`text-xs inline-block px-2 mr-1 lowercase rounded ${categoryClasses[category]}`}>{category}</span>)}
+    {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
   </div>
 )
 
