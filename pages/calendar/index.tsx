@@ -17,18 +17,17 @@ moment.locale("en", {
 })
 const localizer = momentLocalizer(moment);
 
-const Toolbar = ({ label, onNavigate, selectedCategories}) => {
-  const prevMonth = () => {
-      onNavigate("PREV")
-  }
-  const currentMonth = () => {
-      onNavigate("TODAY")
-  }
-  const nextMonth = () => {
-      onNavigate("NEXT")
-  }
-  const changeFilters = () => {
-    onNavigate("test")
+const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
+  const prevMonth = () => onNavigate("PREV")
+  const currentMonth = () => onNavigate("TODAY")
+  const nextMonth = () => onNavigate("NEXT")
+  const changeFilters = () => onNavigate()
+  const taskId = undefined
+  const delayFTS = () => {
+      if (taskId) {
+          clearTimeout(taskId)
+      }
+      setTimeout(onNavigate, 600)
   }
   return (
       <>
@@ -43,7 +42,10 @@ const Toolbar = ({ label, onNavigate, selectedCategories}) => {
                     <ChevronRightIcon className="h-6 w-12"/>
                 </button>
             </div>
-            <div className="col-span-3">
+            <div className="col-span-3 flex justify-center hidden">
+              <input key="fts-field" type="text" onChange={changeFilters} value={ftsValue} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
+            </div>
+            <div className="col-span-7 md:col-span-3">
                 <div className="mt-2 flex items-center">
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
@@ -54,7 +56,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories}) => {
                 </div>
             </div>
             <div className="col-span-3 flex justify-center">
-              <input type="text" onChange={changeFilters} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-1/2 rounded sm:text-sm border-gray-300" />
+              <input key="fts-field" type="text" onChange={changeFilters} value={ftsValue} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-1/2 rounded sm:text-sm border-gray-300" data-filters-fts />
             </div>
         </div>
       </>
@@ -64,6 +66,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories}) => {
 const Calendar: NextPage = () => {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedCategories, setSelectedCategories] = useState(categories)
+    const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
     useEffect(() => {
         let lbound = moment(currentDate).startOf('month').startOf('week').format('YYYY-MM-DD')
@@ -73,17 +76,17 @@ const Calendar: NextPage = () => {
             `ubound=${encodeURIComponent(ubound)}`,
         ]
         let categories = ([...selectedCategories].map( (category) =>  `categories=${encodeURIComponent(category)}` ))
-        let params = [...dates, ...categories]
+        let params = [...dates, ...categories, `fts=${encodeURIComponent(ftsValue)}`]
         fetch(`/api/calendar/events?${params.join("&")}`)
           .then(res => res.json())
           .then(data => setEvents(data))
-      }, [currentDate, selectedCategories])
+      }, [currentDate, selectedCategories, ftsValue])
 
     return (
         <BigCalendar
           components={{
             event: EventDetailsSimple,
-            toolbar: (args) => Toolbar({...args, selectedCategories}),
+            toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
           }}
           defaultDate={currentDate}
           defaultView="month"
@@ -98,7 +101,9 @@ const Calendar: NextPage = () => {
           localizer={localizer}
           onNavigate={(newDate) => {
               let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
+              let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
               setSelectedCategories([...elements].map( (el) =>  el.value ))
+              setFTSValue(ftsInput ? ftsInput.value : "")
               setCurrentDate(newDate)
           }}
           startAccessor="start_at"

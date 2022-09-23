@@ -20,7 +20,7 @@ export async function CreateEvent(event: Event) {
     return result
 }
 
-export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: String[]) {
+export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: string[]) {
     const events = await prisma.event.findMany({
         select: {
             title: true,
