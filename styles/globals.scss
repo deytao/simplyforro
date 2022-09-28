@@ -35,12 +35,25 @@ $event-bg: #fff;
 $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
 @import 'react-big-calendar/lib/sass/styles';
 
+.rbc-today {
+    @extend .rbc-today;
+    @apply bg-violet-300;
+}
+
 .rbc-month-row {
     @extend .rbc-month-row;
     @apply grow;
     flex-basis: max-content;
     min-height: 130px;
     height: max-content;
+
+    &:nth-child(odd) {
+        @apply bg-slate-100;
+    }
+
+    &:nth-child(even) {
+        @apply bg-slate-50;
+    }
 }
 
 .rbc-event {
