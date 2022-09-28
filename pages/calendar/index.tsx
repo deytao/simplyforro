@@ -1,5 +1,6 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
+import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
@@ -16,6 +17,13 @@ moment.locale("en", {
     },
 })
 const localizer = momentLocalizer(moment);
+
+const frequencyIntervals: {[key: string]: object} = {
+    "daily": {"days": 1},
+    "weekly": {"weeks": 1},
+    "biweekly": {"weeks": 2},
+    "monthly": {"months": 1},
+}
 
 const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
   const prevMonth = () => onNavigate("PREV")
@@ -69,17 +77,38 @@ const Calendar: NextPage = () => {
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
     useEffect(() => {
-        let lbound = moment(currentDate).startOf('month').startOf('week').format('YYYY-MM-DD')
-        let ubound = moment(currentDate).endOf('month').endOf('week').format('YYYY-MM-DD')
+        let lbound = moment(currentDate).startOf('month').startOf('week')
+        let ubound = moment(currentDate).endOf('month').endOf('week')
         let dates = [
-            `lbound=${encodeURIComponent(lbound)}`,
-            `ubound=${encodeURIComponent(ubound)}`,
+            `lbound=${encodeURIComponent(lbound.format('YYYY-MM-DD'))}`,
+            `ubound=${encodeURIComponent(ubound.format('YYYY-MM-DD'))}`,
         ]
         let categories = ([...selectedCategories].map( (category) =>  `categories=${encodeURIComponent(category)}` ))
         let params = [...dates, ...categories, `fts=${encodeURIComponent(ftsValue)}`]
         fetch(`/api/calendar/events?${params.join("&")}`)
           .then(res => res.json())
-          .then(data => setEvents(data))
+          .then(data => {
+              let events = data.map((event: Event) => {
+                  if (!event.frequency) {
+                      return event
+                  }
+                  let eventDate = moment(event.start_at)
+                  let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at) : ubound
+                  let events: Event[] = []
+                  while (eventDate <= lastDate) {
+                      if (eventDate >= lbound) {
+                          events.push({
+                              ...event,
+                              start_at: eventDate.toDate(),
+                              end_at: eventDate.toDate(),
+                          })
+                      }
+                      eventDate.add(frequencyIntervals[event.frequency])
+                  }
+                  return events
+              }).flat(1)
+              setEvents(events)
+          })
       }, [currentDate, selectedCategories, ftsValue])
 
     return (
