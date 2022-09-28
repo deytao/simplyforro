@@ -108,6 +108,7 @@ const Calendar: NextPage = () => {
           }}
           startAccessor="start_at"
           endAccessor="end_at"
+          showAllEvents={true}
           style={{ height: "100vh", width: "100%" }}
           views={['month']}
         />

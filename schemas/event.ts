@@ -55,4 +55,4 @@ export const eventSchema = yup.object({
   url: yup.string().url().nullable(),
 });
 
-export interface Event extends yup.InferType<typeof eventSchema> {}
+export interface EventInter extends yup.InferType<typeof eventSchema> {}
