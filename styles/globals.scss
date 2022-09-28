@@ -40,6 +40,11 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
     @apply bg-violet-300;
 }
 
+.rbc-month-header {
+    @extend .rbc-month-header;
+    @apply sticky top-[218px] z-50 bg-white;
+}
+
 .rbc-month-row {
     @extend .rbc-month-row;
     @apply grow;

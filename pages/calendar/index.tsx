@@ -38,16 +38,16 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
       setTimeout(onNavigate, 600)
   }
   return (
-      <>
+      <div className="sticky top-[65px] md:top-[80px] z-50 bg-white">
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
         <div className="relative grid grid-cols-7 gap-4 mb-2">
-            <div className="col-span-1 flex items-center">
+            <div className="col-span-4 md:col-span-1 flex items-center">
                 <button type="button" onClick={prevMonth}>
-                    <ChevronLeftIcon className="h-6 w-12"/>
+                    <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
-                <button type="button" onClick={currentMonth} className="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Today</button>
+                <button type="button" onClick={currentMonth} className="py-1 md:py-2 px-2 md:px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Today</button>
                 <button type="button" onClick={nextMonth}>
-                    <ChevronRightIcon className="h-6 w-12"/>
+                    <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
             </div>
             <div className="col-span-3 flex justify-center hidden">
@@ -58,16 +58,13 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
                           <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeFilters} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
-                          <label htmlFor={`categories-${category}`}className={`event-tag-${category} px-2 rounded capitalize`}>{category}</label>
+                          <label htmlFor={`categories-${category}`} className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}>{category}</label>
                       </div>
                     ))}
                 </div>
             </div>
-            <div className="col-span-3 flex justify-center">
-              <input key="fts-field" type="text" onChange={changeFilters} value={ftsValue} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-1/2 rounded sm:text-sm border-gray-300" data-filters-fts />
-            </div>
         </div>
-      </>
+      </div>
     )
 }
 
@@ -138,7 +135,7 @@ const Calendar: NextPage = () => {
           startAccessor="start_at"
           endAccessor="end_at"
           showAllEvents={true}
-          style={{ height: "100vh", width: "100%" }}
+          style={{ width: "100%" }}
           views={['month']}
         />
     )
