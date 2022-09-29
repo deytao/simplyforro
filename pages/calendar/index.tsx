@@ -45,7 +45,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
                 <button type="button" onClick={prevMonth}>
                     <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
-                <button type="button" onClick={currentMonth} className="py-1 md:py-2 px-2 md:px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Today</button>
+                <button type="button" onClick={currentMonth} className="btn btn-neutral">Today</button>
                 <button type="button" onClick={nextMonth}>
                     <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
