@@ -261,8 +261,8 @@ const CalendarForm: NextPage = () => {
               </div>
       
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                <button type="button" onClick={togglePreview} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
-                <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting && "cursor-not-allowed"}`} disabled={isSubmitting}>
+                <button type="button" onClick={togglePreview} className=" btn btn-neutral inline-flex justify-center mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
+                <button type="submit" className={`btn btn-violet inline-flex justify-center ${isSubmitting && "cursor-not-allowed"}`} disabled={isSubmitting}>
                     {isSubmitting && 
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

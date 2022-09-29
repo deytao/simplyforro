@@ -22,6 +22,16 @@ export async function CreateEvent(event: EventInter) {
     return result
 }
 
+export async function UpdateEvent(eventId: number, data: any) {
+    let result = await prisma.event.update({
+        where: {
+            id: eventId,
+        },
+        data: data,
+    })
+    return result
+}
+
 export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: Category[], validationStatus: ValidationStatus = "validated") {
     let events: Event[] = []
     try {
@@ -52,6 +62,23 @@ export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, ca
                 },
                 validation_status: {
                     equals: validationStatus,
+                },
+            },
+        })
+    }
+    catch (e) {
+        console.error(e)
+    }
+    return events
+}
+
+export async function GetPendingEvents() {
+    let events: Event[] = []
+    try {
+        events = await prisma.event.findMany({
+            where: {
+                validation_status: {
+                    equals: ValidationStatus.pending,
                 },
             },
         })

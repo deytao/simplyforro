@@ -1,6 +1,6 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Category } from '@prisma/client';
+import { Category, Event } from '@prisma/client';
 
 import { CreateEvent, GetEvents } from 'lib/calendar';
 
@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-    if (req.method == "POST") {
+    if (req.method === "POST") {
         const body = req.body
         let status: number, content: object;
         try {
