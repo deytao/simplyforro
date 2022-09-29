@@ -615,5 +615,9 @@ VALUES
     (CURRENT_TIMESTAMP,'Janayna Pereira - Forrobodo la reprise','Paris','France','2022-09-16',NULL,'{"party"}','https://facebook.com/events/s/janayna-pereira-forrobodo-la-r/1491182454650896/'),
     (CURRENT_TIMESTAMP,'Stage de rentrée - Marion PBP','Paris','France','2022-09-17',NULL,'{"class"}','https://facebook.com/events/s/stages-de-rentree-marion-pbp/775812640423753/'),
     (CURRENT_TIMESTAMP,'Forró Vinyl Party - Jacinto Silva','Zürich','Switzerland','2022-09-23',NULL,'{"party", "workshop"}','https://facebook.com/events/s/forro-vinyl-party-jacinto-silv/474414344583261/'),
-    (CURRENT_TIMESTAMP,'Freiburg Forró Festival','Freiburg','Germany','2022-11-25','2022-11-27','{"festival"}','https://facebook.com/events/s/freiburg-forro-festival/792182262019383/')
+    (CURRENT_TIMESTAMP,'Freiburg Forró Festival','Freiburg','Germany','2022-11-25','2022-11-27','{"festival"}','https://facebook.com/events/s/freiburg-forro-festival/792182262019383/'),
+    (CURRENT_TIMESTAMP, 'Não Para, Não Para, Não Para','Paris','France','2022-11-11', '2022-11-13','{"party", "workshop"}','https://facebook.com/events/s/nao-para-nao-para-nao-para-for/444578597696607/'),
+    (CURRENT_TIMESTAMP, 'Forró Vinyl Party','Zürich','Switzerland','2022-10-21', NULL,'{"party", "workshop"}','https://www.tickettailor.com/events/forrvinylzrich/773302'),
+    (CURRENT_TIMESTAMP, 'Léo Diniz in Bern','Bern','Switzerland','2022-09-27', NULL,'{"pratica", "workshop"}','https://docs.google.com/forms/d/e/1FAIpQLSdnKrHEPzsd8UKytxViVhcWFiWj2UfUcJN5x3qZcuqtEzjiww/viewform'),
+    (CURRENT_TIMESTAMP, 'Workshop exceptionnel Felipe Abreu','Marseille','France','2022-10-11', NULL,'{"pratica", "workshop"}','https://facebook.com/events/s/workshop-exceptionnel-felipe-a/492655229372988/')
 ;
