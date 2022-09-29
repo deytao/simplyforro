@@ -1,8 +1,10 @@
+import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { Event } from '@prisma/client';
 import { ArrowSmRightIcon } from '@heroicons/react/outline'
 
-import { getNextEvents } from 'lib/notion'
+import { GetEvents } from 'lib/calendar'
 
 
 interface Props {
@@ -11,11 +13,19 @@ interface Props {
 
 
 export const getStaticProps = async () => {
-  const events = await getNextEvents(`${process.env.NOTION_CALENDAR_DATABASE_ID}`);
+  const lbound = moment(new Date())
+  const ubound = moment(new Date()).add(7, "days").endOf("week")
+  const events: Event[] = await GetEvents(lbound, ubound, ["party"]);
 
   return {
     props: {
-      events: events,
+      events: events.map((event) => ({
+          title: event.title,
+          url: event.url,
+          location: `${event.city}, ${event.country}`,
+          start_at: moment(event.start_at).format("YYYY-MM-DD"),
+          end_at: event.end_at ? moment(event.end_at).format("YYYY-MM-DD") : null,
+      })),
     },
     // Next.js will attempt to re-generate the page:
     // - When a request comes in
@@ -32,15 +42,15 @@ const Home: NextPage<Props> = ({ events }) => {
       <div className="rounded-xl border p-6 text-left">
         <h3 className="text-2xl font-bold">Next week events</h3>
         <div className="overflow-y-auto h-60 rounded p-2 border bg-gray-100">
-            {events.map((event: any) => (
-              <div key={event.id} className="p-2 rounded hover:bg-gray-200 focus:bg-gray-200">
-                  <a href={`https://simplyforro.notion.site/${event.database_id}?p=${event.id}`} className="hover:text-blue-600 focus:text-blue-600" target="_blank">
+            {events.map((event: any, idx: number) => (
+              <div key={idx} className="p-2 rounded hover:bg-gray-200 focus:bg-gray-200">
+                  <a href={event.url} className="hover:text-blue-600 focus:text-blue-600" target="_blank">
                     {event.title}
                   </a>
                   <br />
-                  {event.start_date}
+                  {event.start_at}
                   <ArrowSmRightIcon className="h-6 w-6 -mt-1 inline"/>
-                  {event.end_date}
+                  {event.end_at}
                   <br />
                   {event.location}
                   <br />
