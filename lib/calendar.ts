@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Category, Event, Frequency } from '@prisma/client';
+import { Category, Event, Frequency, ValidationStatus } from '@prisma/client';
 
 import prisma from 'lib/prisma';
 import { EventInter } from 'schemas/event';
@@ -22,7 +22,7 @@ export async function CreateEvent(event: EventInter) {
     return result
 }
 
-export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: Category[]) {
+export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: Category[], validationStatus: ValidationStatus = "validated") {
     let events: Event[] = []
     try {
         events = await prisma.event.findMany({
@@ -49,7 +49,10 @@ export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, ca
                 }],
                 categories: {
                     hasSome: categories,
-                }
+                },
+                validation_status: {
+                    equals: validationStatus,
+                },
             },
         })
     }

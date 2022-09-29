@@ -25,17 +25,24 @@ enum Frequency {
     monthly
 }
 
+enum ValidationStatus {
+    pending
+    validated
+    rejected
+}
+
 model Event {
-  id            Int         @id @default(autoincrement())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  title         String      @db.VarChar(255)
-  start_at      DateTime    @db.Timestamptz
-  end_at        DateTime?   @db.Timestamptz
-  frequency     Frequency?
-  excluded_on   DateTime[]  @db.Date
-  url           String?
-  city          String      @db.VarChar(255)
-  country       String      @db.VarChar(255)
-  categories    Category[]
+  id                    Int                 @id @default(autoincrement())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  title                 String              @db.VarChar(255)
+  start_at              DateTime            @db.Timestamptz
+  end_at                DateTime?           @db.Timestamptz
+  frequency             Frequency?
+  excluded_on           DateTime[]          @db.Date
+  url                   String?
+  city                  String              @db.VarChar(255)
+  country               String              @db.VarChar(255)
+  categories            Category[]
+  validation_status     ValidationStatus    @default(pending)
 }
