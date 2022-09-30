@@ -65,7 +65,7 @@ const CalendarForm: NextPage = () => {
   async function submitForm(formData: object) {
       if (isSubmitting) return false
       setIsSubmitting(true)
-      const endpoint = '/api/calendar/event'
+      const endpoint = '/api/calendar/events'
       const event = eventSchema.cast(formData)
       const JSONdata = JSON.stringify(event)
 
