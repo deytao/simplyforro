@@ -51,7 +51,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
             eventIds = [button.dataset.eventId]
         }
         const requests = eventIds.map((eventId) => {
-            const endpoint = `/api/calendar/events/${eventId}`
+            const endpoint = `/api/events/${eventId}`
             const JSONdata = JSON.stringify({"validation_status": validation_status})
 
             const options = {

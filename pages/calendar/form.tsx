@@ -65,7 +65,7 @@ const CalendarForm: NextPage = () => {
   async function submitForm(formData: object) {
       if (isSubmitting) return false
       setIsSubmitting(true)
-      const endpoint = '/api/calendar/events'
+      const endpoint = '/api/events'
       const event = eventSchema.cast(formData)
       const JSONdata = JSON.stringify(event)
 
@@ -89,10 +89,7 @@ const CalendarForm: NextPage = () => {
               isOpen: true,
               status: "success",
               title: "Thank you!",
-              message: `
-                You have created ${data.pagesCount} ${data.pagesCount > 1 ? "events" : "event"}.
-                ${data.pagesCount > 1 ? "They" : "It"} will be validated and added to the calendar soon.
-              `,
+              message: "Your event has been created. It will be validated and added to the calendar soon.",
             })
         })
         .catch(error => {
