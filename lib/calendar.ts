@@ -1,76 +1,90 @@
 import moment from 'moment';
+import { Category, Event, Frequency, ValidationStatus } from '@prisma/client';
 
-import { Event } from 'schemas/event';
-import { createPage } from 'lib/notion';
+import prisma from 'lib/prisma';
+import { EventInter } from 'schemas/event';
 
 
-const frequencyIntervals: {[key: string]: object} = {
-    "daily": {"days": 1},
-    "weekly": {"weeks": 1},
-    "biweekly": {"weeks": 2},
-    "monthly": {"months": 1},
+export async function CreateEvent(event: EventInter) {
+    let start_at: moment.Moment = moment(event.start_at)
+    let end_at: moment.Moment = moment(event.end_at)
+
+    let result = await prisma.event.create({
+        data: {
+            ...event,
+            url: event.url ? event.url : null,
+            start_at: start_at.toDate(),
+            end_at: end_at.isValid() ? end_at.toDate() : null,
+            frequency: event.frequency ? event.frequency as Frequency : null,
+            categories: event.categories as Category[],
+        }
+    })
+    return result
 }
 
+export async function UpdateEvent(eventId: number, data: any) {
+    let result = await prisma.event.update({
+        where: {
+            id: eventId,
+        },
+        data: data,
+    })
+    return result
+}
 
-export async function CreateEvent(event: Event) {
-    let startDate: moment.Moment = moment(event.startDate)
-    let endDate: moment.Moment = moment(event.endDate)
-    let interval = event.frequency != null ? frequencyIntervals[event.frequency] : false
-    let dates: {[key: string]: string | null} = {}
-    dates[startDate.format("YYYY-MM-DD")] = endDate.isValid() ? endDate.format("YYYY-MM-DD") : null
-    while (interval && startDate.isSameOrBefore(endDate) && endDate.isValid()) {
-        dates[startDate.format("YYYY-MM-DD")] = null
-        startDate.add(interval)
-    }
-    let pagesCount = 0
-    for (let [startDate, endDate] of Object.entries(dates)) {
-        let page = await createPage(
-            `${process.env.NOTION_PENDINGS_DATABASE_ID}`,
-            {
-                "Name": {
-                    "title": [
-                        {
-                            "text": {
-                                "content": event.title,
-                            },
-                        },
-                    ],
-                },
-                "Date": {
-                    "date": {
-                        "start": startDate,
-                        "end": endDate === startDate ? null : endDate,
+export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: Category[], validationStatus: ValidationStatus = "validated") {
+    let events: Event[] = []
+    try {
+        events = await prisma.event.findMany({
+            where: {
+                OR: [{
+                    start_at: {
+                        gte: lbound.toDate(),
+                        lte: ubound.toDate(),
                     },
-                },
-                'Tickets / Infos': {
-                    "url": event.link ? event.link : null,
-                },
-                "Tags": {
-                    "multi_select": event.tags.map((currentElement: any) => {
-                        return {name: currentElement};
-                    })
-                },
-                "City": {
-                    "rich_text": [
-                        {
-                            "text": {
-                                "content": event.city,
-                            },
+                }, {
+                    end_at: {
+                        gte: lbound.toDate(),
+                        lte: ubound.toDate(),
+                    },
+                }, {
+                    AND: [{
+                        start_at: {
+                            lte: lbound.toDate(),
                         },
-                    ],
-                },
-                "Country": {
-                    "rich_text": [
-                        {
-                            "text": {
-                                "content": event.country,
-                            },
+                        end_at: {
+                            gte: ubound.toDate(),
                         },
-                    ],
+                    }],
+                }],
+                categories: {
+                    hasSome: categories,
+                },
+                validation_status: {
+                    equals: validationStatus,
                 },
             },
-        );
-        pagesCount = pagesCount + 1
+        })
     }
-    return pagesCount
+    catch (e) {
+        console.error(e)
+    }
+    return events
+}
+
+export async function GetPendingEvents() {
+    let events: Event[] = []
+    try {
+        events = await prisma.event.findMany({
+            where: {
+                validation_status: {
+                    equals: ValidationStatus.pending,
+                },
+            },
+        })
+    }
+    catch (e) {
+        console.error(e)
+    }
+    return events
 }

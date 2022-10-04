@@ -31,13 +31,13 @@ const CalendarForm: NextPage = () => {
   });
   const event = {
       title: "FENFIT",
-      link: "https://www.example.com",
-      startDate: "2022-04-23",
-      endDate: "",
+      url: "https://www.example.com",
+      start_at: "2022-04-23",
+      end_at: "",
       frequency: "",
       city: "Itaunas",
       country: "Brazil",
-      tags: [
+      categories: [
         "party",
         "class",
       ],
@@ -47,13 +47,13 @@ const CalendarForm: NextPage = () => {
   watch((data: any, options) => {
       const newEvent = {
           title: data.title|| event.title,
-          link: data.link || event.link,
-          startDate: data.startDate || event.startDate,
-          endDate: data.endDate || event.endDate,
+          url: data.url || event.url,
+          start_at: data.start_at || event.start_at,
+          end_at: data.end_at || event.end_at,
           frequency: data.frequency || event.frequency,
           city: data.city || event.city,
           country: data.country || event.country,
-          tags: data.tags || event.tags,
+          categories: data.categories || event.categories,
       }
       setPreviewState(newEvent)
   })
@@ -65,7 +65,7 @@ const CalendarForm: NextPage = () => {
   async function submitForm(formData: object) {
       if (isSubmitting) return false
       setIsSubmitting(true)
-      const endpoint = '/api/calendar/event'
+      const endpoint = '/api/events'
       const event = eventSchema.cast(formData)
       const JSONdata = JSON.stringify(event)
 
@@ -78,21 +78,18 @@ const CalendarForm: NextPage = () => {
       }
       await fetch(endpoint, options)
         .then(response => {
-            setIsSubmitting(false)
             if (!response.ok) {
                 throw new Error("An error occured, please try again later.")
             }
             return response.json()
         })
         .then(data => {
+            setIsSubmitting(false)
             setMessageDialogState({
               isOpen: true,
               status: "success",
               title: "Thank you!",
-              message: `
-                You have created ${data.pagesCount} ${data.pagesCount > 1 ? "events" : "event"}.
-                ${data.pagesCount > 1 ? "They" : "It"} will be validated and added to the calendar soon.
-              `,
+              message: "Your event has been created. It will be validated and added to the calendar soon.",
             })
         })
         .catch(error => {
@@ -141,27 +138,27 @@ const CalendarForm: NextPage = () => {
                   </div>
 
                   <div className="col-span-4">
-                    <label htmlFor="event-link" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
+                    <label htmlFor="event-url" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("link")} id="event-link" className={`${commonClassnames} ${errors.link ? 'border-red-500' : ''}`} placeholder={`${event.link}`} />
+                      <input type="text" {...register("url")} id="event-url" className={`${commonClassnames} ${errors.url ? 'border-red-500' : ''}`} placeholder={`${event.url}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.link?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("startDate")} id="event-start-date" className={`${commonClassnames} ${errors.startDate ? 'border-red-500' : ''}`} placeholder={`${event.startDate}`} />
+                      <input type="date" {...register("start_at")} id="event-start-date" className={`${commonClassnames} ${errors.start_at ? 'border-red-500' : ''}`} placeholder={`${event.start_at}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.startDate?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.start_at?.message}</p>
                   </div>
 
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("endDate")} id="event-end-date" className={`${commonClassnames} ${errors.endDate ? 'border-red-500' : ''}`} placeholder={`${event.endDate}`} />
+                      <input type="date" {...register("end_at")} id="event-end-date" className={`${commonClassnames} ${errors.end_at ? 'border-red-500' : ''}`} placeholder={`${event.end_at}`} />
                     </div>
-                    <p className="text-red-500 text-xs italic">{errors.endDate?.message}</p>
+                    <p className="text-red-500 text-xs italic">{errors.end_at?.message}</p>
                   </div>
 
                   <div className="col-span-4 md:col-span-2">
@@ -199,14 +196,14 @@ const CalendarForm: NextPage = () => {
 
                 <fieldset>
                   <legend className="text-base font-medium text-gray-900">Category</legend>
-                  <p className="text-red-500 text-xs italic">{errors.tags?.message}</p>
+                  <p className="text-red-500 text-xs italic">{errors.categories?.message}</p>
                   <div className="mt-4 space-y-4">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-party" {...register("tags")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-party" {...register("categories")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-party" className="font-medium text-gray-700">
+                        <label htmlFor="categories-party" className="font-medium text-gray-700">
                             Party
                             <p className="text-gray-500 font-normal">Event where a DJ and/or a band is playing the music</p>
                         </label>
@@ -214,10 +211,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-pratica" {...register("tags")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-pratica" {...register("categories")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-pratica" className="font-medium text-gray-700">
+                        <label htmlFor="categories-pratica" className="font-medium text-gray-700">
                             Pratica
                             <p className="text-gray-500 font-normal">Event where participants are handling the music and practicing steps</p>
                         </label>
@@ -225,10 +222,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-class" {...register("tags")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-class" {...register("categories")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-class" className="font-medium text-gray-700">
+                        <label htmlFor="categories-class" className="font-medium text-gray-700">
                             Class
                             <p className="text-gray-500 font-normal">Regular event where a teacher is showing new steps or concepts</p>
                         </label>
@@ -236,10 +233,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                    <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-workshop" {...register("tags")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-workshop" {...register("categories")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-workshop" className="font-medium text-gray-700">
+                        <label htmlFor="categories-workshop" className="font-medium text-gray-700">
                             Workshop
                             <p className="text-gray-500 font-normal">Ponctual event where a guest teacher is handling the class</p>
                         </label>
@@ -247,10 +244,10 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="tags-festival" {...register("tags")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.tags ? 'border-red-500' : ''}`} />
+                        <input id="categories-festival" {...register("categories")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
                       </div>
                       <div className="ml-3 text-sm">
-                        <label htmlFor="tags-festival" className="font-medium text-gray-700">
+                        <label htmlFor="categories-festival" className="font-medium text-gray-700">
                             Festival
                             <p className="text-gray-500 font-normal">Event generally happening over few days with workshops and parties</p>
                         </label>
@@ -261,8 +258,8 @@ const CalendarForm: NextPage = () => {
               </div>
       
               <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                <button type="button" onClick={togglePreview} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
-                <button type="submit" className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting && "cursor-not-allowed"}`} disabled={isSubmitting}>
+                <button type="button" onClick={togglePreview} className=" btn btn-neutral inline-flex justify-center mr-2 md:hidden" data-preview-panel="event-preview">Preview </button>
+                <button type="submit" className={`btn btn-violet inline-flex justify-center ${isSubmitting && "cursor-not-allowed"}`} disabled={isSubmitting}>
                     {isSubmitting && 
                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

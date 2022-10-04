@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { useState } from "react"
-import { ExternalLinkIcon, MenuIcon } from '@heroicons/react/outline'
+import { MenuIcon } from '@heroicons/react/outline'
 
 
 export function Navbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-menu p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
+    <nav className="bg-menu flex items-center justify-between flex-wrap p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
       <div className="flex items-center flex-shrink-0 text-white md:mr-6">
         <Link href="/">
           <a>
@@ -26,10 +26,11 @@ export function Navbar() {
       </div>
       <div className={`w-full block ${isNavbarOpen ? "flex" : "hidden"} flex-grow items-center lg:flex lg:w-auto`}>
         <div className="text-sm lg:flex-grow flex-row-reverse">
-          <a href="https://simplyforro.notion.site/42f9fe6ead9544338eb4d5ee5c85e13e" className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4" target="_blank">
-            Calendar
-            <ExternalLinkIcon className="h-4 w-4 ml-0.5 -mt-0.5 inline"/>
-          </a>
+          <Link href="/calendar">
+            <a className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4">
+              Calendar
+            </a>
+          </Link>
         </div>
       </div>
     </nav>

@@ -8,26 +8,26 @@ const toISODateOrNull = (currentValue: string, originalValue: string) => {
 }
 
 
-export const tags = ["party", "pratica", "class", "workshop", "festival"]
+export const categories = ["party", "pratica", "class", "workshop", "festival"]
 export const frequencies = ["", "daily", "weekly", "biweekly", "monthly"]
 
 export const eventSchema = yup.object({
   title: yup.string().required("A title is required"),
-  startDate: yup
+  start_at: yup
   .string()
   .nullable()
   .transform(toISODateOrNull)
   .required("A valid date is required"),
-  endDate: yup
+  end_at: yup
   .string()
   .nullable()
   .transform(toISODateOrNull)
   .test((value: any, context) => {
-      let startDate = moment(context.parent.startDate)
-      let endDate = moment(value)
+      let start_at = moment(context.parent.start_at)
+      let end_at = moment(value)
       let frequency = context.parent.frequency
-      if (endDate.isValid()) {
-          if (endDate.isSameOrAfter(startDate)) {
+      if (end_at.isValid()) {
+          if (end_at.isSameOrAfter(start_at)) {
               return true
           }
           return context.createError({ message: "The date needs to be later than the start" })
@@ -46,13 +46,13 @@ export const eventSchema = yup.object({
     .oneOf(frequencies),
   city: yup.string().required("A city is required"),
   country: yup.string().required("A country is required"),
-  tags: yup
+  categories: yup
     .array()
-    .of(yup.string().oneOf(tags))
+    .of(yup.string().oneOf(categories))
     .nullable()
     .transform((curr, orig) => orig === false ? null : curr)
     .required("You need to choose at least one category"),
-  link: yup.string().url().nullable(),
+  url: yup.string().url().nullable(),
 });
 
-export interface Event extends yup.InferType<typeof eventSchema> {}
+export interface EventInter extends yup.InferType<typeof eventSchema> {}
