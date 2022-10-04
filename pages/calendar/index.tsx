@@ -82,7 +82,7 @@ const Calendar: NextPage = () => {
         ]
         let categories = ([...selectedCategories].map( (category) =>  `categories=${encodeURIComponent(category)}` ))
         let params = [...dates, ...categories, `fts=${encodeURIComponent(ftsValue)}`]
-        fetch(`/api/calendar/events?${params.join("&")}`)
+        fetch(`/api/events?${params.join("&")}`)
           .then(res => res.json())
           .then(data => {
               let events = data.map((event: Event) => {
