@@ -25,7 +25,7 @@ const frequencyIntervals: {[key: string]: object} = {
     "monthly": {"months": 1},
 }
 
-const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}) => {
+const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string}) => {
   const prevMonth = () => onNavigate("PREV")
   const currentMonth = () => onNavigate("TODAY")
   const nextMonth = () => onNavigate("NEXT")

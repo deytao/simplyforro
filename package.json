@@ -1,4 +1,6 @@
 {
+  "name": "SimplyForró",
+  "version": "1.0.0",
   "engines": {
     "node": "16.x",
     "npm": "8.8.x",
@@ -12,7 +14,7 @@
     "dev": "next dev",
     "build": "next build",
     "heroku-postbuild": "npm run build",
-    "prisma": "npx prisma",
+    "prepare": "npx prisma migrate deploy",
     "start": "next start -p $PORT"
   },
   "dependencies": {
