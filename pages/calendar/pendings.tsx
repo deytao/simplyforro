@@ -4,6 +4,7 @@ import type { NextPage } from 'next'
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 
+import { MessageDialog } from 'components/MessageDialog'
 import { GetPendingEvents } from 'lib/calendar'
 
 
@@ -36,6 +37,12 @@ export const getStaticProps = async () => {
 
 
 const Pendings: NextPage<Props> = ({ events }) => {
+    const [ messageDialogState, setMessageDialogState ] = useState({
+        isOpen: false,
+        status: "",
+        title: "",
+        message: "",
+    });
     const statuteEvent = (e: any) => {
         const button = e.target
         const validation_status = {
@@ -73,16 +80,38 @@ const Pendings: NextPage<Props> = ({ events }) => {
                 return Promise.all(json);
             })
             .then((data) => {
-                data.forEach((datum) => console.log(datum));
+                data.forEach((datum) => {
+                    const element = document.querySelector(`[data-row-event-id="${datum.eventId}"]`) as HTMLElement;
+                    if (element) {
+                        element.remove()
+                    }
+                });
+                setMessageDialogState({
+                    isOpen: true,
+                    status: "success",
+                    title: "Success!",
+                    message: "",
+                })
             })
             .catch((errors) => {
-                errors.forEach((error: Error) => console.error(error));
+                if (!errors) {
+                    return
+                }
+                setMessageDialogState({
+                    isOpen: true,
+                    status: "error",
+                    title: "Fail!",
+                    message: "",
+                })
             })
   }
 
   return (
       <>
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Pendings</h1>
+
+        <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+
         <table className="w-full table-fixed">
             <thead>
                 <tr>
@@ -99,7 +128,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
             </thead>
             <tbody>
                 {events.map((event: any, idx: number) => (
-                    <tr key={event.id}>
+                    <tr key={event.id} data-row-event-id={event.id}>
                         <td className="border-b border-slate-100 p-4 pl-8">{event.title}</td>
                         <td className="border-b border-slate-100 p-4 pl-8">
                             {event.start_at} 

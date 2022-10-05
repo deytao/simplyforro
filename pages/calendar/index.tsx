@@ -1,5 +1,6 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
+import Link from 'next/link'
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
@@ -62,6 +63,11 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                       </div>
                     ))}
                 </div>
+            </div>
+            <div className="col-end-8 col-span-1 text-right">
+              <Link href="/calendar/form">
+                  <a className="btn btn-violet mr-5">Add</a>
+              </Link>
             </div>
         </div>
       </div>
