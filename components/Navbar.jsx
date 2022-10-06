@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { useState } from "react"
 import { MenuIcon } from '@heroicons/react/outline'
 
+import User from "components/User"
+
 
 export function Navbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false)
@@ -32,6 +34,7 @@ export function Navbar() {
             </a>
           </Link>
         </div>
+        <User />
       </div>
     </nav>
   )
