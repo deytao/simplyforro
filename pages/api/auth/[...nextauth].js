@@ -1,6 +1,5 @@
-import jwt from 'jsonwebtoken'
 import NextAuth from 'next-auth'
-import CredentialsProvider from "next-auth/providers/credentials"
+import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 import prisma from 'lib/prisma';
@@ -9,32 +8,16 @@ export default NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         // Passwordless / email sign in
-        CredentialsProvider({
-            // The name to display on the sign in form (e.g. 'Sign in with...')
-            name: 'Credentials',
-            credentials: {
-                email: { label: "Email", type: "text", placeholder: "name@email.ch" },
-                password: {  label: "Password", type: "password" }
+        EmailProvider({
+            server: {
+                host: process.env.EMAIL_SERVER_HOST,
+                port: process.env.EMAIL_SERVER_PORT,
+                auth: {
+                    user: process.env.EMAIL_SERVER_USER,
+                    pass: process.env.EMAIL_SERVER_PASSWORD
+                }
             },
-            async authorize(credentials, req) {
-                const user = await prisma.user.findUniqueOrThrow({
-                    where: {
-                        email: credentials.email,
-                    }
-                })
-                return user
-            }
-        })
+            from: process.env.EMAIL_FROM
+        }),
     ],
-    session: {
-        strategy: "jwt",
-    },
-    jwt: {
-        async encode({ token }) {
-            return jwt.sign(token, process.env.NEXTAUTH_SECRET);
-        },
-        async decode({ token }) {
-            return jwt.verify(token, process.env.NEXTAUTH_SECRET);
-        },
-    },
 })
