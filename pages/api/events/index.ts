@@ -1,6 +1,7 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Category, Event } from '@prisma/client';
+import { getSession } from "next-auth/react"
+import { Category, Event, Role, ValidationStatus } from '@prisma/client';
 
 import { CreateEvent, GetEvents } from 'lib/calendar';
 
@@ -9,12 +10,17 @@ export default async function handler(
   res: NextApiResponse
 ) {
     if (req.method === "POST") {
+        const session  = getSession()
         const body = req.body
         let status: number, content: object;
+        body.validation_status = ValidationStatus.pending
+        if (session && session.user && session.user.roles.includes(Role.contributor)) {
+            body.validation_status = ValidationStatus.validated
+        }
         try {
             const pagesCount = await CreateEvent(body)
             status = 201
-            content = {pagesCount: pagesCount}
+            content = { pagesCount: pagesCount }
         } catch (err) {
             console.error(err)
             status = 500

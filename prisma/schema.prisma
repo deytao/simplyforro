@@ -31,6 +31,12 @@ enum ValidationStatus {
     rejected
 }
 
+enum Role {
+    contributor
+    teacher
+    student
+}
+
 model Event {
   id                    Int                 @id @default(autoincrement())
   createdAt             DateTime            @default(now())
@@ -85,6 +91,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  roles         Role[]
 
   @@map("user")
 }
