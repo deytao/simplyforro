@@ -4,8 +4,14 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 import prisma from 'lib/prisma';
 
-export default NextAuth({
+export const authOptions = {
     adapter: PrismaAdapter(prisma),
+    callbacks: {
+        async session({ session, user, token }) {
+            session.user.roles = user.roles
+            return session
+        },
+    },
     providers: [
         // Passwordless / email sign in
         EmailProvider({
@@ -20,4 +26,6 @@ export default NextAuth({
             from: process.env.EMAIL_FROM
         }),
     ],
-})
+}
+
+export default NextAuth(authOptions)

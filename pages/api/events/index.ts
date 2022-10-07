@@ -1,16 +1,17 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from "next-auth/react"
+import { unstable_getServerSession } from "next-auth/next"
 import { Category, Event, Role, ValidationStatus } from '@prisma/client';
 
 import { CreateEvent, GetEvents } from 'lib/calendar';
+import { authOptions } from 'pages/api/auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
     if (req.method === "POST") {
-        const session  = getSession()
+        const session  = await unstable_getServerSession(req, res, authOptions)
         const body = req.body
         let status: number, content: object;
         body.validation_status = ValidationStatus.pending
