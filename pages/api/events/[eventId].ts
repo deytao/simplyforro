@@ -24,6 +24,6 @@ export default async function handler(
     }
     const { eventId } = req.query
     const event: Event = req.body
-    const result = UpdateEvent(+eventId, event)
+    const result = UpdateEvent(eventId as unknown as number, event)
     res.status(200).json({"eventId": eventId})
 }
