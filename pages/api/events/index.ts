@@ -15,7 +15,7 @@ export default async function handler(
         const body = req.body
         let status: number, content: object;
         body.validation_status = ValidationStatus.pending
-        if (session && session.user && session.user.roles.includes(Role.contributor)) {
+        if (session && session.user.roles.includes(Role.contributor)) {
             body.validation_status = ValidationStatus.validated
         }
         try {

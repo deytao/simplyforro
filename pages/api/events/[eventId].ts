@@ -1,7 +1,7 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { unstable_getServerSession } from 'next-auth/next'
-import { Category } from '@prisma/client';
+import { Category, Role } from '@prisma/client';
 
 import { UpdateEvent } from 'lib/calendar';
 import { authOptions } from "pages/api/auth/[...nextauth]"
@@ -13,7 +13,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
     const session = await unstable_getServerSession(req, res, authOptions)
-    if (!session) {
+    if (!session || !session.user.roles.includes(Role.contributor)) {
         res.status(401)
         res.end()
     }
