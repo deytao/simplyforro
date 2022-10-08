@@ -10,4 +10,8 @@ declare module "next-auth" {
             roles: Role[]
         } & DefaultSession["user"]
     }
+
+    interface User {
+        roles: Role[]
+    }
 }
