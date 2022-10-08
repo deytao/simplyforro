@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { useState } from "react"
 import { MenuIcon } from '@heroicons/react/outline'
 
+import User from "components/User"
+
 
 export function Navbar() {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false)
@@ -25,12 +27,16 @@ export function Navbar() {
         </button>
       </div>
       <div className={`w-full block ${isNavbarOpen ? "flex" : "hidden"} flex-grow items-center lg:flex lg:w-auto`}>
-        <div className="text-sm lg:flex-grow flex-row-reverse">
+        <div className="text-sm flex-row-reverse pt-4 lg:pt-0 pr-4">
           <Link href="/calendar">
-            <a className="block mt-4 lg:inline-block lg:mt-0 text-violet-200 hover:text-white mr-4">
+            <a className="block lg:inline-block text-violet-200 hover:text-white">
               Calendar
             </a>
           </Link>
+        </div>
+        <div className="hidden lg:block lg:flex-grow"></div>
+        <div className="text-sm flex-row-reverse pt-4 lg:pt-0 pr-4">
+          <User />
         </div>
       </div>
     </nav>

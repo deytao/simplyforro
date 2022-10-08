@@ -1,20 +1,27 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Category, Event } from '@prisma/client';
+import { unstable_getServerSession } from "next-auth/next"
+import { Category, Event, Role, ValidationStatus } from '@prisma/client';
 
 import { CreateEvent, GetEvents } from 'lib/calendar';
+import { authOptions } from 'pages/api/auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
     if (req.method === "POST") {
+        const session  = await unstable_getServerSession(req, res, authOptions)
         const body = req.body
         let status: number, content: object;
+        body.validation_status = ValidationStatus.pending
+        if (session && session.user.roles.includes(Role.contributor)) {
+            body.validation_status = ValidationStatus.validated
+        }
         try {
             const pagesCount = await CreateEvent(body)
             status = 201
-            content = {pagesCount: pagesCount}
+            content = { pagesCount: pagesCount }
         } catch (err) {
             console.error(err)
             status = 500
