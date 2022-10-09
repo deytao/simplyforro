@@ -42,8 +42,8 @@ model Event {
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   title                 String              @db.VarChar(255)
-  start_at              DateTime            @db.Timestamptz
-  end_at                DateTime?           @db.Timestamptz
+  start_at              DateTime            @db.Timestamp
+  end_at                DateTime?           @db.Timestamp
   frequency             Frequency?
   excluded_on           DateTime[]          @db.Date
   url                   String?

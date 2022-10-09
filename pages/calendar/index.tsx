@@ -96,7 +96,7 @@ const Calendar: NextPage = () => {
                       return event
                   }
                   let eventDate = moment(event.start_at)
-                  let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at) : ubound
+                  let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
                   let events: Event[] = []
                   while (eventDate <= lastDate) {
                       if (eventDate >= lbound) {
