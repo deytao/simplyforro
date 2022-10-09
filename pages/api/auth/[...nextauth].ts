@@ -95,6 +95,9 @@ export const authOptions: NextAuthOptions = {
             return session
         },
     },
+    pages: {
+        signIn: '/auth/signin',
+    },
     providers: [
         // Passwordless / email sign in
         EmailProvider({

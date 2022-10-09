@@ -1,16 +1,11 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import Head from 'next/head'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { XIcon } from '@heroicons/react/outline'
 
-import { Alert } from 'components/Alert'
 import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
-import { alertService } from 'lib/alert';
 import { eventSchema } from 'schemas/event';
 
 

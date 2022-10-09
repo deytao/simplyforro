@@ -8,14 +8,14 @@ import { GetEvents } from 'lib/calendar'
 
 
 interface Props {
-    events: any
+    events: Event[]
 }
 
 
 export const getStaticProps = async () => {
   const lbound = moment(new Date())
   const ubound = moment(new Date()).add(7, "days").endOf("week")
-  const events: Event[] = await GetEvents(lbound, ubound, ["party"]);
+  const events = await GetEvents(lbound, ubound, ["party"]);
 
   return {
     props: {
