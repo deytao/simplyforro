@@ -126,7 +126,7 @@ const Calendar: NextPage = () => {
               return {
                 ...event,
                 start_at: moment(event.start_at),
-                end_at: moment(event.end_at || event.start_at).endOf('day'),
+                end_at: moment(event.end_at || event.start_at).add(1, 'days').startOf('day'),
                 allDay: true,
               }
           })}
