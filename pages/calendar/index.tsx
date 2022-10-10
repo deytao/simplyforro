@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 import { EventDetailsSimple } from 'components/EventPreview'
 import { GetEvents } from 'lib/calendar'

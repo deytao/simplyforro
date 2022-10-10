@@ -1,4 +1,4 @@
-import { ArrowSmRightIcon } from '@heroicons/react/outline'
+import { ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import moment from 'moment';
 import type { NextPage } from 'next'
 import { useSession, signIn } from "next-auth/react"
@@ -137,7 +137,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                         <td className="border-b border-slate-100 p-4 pl-8">{event.title}</td>
                         <td className="border-b border-slate-100 p-4 pl-8">
                             {event.start_at} 
-                            {event.end_at && <ArrowSmRightIcon className="h-5 w-5 -mt-1 inline"/>}
+                            {event.end_at && <ArrowSmallRightIcon className="h-5 w-5 -mt-1 inline"/>}
                             {event.end_at} 
                         </td>
                         <td className="border-b border-slate-100 p-4 pl-8">

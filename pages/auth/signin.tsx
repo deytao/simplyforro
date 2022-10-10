@@ -3,7 +3,7 @@ import type { Provider } from 'next-auth/providers'
 import { getProviders, signIn } from "next-auth/react"
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { XIcon } from '@heroicons/react/outline'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 
 interface Props {
