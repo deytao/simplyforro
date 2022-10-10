@@ -42,7 +42,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
       <div className="sticky top-[64px] md:top-[80px] z-50 bg-white">
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
         <div className="relative grid grid-cols-7 gap-x-4 mb-2">
-            <div className="col-span-4 md:col-span-1 flex items-center order-1">
+            <div className="col-span-4 md:col-span-2 flex items-center order-1">
                 <button type="button" onClick={prevMonth}>
                     <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
@@ -54,8 +54,8 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
             <div className="col-span-3 flex justify-center hidden">
               <input key="fts-field" type="text" onChange={changeFilters} value={ftsValue} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
             </div>
-            <div className="col-span-7 md:col-span-3 order-3 md:order-2">
-                <div className="mt-2 flex items-center">
+            <div className="col-span-7 md:col-span-3 order-3 md:order-2 p-1">
+                <div className="mt-2 flex flex-wrap items-center gap-2">
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
                           <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeFilters} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
@@ -64,7 +64,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                     ))}
                 </div>
             </div>
-            <div className="col-end-8 col-span-1 text-right order-2 md:order-3">
+            <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-2 md:order-3 pr-2 grid items-center justify-items-end">
               <Link href="/calendar/form">
                   <a className="btn btn-violet md:mr-5">Add</a>
               </Link>
