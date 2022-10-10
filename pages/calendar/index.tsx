@@ -7,6 +7,7 @@ import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
 import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 import { EventDetailsSimple } from 'components/EventPreview'
+import { MessageDialog } from 'components/MessageDialog'
 import { GetEvents } from 'lib/calendar'
 import { categories } from 'schemas/event';
 
@@ -79,6 +80,12 @@ const Calendar: NextPage = () => {
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
+    const [ messageDialogState, setMessageDialogState ] = useState<{isOpen: boolean, status: string, title: string, message: any}>({
+        isOpen: false,
+        status: "",
+        title: "",
+        message: "",
+    });
     useEffect(() => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
@@ -115,35 +122,56 @@ const Calendar: NextPage = () => {
       }, [currentDate, selectedCategories, ftsValue])
 
     return (
-        <BigCalendar
-          components={{
-            event: EventDetailsSimple,
-            toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
-          }}
-          defaultDate={currentDate}
-          defaultView="month"
-          events={events.map((event: any, idx: number) => {
-              return {
-                ...event,
-                start_at: moment(event.start_at),
-                end_at: moment(event.end_at || event.start_at).endOf('day'),
-                allDay: true,
-              }
-          })}
-          localizer={localizer}
-          onNavigate={(newDate) => {
-              let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
-              let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
-              setSelectedCategories([...elements].map( (el) =>  el.value ))
-              setFTSValue(ftsInput ? ftsInput.value : "")
-              setCurrentDate(newDate)
-          }}
-          startAccessor="start_at"
-          endAccessor="end_at"
-          showAllEvents={true}
-          style={{ width: "100%" }}
-          views={['month']}
-        />
+        <>
+            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <BigCalendar
+                components={{
+                    event: EventDetailsSimple,
+                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
+                }}
+                defaultDate={currentDate}
+                defaultView="month"
+                events={events.map((event: any, idx: number) => {
+                    return {
+                        ...event,
+                        start_at: moment(event.start_at),
+                        end_at: moment(event.end_at || event.start_at).endOf('day'),
+                        allDay: true,
+                    }
+                })}
+                localizer={localizer}
+                onNavigate={(newDate) => {
+                    let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
+                    let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
+                    setSelectedCategories([...elements].map( (el) =>  el.value ))
+                    setFTSValue(ftsInput ? ftsInput.value : "")
+                    setCurrentDate(newDate)
+                }}
+                onSelectEvent={(event: Event) => {
+                    setMessageDialogState({
+                        isOpen: true,
+                        status: "neutral",
+                        title: event.title,
+                        message: <>
+                            {moment(event.start_at).format("dddd Do MMMM YYYY")}
+                            <br />
+                            {event.city}, {event.country}
+                            <br />
+                            {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
+                            <br />
+                            {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500">
+                                More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline"/>
+                            </a>}
+                        </>,
+                  })
+                }}
+                startAccessor="start_at"
+                endAccessor="end_at"
+                showAllEvents={true}
+                style={{ width: "100%" }}
+                views={['month']}
+            />
+        </>
     )
 }
 

@@ -6,7 +6,8 @@ const statusClasses = {
     "success": ["bg-green-100 border-green-700 text-green-700", "bg-green-700 hover:bg-green-900"],
     "error": ["bg-red-100 border-red-700 text-red-700", "bg-red-700 hover:bg-red-900"],
     "info": ["bg-teal-100 border-teal-700 text-teal-700", "bg-teal-700 hover:bg-teal-900"],
-    "warning": ["bg-orange-100 border-orange-700 text-orange-700", "bg-orange-700 hover:bg-orange-900"]
+    "warning": ["bg-orange-100 border-orange-700 text-orange-700", "bg-orange-700 hover:bg-orange-900"],
+    "neutral": ["bg-neutral-100 border-neutral-700 text-neutral-700", "bg-neutral-700 hover:bg-neutral-900"],
 }
 
 
