@@ -2,7 +2,7 @@ import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { Event } from '@prisma/client';
-import { ArrowSmRightIcon } from '@heroicons/react/outline'
+import { ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 
 import { GetEvents } from 'lib/calendar'
 
@@ -49,7 +49,7 @@ const Home: NextPage<Props> = ({ events }) => {
                   </a>
                   <br />
                   {event.start_at}
-                  <ArrowSmRightIcon className="h-6 w-6 -mt-1 inline"/>
+                  <ArrowSmallRightIcon className="h-6 w-6 -mt-1 inline"/>
                   {event.end_at}
                   <br />
                   {event.location}

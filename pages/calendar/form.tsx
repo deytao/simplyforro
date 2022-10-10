@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { XIcon } from '@heroicons/react/outline'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
@@ -273,7 +273,7 @@ const CalendarForm: NextPage = () => {
 
         <div data-event-preview className="hidden fixed inset-0 bg-black/20" aria-hidden="true" onClick={togglePreview} />
         <div data-event-preview className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl">
-          <XIcon className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer" onClick={togglePreview} />
+          <XMarkIcon className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer" onClick={togglePreview} />
           <EventPreview eventData={previewState} />
         </div>
       </div>

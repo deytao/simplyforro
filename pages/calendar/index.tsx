@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 import { EventDetailsSimple } from 'components/EventPreview'
+import { MessageDialog } from 'components/MessageDialog'
 import { GetEvents } from 'lib/calendar'
 import { categories } from 'schemas/event';
 
@@ -39,10 +40,10 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
       setTimeout(onNavigate, 600)
   }
   return (
-      <div className="sticky top-[64px] md:top-[80px] z-50 bg-white">
+      <div className="sticky top-[66px] md:top-[80px] z-40 bg-white">
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
         <div className="relative grid grid-cols-7 gap-x-4 mb-2">
-            <div className="col-span-4 md:col-span-1 flex items-center order-1">
+            <div className="col-span-4 md:col-span-2 flex items-center order-1">
                 <button type="button" onClick={prevMonth}>
                     <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
@@ -54,8 +55,8 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
             <div className="col-span-3 flex justify-center hidden">
               <input key="fts-field" type="text" onChange={changeFilters} value={ftsValue} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
             </div>
-            <div className="col-span-7 md:col-span-3 order-3 md:order-2">
-                <div className="mt-2 flex items-center">
+            <div className="col-span-7 md:col-span-3 order-3 md:order-2 p-1">
+                <div className="mt-2 flex flex-wrap items-center gap-2">
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
                           <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeFilters} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
@@ -64,7 +65,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                     ))}
                 </div>
             </div>
-            <div className="col-end-8 col-span-1 text-right order-2 md:order-3">
+            <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-2 md:order-3 pr-2 grid items-center justify-items-end">
               <Link href="/calendar/form">
                   <a className="btn btn-violet md:mr-5">Add</a>
               </Link>
@@ -79,6 +80,12 @@ const Calendar: NextPage = () => {
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
+    const [ messageDialogState, setMessageDialogState ] = useState<{isOpen: boolean, status: string, title: string, message: any}>({
+        isOpen: false,
+        status: "",
+        title: "",
+        message: "",
+    });
     useEffect(() => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
@@ -115,35 +122,56 @@ const Calendar: NextPage = () => {
       }, [currentDate, selectedCategories, ftsValue])
 
     return (
-        <BigCalendar
-          components={{
-            event: EventDetailsSimple,
-            toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
-          }}
-          defaultDate={currentDate}
-          defaultView="month"
-          events={events.map((event: any, idx: number) => {
-              return {
-                ...event,
-                start_at: moment(event.start_at),
-                end_at: moment(event.end_at || event.start_at).endOf('day'),
-                allDay: true,
-              }
-          })}
-          localizer={localizer}
-          onNavigate={(newDate) => {
-              let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
-              let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
-              setSelectedCategories([...elements].map( (el) =>  el.value ))
-              setFTSValue(ftsInput ? ftsInput.value : "")
-              setCurrentDate(newDate)
-          }}
-          startAccessor="start_at"
-          endAccessor="end_at"
-          showAllEvents={true}
-          style={{ width: "100%" }}
-          views={['month']}
-        />
+        <>
+            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <BigCalendar
+                components={{
+                    event: EventDetailsSimple,
+                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
+                }}
+                defaultDate={currentDate}
+                defaultView="month"
+                events={events.map((event: any, idx: number) => {
+                    return {
+                        ...event,
+                        start_at: moment(event.start_at),
+                        end_at: moment(event.end_at || event.start_at).endOf('day'),
+                        allDay: true,
+                    }
+                })}
+                localizer={localizer}
+                onNavigate={(newDate) => {
+                    let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
+                    let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
+                    setSelectedCategories([...elements].map( (el) =>  el.value ))
+                    setFTSValue(ftsInput ? ftsInput.value : "")
+                    setCurrentDate(newDate)
+                }}
+                onSelectEvent={(event: Event) => {
+                    setMessageDialogState({
+                        isOpen: true,
+                        status: "neutral",
+                        title: event.title,
+                        message: <>
+                            {moment(event.start_at).format("dddd Do MMMM YYYY")}
+                            <br />
+                            {event.city}, {event.country}
+                            <br />
+                            {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
+                            <br />
+                            {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500">
+                                More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline"/>
+                            </a>}
+                        </>,
+                  })
+                }}
+                startAccessor="start_at"
+                endAccessor="end_at"
+                showAllEvents={true}
+                style={{ width: "100%" }}
+                views={['month']}
+            />
+        </>
     )
 }
 

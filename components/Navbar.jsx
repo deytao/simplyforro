@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useState } from "react"
-import { MenuIcon } from '@heroicons/react/outline'
+import { Bars3Icon } from '@heroicons/react/24/outline'
 
 import User from "components/User"
 
@@ -23,7 +23,7 @@ export function Navbar() {
             className="flex items-center px-3 py-2 border rounded text-violet-200 border-violet-400 hover:text-white hover:border-white"
             onClick={() => setIsNavbarOpen(!isNavbarOpen)}
         >
-          <MenuIcon className="fill-current h-3 w-3"/>
+          <Bars3Icon className="h-4 w-4"/>
         </button>
       </div>
       <div className={`w-full block ${isNavbarOpen ? "flex" : "hidden"} flex-grow items-center lg:flex lg:w-auto`}>
