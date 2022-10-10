@@ -40,7 +40,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
       setTimeout(onNavigate, 600)
   }
   return (
-      <div className="sticky top-[64px] md:top-[80px] z-50 bg-white">
+      <div className="sticky top-[66px] md:top-[80px] z-40 bg-white">
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
         <div className="relative grid grid-cols-7 gap-x-4 mb-2">
             <div className="col-span-4 md:col-span-2 flex items-center order-1">
