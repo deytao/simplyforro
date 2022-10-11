@@ -37,5 +37,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# dump from heroku
+latest.dump
 
+# ssl certificates
 certs/
