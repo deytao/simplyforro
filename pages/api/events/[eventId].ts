@@ -14,16 +14,20 @@ export default async function handler(
 ) {
     const session = await unstable_getServerSession(req, res, authOptions)
     if (!session || !session.user.roles.includes(Role.contributor)) {
-        res.status(401)
-        res.end()
+        res.status(401).json({ message: "Insufficient rights" })
+        return
     }
     const method = req.method || ""
     if (!allowedMethods.includes(method)) {
-        res.status(405).json({})
+        res.status(405).json({ message: "Method not allowed" })
         return
     }
     const { eventId } = req.query
+    if (!eventId) {
+        res.status(400).json({ message: "Invalid parameters" })
+        return
+    }
     const event: Event = req.body
-    const result = UpdateEvent(eventId as unknown as number, event)
+    const result = UpdateEvent(+eventId, event)
     res.status(200).json({"eventId": eventId})
 }
