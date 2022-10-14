@@ -15,7 +15,6 @@ const commonClassnames = "focus:ring-indigo-500 focus:border-indigo-500 flex-1 b
 
 export const getStaticProps = async () => {
     const providers = await getProviders()
-    console.log(providers)
     return {
         props: { providers },
     }
