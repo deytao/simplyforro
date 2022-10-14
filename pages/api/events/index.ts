@@ -33,8 +33,8 @@ export default async function handler(
         const lbound = moment(req.query.lbound)
         const ubound = moment(req.query.ubound)
         const categories = req.query.categories as Category[]
-        const fts = req.query.fts
-        const events = await GetEvents(lbound, ubound, categories)
+        const fts = req.query.fts as string
+        const events = await GetEvents(lbound, ubound, categories, fts)
         res.status(200).json(events)
     }
 }

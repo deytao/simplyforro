@@ -32,13 +32,18 @@ export async function UpdateEvent(eventId: number, data: any) {
     return result
 }
 
-export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, categories: Category[], validationStatus: ValidationStatus = "validated") {
+export async function GetEvents(
+    lbound: moment.Moment,
+    ubound: moment.Moment,
+    categories: Category[],
+    fts: string,
+    validationStatus: ValidationStatus = "validated",
+) {
     let events: Event[] = []
-    try {
-        events = await prisma.event.findMany({
-            where: {
-                OR: [{
-                    start_at: {
+    let filters: any = {
+        AND: [{
+            OR: [{
+                start_at: {
                         gte: lbound.toDate(),
                         lte: ubound.toDate(),
                     },
@@ -56,15 +61,28 @@ export async function GetEvents(lbound: moment.Moment, ubound: moment.Moment, ca
                             gte: ubound.toDate(),
                         },
                     }],
-                }],
-                categories: {
-                    hasSome: categories,
-                },
-                validation_status: {
-                    equals: validationStatus,
-                },
+            }],
+        }, {
+            categories: {
+                hasSome: categories,
             },
+        }, {
+            validation_status: {
+                equals: validationStatus,
+            },
+        }],
+    }
+    if (fts) {
+        filters["AND"].push({
+            OR: [
+                {title: {search: fts}},
+                {city: {search: fts}},
+                {country: {search: fts}},
+            ]
         })
+    }
+    try {
+        events = await prisma.event.findMany({where: filters})
     }
     catch (e) {
         console.error(e)
