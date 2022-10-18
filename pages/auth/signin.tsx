@@ -4,7 +4,6 @@ import type { Provider } from 'next-auth/providers'
 import { getProviders, signIn } from "next-auth/react"
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { XMarkIcon } from '@heroicons/react/24/outline'
 
 
 interface Props {
@@ -15,7 +14,6 @@ const commonClassnames = "focus:ring-indigo-500 focus:border-indigo-500 flex-1 b
 
 export const getStaticProps = async () => {
     const providers = await getProviders()
-    console.log(providers)
     return {
         props: { providers },
     }
