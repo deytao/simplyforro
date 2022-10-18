@@ -36,7 +36,7 @@ export async function GetEvents(
     lbound: moment.Moment,
     ubound: moment.Moment,
     categories: Category[],
-    searchedText: string,
+    searchedText: string = "",
     validationStatus: ValidationStatus = "validated",
 ) {
     const formatDate = (date: moment.Moment) => date.format("YYYY-MM-DD")

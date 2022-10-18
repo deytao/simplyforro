@@ -55,7 +55,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                 </button>
             </div>
             <div className="col-span-2 flex justify-center order-2">
-              <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
+              <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
             </div>
             <div className="col-span-7 md:col-span-3 order-4 md:order-3 p-1">
                 <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -120,8 +120,6 @@ const Calendar: NextPage = () => {
                   return events
               }).flat(1)
               setEvents(events)
-              let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
-              if (ftsInput) ftsInput.value = ftsValue
           })
       }, [currentDate, selectedCategories, ftsValue])
 
