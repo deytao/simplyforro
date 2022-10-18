@@ -36,10 +36,11 @@ export async function GetEvents(
     lbound: moment.Moment,
     ubound: moment.Moment,
     categories: Category[],
-    fts: string,
+    searchedText: string,
     validationStatus: ValidationStatus = "validated",
 ) {
     const formatDate = (date: moment.Moment) => date.format("YYYY-MM-DD")
+    const fts = searchedText.replace(/\W/g, " ").replace(/\s+/g, " ").trim().split(" ").join(" | ")
     try {
         const events = prisma.$queryRaw<Event[]>`
             SELECT *
@@ -56,18 +57,18 @@ export async function GetEvents(
             )
             ${
                 fts ? Prisma.sql`AND (
-                    to_tsvector('english', title) @@ to_tsquery(${fts})
-                OR to_tsvector('english', city) @@ to_tsquery(${fts})
-                OR to_tsvector('english', country) @@ to_tsquery(${fts})
-                OR to_tsvector('french', title) @@ to_tsquery(${fts})
-                OR to_tsvector('french', city) @@ to_tsquery(${fts})
-                OR to_tsvector('french', country) @@ to_tsquery(${fts})
-                OR to_tsvector('german', title) @@ to_tsquery(${fts})
-                OR to_tsvector('german', city) @@ to_tsquery(${fts})
-                OR to_tsvector('german', country) @@ to_tsquery(${fts})
-                OR to_tsvector('portuguese', title) @@ to_tsquery(${fts})
-                OR to_tsvector('portuguese', city) @@ to_tsquery(${fts})
-                OR to_tsvector('portuguese', country) @@ to_tsquery(${fts})
+                    to_tsvector('english', title) @@ to_tsquery('english', ${fts})
+                OR to_tsvector('english', city) @@ to_tsquery('english', ${fts})
+                OR to_tsvector('english', country) @@ to_tsquery('english', ${fts})
+                OR to_tsvector('french', title) @@ to_tsquery('french', ${fts})
+                OR to_tsvector('french', city) @@ to_tsquery('french', ${fts})
+                OR to_tsvector('french', country) @@ to_tsquery('french', ${fts})
+                OR to_tsvector('german', title) @@ to_tsquery('german', ${fts})
+                OR to_tsvector('german', city) @@ to_tsquery('german', ${fts})
+                OR to_tsvector('german', country) @@ to_tsquery('german', ${fts})
+                OR to_tsvector('portuguese', title) @@ to_tsquery('portuguese', ${fts})
+                OR to_tsvector('portuguese', city) @@ to_tsquery('portuguese', ${fts})
+                OR to_tsvector('portuguese', country) @@ to_tsquery('portuguese', ${fts})
             )` : Prisma.empty}
         `
         return events
