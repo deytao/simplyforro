@@ -42,10 +42,10 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
       }, 800)
   }
   return (
-      <div className="sticky top-[66px] md:top-[80px] z-40 bg-white">
+      <div className="sticky top-[66px] md:top-[81px] lg:top-[86px] z-40 bg-white">
         <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
         <div className="relative grid grid-cols-7 gap-x-4 mb-2">
-            <div className="col-span-4 md:col-span-2 lg:col-span-1 flex items-center order-1">
+            <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
                 <button type="button" onClick={prevMonth}>
                     <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
@@ -54,10 +54,10 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                     <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
                 </button>
             </div>
-            <div className="col-span-2 flex justify-center order-2">
-              <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} className="focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-1/2 rounded text-sm border-gray-300" data-filters-fts />
+            <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
+              <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} className="focus:ring-indigo-500 focus:border-indigo-500 w-full rounded text-sm border-gray-300" data-filters-fts />
             </div>
-            <div className="col-span-7 md:col-span-3 order-4 md:order-3 p-1">
+            <div className="col-span-5 lg:col-span-3 order-3 p-1">
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                     {categories.map((category: any, idx: number) => (
                       <div key={idx} className="flex items-center basis-1/6">
@@ -67,7 +67,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: str
                     ))}
                 </div>
             </div>
-            <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-3 md:order-4 pr-2 grid items-center justify-items-end">
+            <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 grid items-center justify-items-end">
               <Link href="/calendar/form">
                   <a className="btn btn-violet md:mr-5">Add</a>
               </Link>

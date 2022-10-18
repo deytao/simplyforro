@@ -2,8 +2,9 @@ import { ArrowSmallRightIcon } from '@heroicons/react/24/outline'
 import moment from 'moment';
 import type { NextPage } from 'next'
 import { useSession, signIn } from "next-auth/react"
-import { Event, Role } from '@prisma/client';
 import { useEffect, useState } from 'react'
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Event, Role } from '@prisma/client';
 
 import { MessageDialog } from 'components/MessageDialog'
 import { GetPendingEvents } from 'lib/calendar'
@@ -117,39 +118,47 @@ const Pendings: NextPage<Props> = ({ events }) => {
 
         <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
 
-        <table className="w-full table-fixed">
+        <table className="w-full table-fixed text-sm md:text-base">
             <thead>
                 <tr>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left">Title</th>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left">Date</th>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left">Categories</th>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left">Location</th>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left">Url</th>
-                    <th className="border-b font-medium p-4 pl-8 pt-0 pb-3 text-left flex gap-x-px">
-                        <button type="button" className="basis-1/2 btn btn-emerald" onClick={statuteEvent} data-event-action="validate" data-event-all>Validate all</button>
-                        <button type="button" className="basis-1/2 btn btn-red" onClick={statuteEvent} data-event-action="reject" data-event-all>Reject all</button>
+                    <th className="border-b font-medium p-1 md:p-2 text-left">Title</th>
+                    <th className="border-b font-medium p-1 md:p-2 text-left">Date</th>
+                    <th className="border-b font-medium p-1 md:p-2 text-left">Categories</th>
+                    <th className="border-b font-medium p-1 md:p-2 text-left">Location</th>
+                    <th className="border-b font-medium p-1 md:p-2 text-left">Url</th>
+                    <th className="border-b font-medium p-1 md:p-2 text-left flex gap-x-px justify-center">
+                        <button type="button" className="btn btn-emerald lg:before:content-['Validate_all']" onClick={statuteEvent} data-event-action="validate" data-event-all>
+                          <CheckIcon className="h-3 w-3 lg:hidden" />
+                        </button>
+                        <button type="button" className="btn btn-red lg:before:content-['Reject_all']" onClick={statuteEvent} data-event-action="reject" data-event-all>
+                          <XMarkIcon className="h-3 w-3 lg:hidden" />
+                        </button>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 {events.map((event: any, idx: number) => (
                     <tr key={event.id} data-row-event-id={event.id}>
-                        <td className="border-b border-slate-100 p-4 pl-8">{event.title}</td>
-                        <td className="border-b border-slate-100 p-4 pl-8">
+                        <td className="border-b border-slate-100 p-1 md:p-2">{event.title}</td>
+                        <td className="border-b border-slate-100 p-1 md:p-2">
                             {event.start_at} 
                             {event.end_at && <ArrowSmallRightIcon className="h-5 w-5 -mt-1 inline"/>}
                             {event.end_at} 
                         </td>
-                        <td className="border-b border-slate-100 p-4 pl-8">
+                        <td className="border-b border-slate-100 p-1 md:p-2">
                             {event.categories.map((category: any, idx: number) => (
                               <span key={idx} className={`event-tag-${category} px-2 rounded lowercase text-sm mr-1 md:text-base`}>{category}</span>
                             ))}
                         </td>
-                        <td className="border-b border-slate-100 p-4 pl-8">{event.location}</td>
-                        <td className="border-b border-slate-100 p-4 pl-8"><a href={event.url}>{event.url}</a></td>
-                        <td className="border-b border-slate-100 p-4 pl-8 flex gap-x-px">
-                            <button type="button" className="basis-1/2 btn btn-emerald" onClick={statuteEvent} data-event-action="validate" data-event-id={event.id}>Validate</button>
-                            <button type="button" className="basis-1/2 btn btn-red" onClick={statuteEvent} data-event-action="reject" data-event-id={event.id}>Reject</button>
+                        <td className="border-b border-slate-100 p-1 md:p-2">{event.location}</td>
+                        <td className="border-b border-slate-100 p-1 md:p-2"><a href={event.url}>{event.url}</a></td>
+                        <td className="border-b border-slate-100 p-1 md:p-2 flex gap-x-px justify-center">
+                            <button type="button" className="btn btn-emerald lg:before:content-['Validate']" onClick={statuteEvent} data-event-action="validate" data-event-id={event.id}>
+                              <CheckIcon className="h-3 w-3 lg:hidden" />
+                            </button>
+                            <button type="button" className="btn btn-red lg:before:content-['Reject'] justify-center" onClick={statuteEvent} data-event-action="reject" data-event-id={event.id}>
+                              <XMarkIcon className="h-3 w-3 lg:hidden" />
+                            </button>
                         </td>
                     </tr>
                 ))}
