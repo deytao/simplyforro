@@ -143,9 +143,15 @@ const Calendar: NextPage = () => {
                 })}
                 localizer={localizer}
                 onNavigate={(newDate) => {
-                    let elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
-                    let ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
-                    setSelectedCategories([...elements].map( (el) =>  el.value ))
+                    const elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
+                    const newCategories = [...elements].map( (el) =>  el.value )
+                    const ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
+
+                    if (selectedCategories.length !== newCategories.length) {
+                        // useState doesn't check the values themselves but the signature of the array
+                        // which is different everytime
+                        setSelectedCategories(newCategories)
+                    }
                     setFTSValue(ftsInput ? ftsInput.value : "")
                     setCurrentDate(newDate)
                 }}
