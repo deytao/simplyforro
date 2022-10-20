@@ -24,7 +24,7 @@ const frequencyIntervals: {[key: string]: object} = {
     "daily": {"days": 1},
     "weekly": {"weeks": 1},
     "biweekly": {"weeks": 2},
-    "monthly": {"months": 1},
+    "monthly": {"weeks": 4},
 }
 
 const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string}) => {
