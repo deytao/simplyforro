@@ -44,7 +44,7 @@ export async function GetEvents(
     try {
         const events = prisma.$queryRaw<Event[]>`
             SELECT *
-            FROM "Event"
+            FROM event
             WHERE validation_status = ${validationStatus}::"ValidationStatus"
             AND categories && ${categories}::"Category"[]
             AND (

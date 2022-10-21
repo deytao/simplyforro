@@ -1,6 +1,6 @@
 {
   "name": "simplyforro",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "engines": {
     "node": "16.x",
     "npm": "8.8.x",
