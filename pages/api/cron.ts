@@ -19,10 +19,11 @@ export default async function handler(
         if (token === CRON_TOKEN) {
             // Process the POST request
             const subscriptions: Subscription[] = await GetNextSubscriptions()
-            const recipients = subscriptions.map((subscription: Subscription) => {
+            const recipients = subscriptions.map((subscription) => {
                 return subscription.subscribers.map((subscriber) => subscriber.user.email)
             }).flat()
-            res.status(200).json(subscriptions)
+            const result = sendBulkEmails(recipients, "Weekly Forró Calendar", "Event this week", "<h1>Event this week</h1>")
+            res.status(200).json(result)
         }
         else {
             res.status(401)
