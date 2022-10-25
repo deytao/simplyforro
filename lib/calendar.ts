@@ -5,6 +5,13 @@ import prisma from 'lib/prisma';
 import { EventInter } from 'schemas/event';
 
 
+export const frequencyIntervals: {[key: string]: object} = {
+    "daily": {"days": 1},
+    "weekly": {"weeks": 1},
+    "biweekly": {"weeks": 2},
+    "monthly": {"weeks": 4},
+}
+
 export async function CreateEvent(event: EventInter) {
     let start_at: moment.Moment = moment(event.start_at)
     let end_at: moment.Moment = moment(event.end_at)
