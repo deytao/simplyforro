@@ -8,7 +8,7 @@ import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@h
 
 import { EventDetailsSimple } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
-import { GetEvents } from 'lib/calendar'
+import { frequencyIntervals } from 'lib/calendar'
 import { categories } from 'schemas/event';
 
 
@@ -19,13 +19,6 @@ moment.locale("en", {
     },
 })
 const localizer = momentLocalizer(moment);
-
-const frequencyIntervals: {[key: string]: object} = {
-    "daily": {"days": 1},
-    "weekly": {"weeks": 1},
-    "biweekly": {"weeks": 2},
-    "monthly": {"weeks": 4},
-}
 
 const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string}) => {
   const prevMonth = () => onNavigate("PREV")

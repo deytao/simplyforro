@@ -6,28 +6,30 @@ const mailjet = new Mailjet({
 });
 
 
-const sender = (messages: any) => {
-  return mailjet
-    .post("send", { version: "v3.1" })
-    .request({
-      Messages: messages,
-    })
-    .then((result) => {
-        console.log(result)
-    })
-    .catch((err) => {
-        console.log(err)
-    });
+const sender = async (messages: any) => {
+    return mailjet
+        .post("send", { version: "v3.1" })
+        .request({
+            Globals: {
+                From: {
+                    Email: "no-reply@simplyforro.dance",
+                    Name: "SimplyForró",
+                },
+            },
+            Messages: messages,
+        })
+        .then((result) => {
+            console.log("success")
+        })
+        .catch((err) => {
+            console.log(err)
+        });
 }
 
 
 export const sendEmail = async (recipient: string, subject: string, text: string, html: string) => {
-    return sender([
+    return await sender([
         {
-            From: {
-                Email: "no-reply@simplyforro.dance",
-                Name: "SimplyForró",
-            },
             To: [
                 {
                     Email: recipient,
@@ -41,17 +43,16 @@ export const sendEmail = async (recipient: string, subject: string, text: string
 }
 
 
-export const sendBulkEmails = async (recipients: string[], subject: string, text: string, html: string) => {
-    return sender([
+export const sendBulkEmails = async (recipients: string[], template_id: number, data: any | undefined = {}) => {
+    return await sender([
         {
-            From: {
-                Email: "no-reply@simplyforro.dance",
-                Name: "SimplyForró",
-            },
+            TemplateID: template_id,
+            TemplateLanguage: true,
             To: [...recipients.map((recipient) => { return {Email: recipient}})],
-            Subject: subject,
-            TextPart: text,
-            HTMLPart: html,
+            Variables: {
+                ...data,
+                base_url: process.env.BASE_URL,
+            },
         },
     ])
 }
