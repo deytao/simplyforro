@@ -1,9 +1,10 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Category, Event, Subscription } from '@prisma/client';
+import { Category, Event } from '@prisma/client';
 
 import { GetEvents, frequencyIntervals } from 'lib/calendar'
 import { sendBulkEmails } from 'lib/mailjet';
+import { Subscription } from 'lib/prisma';
 import { GetNextSubscriptions } from 'lib/subscription';
 
 export default async function handler(
@@ -25,7 +26,7 @@ export default async function handler(
             }).flat()
             const lbound = moment(new Date())
             const ubound = moment(new Date()).add(7, "days").endOf("week")
-            const result = GetEvents(lbound, ubound, Object.keys(Category))
+            const result = GetEvents(lbound, ubound, Object.keys(Category) as Category[])
                 .then((data: Event[]) => {
                     const events = data.map((event) => {
                         if (!event.frequency) {

@@ -12,7 +12,7 @@ const sender = async (messages: any) => {
         .request({
             Globals: {
                 From: {
-                    Email: "no-reply@simplyforro.dance",
+                    Email: process.env.EMAIL_FROM,
                     Name: "SimplyForró",
                 },
             },

@@ -1,7 +1,7 @@
 import moment from 'moment';
-import { Subscription, Frequency } from '@prisma/client';
+import { Frequency } from '@prisma/client';
 
-import prisma from 'lib/prisma';
+import prisma, { Subscription } from 'lib/prisma';
 
 
 export async function GetNextSubscriptions(): Promise<Subscription[]> {
