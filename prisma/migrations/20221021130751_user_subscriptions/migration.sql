@@ -27,7 +27,7 @@ CREATE TABLE "subscriber" (
 
 -- First Subscriptions
 INSERT INTO subscription (updated_at, title, description, slug, active, next_run, frequency) VALUES
-    (CURRENT_TIMESTAMP, 'Next Events', 'Upcoming events for the following week', 'next-events-weekly', false, NOW(), 'weekly'::"Frequency"),
+    (CURRENT_TIMESTAMP, 'Weekly Forró Calendar', 'Upcoming events for the following week', 'weekly-forro-calendar', false, NOW(), 'weekly'::"Frequency"),
     (CURRENT_TIMESTAMP, 'Last Updated Events', 'Recently updated events', 'last-updated-events-weekly', false, NOW(), 'weekly'::"Frequency"),
     (CURRENT_TIMESTAMP, 'Events To Review', 'Events still pending review', 'events-to-review-daily', false, NOW(), 'daily'::"Frequency")
 ;

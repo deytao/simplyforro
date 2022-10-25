@@ -32,33 +32,53 @@ export default async function handler(
                         if (!event.frequency) {
                             return {
                                 title: event.title,
-                                date: moment(event.start_at).format("ddd Do of MMM YYYY"),
+                                date: moment(event.start_at),
                                 url: event.url,
                                 categories: event.categories,
+                                city: event.city,
+                                country: event.country,
                             }
                         }
                         let eventDate = moment(event.start_at)
                         let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
                         let events: {
                             title: string,
-                            date: string,
+                            date: moment.Moment,
                             url: string | null,
                             categories: Category[],
+                            city: string,
+                            country: string,
                         }[] = []
                         while (eventDate <= lastDate) {
                             if (eventDate >= lbound) {
                                 events.push({
                                     title: event.title,
-                                    date: eventDate.format("ddd Do of MMM YYYY"),
+                                    date: eventDate,
                                     url: event.url,
                                     categories: event.categories,
+                                    city: event.city,
+                                    country: event.country,
                                 })
                             }
                             eventDate.add(frequencyIntervals[event.frequency])
                         }
                         return events
                     }).flat()
-                    sendBulkEmails(recipients, 4304516, {events: events})
+                    events.sort((event_a, event_b) => {
+                        if (event_a.date.isBefore(event_b.date)) {
+                            return -1
+                        }
+                        if (event_a.date.isAfter(event_b.date)) {
+                            return 1
+                        }
+                        return 0
+                    })
+                    sendBulkEmails(recipients, 4304516, {events: events.map((event) => {
+                        return {
+                            ...event,
+                            date: event.date.format("ddd Do of MMM YYYY"),
+                        }
+                    })})
                 })
             res.status(200).json("success")
         }

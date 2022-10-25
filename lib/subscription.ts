@@ -6,7 +6,7 @@ import prisma, { Subscription } from 'lib/prisma';
 
 export async function GetNextSubscriptions(): Promise<Subscription[]> {
     let subscriptions: Subscription[] = []
-    const date = moment().add({'hours': 3}).toDate()
+    const date = moment().toDate()
     try {
         subscriptions = await prisma.subscription.findMany({
             where: {
