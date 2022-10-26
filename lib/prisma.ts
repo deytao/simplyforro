@@ -20,5 +20,5 @@ export declare type Subscriber = _Subscriber & {
 }
 
 export declare type Subscription = _Subscription & {
-  subscribers: Subscriber[]
+  subscribers?: Subscriber[]
 }

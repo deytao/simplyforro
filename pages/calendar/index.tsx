@@ -1,6 +1,7 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { useSession } from "next-auth/react"
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
@@ -11,7 +12,9 @@ import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@h
 import { EventDetailsSimple } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
 import { frequencyIntervals } from 'lib/calendar'
+import { Subscription } from 'lib/prisma'
 import { categories } from 'schemas/event';
+import { GetSubscriptions } from 'lib/subscription'
 import { subscriberSchema } from 'schemas/subscriber';
 
 
@@ -23,7 +26,31 @@ moment.locale("en", {
 })
 const localizer = momentLocalizer(moment);
 
+
+interface Props {
+    subscriptions: Subscription[]
+}
+
+export const getStaticProps = async () => {
+  const subscriptions = await GetSubscriptions();
+
+  return {
+    props: {
+      subscriptions: subscriptions.map((subscription) => ({
+          title: subscription.title,
+          description: subscription.description,
+          slug: subscription.slug,
+      })),
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every second
+    revalidate: 3600, // In seconds
+  };
+};
+
 const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string, showForm: any}) => {
+    const { data: session } = useSession()
     const prevMonth = () => onNavigate("PREV")
     const currentMonth = () => onNavigate("TODAY")
     const nextMonth = () => onNavigate("NEXT")
@@ -33,9 +60,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {
         if (taskId) {
             clearTimeout(taskId)
         }
-        taskId = setTimeout(() => {
-                onNavigate()
-                }, 800)
+        taskId = setTimeout(() => onNavigate(), 800)
     }
     return (
         <>
@@ -65,7 +90,10 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
-                        <button className="btn btn-neutral" onClick={showForm}>Subscribe</button>
+                        <button className="btn btn-neutral" onClick={showForm}>
+                            {!session && "Subscribe"}
+                            {session && "My Subscriptions"}
+                        </button>
                         <Link href="/calendar/form">
                             <a className="btn btn-violet">Add</a>
                         </Link>
@@ -76,7 +104,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {
     )
 }
 
-const Calendar: NextPage = () => {
+const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
@@ -118,8 +146,8 @@ const Calendar: NextPage = () => {
                 setMessageDialogState({
                   isOpen: true,
                   status: "success",
-                  title: "Successfully subscribed!",
-                  message: "You'll receive your weekly digest every Sunday afternoon",
+                  title: "Subscriptions updated!",
+                  message: "Your subscriptions settings have updated.",
                 })
             })
             .catch(error => {
@@ -132,7 +160,7 @@ const Calendar: NextPage = () => {
             })
         return false;
     }
-    
+
     const reloadFailSubmit = (errors: Object) => {
         setMessageDialogState({isOpen: false})
         showForm(errors)
@@ -157,6 +185,27 @@ const Calendar: NextPage = () => {
                             <input type="text" {...register("email")} placeholder="john.doe@email.com" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
                         </div>
                         <div className="text-red-500 text-xs italic">{errors.email?.message}</div>
+                    </div>
+                    <div className="col-span-2">
+                        <fieldset className="mt-2">
+                            <legend className="text-base font-medium text-gray-900">Subscriptions</legend>
+                            <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
+                            <div className="mt-2 space-y-4">
+                                {subscriptions.map((subscription: Subscription) => (
+                                    <div key={subscription.slug} className="flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} type="checkbox" className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label htmlFor={`subscriptions-${subscription.slug}`} className="font-medium text-gray-700">
+                                                {subscription.title}
+                                                <p className="text-gray-500 font-normal">{subscription.description}</p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
             </>,

@@ -4,6 +4,27 @@ import { Prisma } from '@prisma/client';
 import prisma, { Subscription } from 'lib/prisma';
 
 
+export async function GetSubscriptions(): Promise<Subscription[]> {
+    let subscriptions: Subscription[] = []
+    try {
+        subscriptions = await prisma.subscription.findMany({
+            where: {
+                active: {
+                    equals: true,
+                },
+            },
+            orderBy: [{
+                title: "asc",
+            }],
+        })
+    }
+    catch (e) {
+        console.error(e)
+    }
+    return subscriptions
+}
+
+
 export async function GetNextSubscriptions(): Promise<Subscription[]> {
     let subscriptions: Subscription[] = []
     const date = moment().toDate()
