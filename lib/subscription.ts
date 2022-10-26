@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Frequency } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import prisma, { Subscription } from 'lib/prisma';
 
@@ -30,4 +30,37 @@ export async function GetNextSubscriptions(): Promise<Subscription[]> {
         console.error(e)
     }
     return subscriptions
+}
+
+
+export async function CreateSubscriber(subscriber: any) {
+    const user = await prisma.user.findUnique({
+        where: {
+            email: subscriber.email,
+        },
+    })
+    if (user) {
+        console.log("User found, create subscriber only")
+        const createUserAndSubscriber = await prisma.subscriber.create({
+            data: {
+                subscriptionId: 1,
+                userId: user.id,
+            },
+        })
+    }
+    else {
+        console.log("User not found, create all")
+        const createUserAndSubscriber = await prisma.user.create({
+            data: {
+                name: subscriber.name,
+                email: subscriber.email,
+                subscriptions: {
+                    create: [
+                        { subscriptionId: 1 },
+                    ],
+                },
+            },
+        })
+    }
+    return true
 }
