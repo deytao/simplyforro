@@ -3,15 +3,15 @@ import { Dialog } from '@headlessui/react'
 
 
 const statusClasses = {
-    "success": ["bg-green-100 border-green-700 text-green-700", "bg-green-700 hover:bg-green-900"],
-    "error": ["bg-red-100 border-red-700 text-red-700", "bg-red-700 hover:bg-red-900"],
+    "success": ["bg-green-100 border-green-700 text-green-700", "btn-emerald"],
+    "error": ["bg-red-100 border-red-700 text-red-700", "btn-red"],
     "info": ["bg-teal-100 border-teal-700 text-teal-700", "bg-teal-700 hover:bg-teal-900"],
     "warning": ["bg-orange-100 border-orange-700 text-orange-700", "bg-orange-700 hover:bg-orange-900"],
-    "neutral": ["bg-neutral-100 border-neutral-700 text-neutral-700", "bg-neutral-700 hover:bg-neutral-900"],
+    "neutral": ["bg-neutral-100 border-neutral-700 text-neutral-700", "btn-neutral"],
 }
 
 
-export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
+export const MessageDialog = ({ messageDialog, setMessageDialog, customAction = {} }) => {
   if (!(messageDialog.status in statusClasses)) {
     return <></>
   }
@@ -27,13 +27,20 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
         <Dialog.Panel className={`border-t-4 rounded-b px-4 py-3 shadow-md w-full max-w-sm ${panelClasses}`}>
           <Dialog.Title className="font-bold">{messageDialog.title}</Dialog.Title>
 
-          <Dialog.Description className="text-sm my-5">
+          {messageDialog.message && <Dialog.Description className="text-sm my-5">
             {messageDialog.message}
-          </Dialog.Description>
+          </Dialog.Description>}
 
-          <button onClick={() => setMessageDialog({isOpen: false})} className={`${buttonClasses} text-white font-bold py-2 px-4 rounded`}>
+          {messageDialog.content && <div className="my-5">
+              {messageDialog.content}
+          </div>}
+
+          <button onClick={() => setMessageDialog({isOpen: false})} className={`${buttonClasses} btn`}>
             Close
           </button>
+          {customAction && <button onClick={customAction.callback} className={`${customAction.classes} ml-1`}>
+              {customAction.title}
+          </button>}
         </Dialog.Panel>
       </div>
     </Dialog>
