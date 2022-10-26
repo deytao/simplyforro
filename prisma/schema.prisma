@@ -134,5 +134,6 @@ model Subscriber {
   subscriptionId Int          @map("subscription_id")
   subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
+  @@unique([subscriptionId, userId])
   @@map("subscriber")
 }
