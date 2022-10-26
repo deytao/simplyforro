@@ -11,7 +11,7 @@ const statusClasses = {
 }
 
 
-export const MessageDialog = ({ messageDialog, setMessageDialog, customAction = {} }) => {
+export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
   if (!(messageDialog.status in statusClasses)) {
     return <></>
   }
@@ -38,8 +38,8 @@ export const MessageDialog = ({ messageDialog, setMessageDialog, customAction = 
           <button onClick={() => setMessageDialog({isOpen: false})} className={`${buttonClasses} btn`}>
             Close
           </button>
-          {customAction && <button onClick={customAction.callback} className={`${customAction.classes} ml-1`}>
-              {customAction.title}
+          {messageDialog.customButton && <button onClick={messageDialog.customButton.callback} className={`${messageDialog.customButton.classes} ml-1`}>
+              {messageDialog.customButton.title}
           </button>}
         </Dialog.Panel>
       </div>

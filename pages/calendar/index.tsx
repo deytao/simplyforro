@@ -81,17 +81,15 @@ const Calendar: NextPage = () => {
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
-    const [ messageDialogState, setMessageDialogState ] = useState<{isOpen: boolean, status: string, title: string, message: any}>({
+    const [ messageDialogState, setMessageDialogState ] = useState<{
+        isOpen: boolean,
+        status?: string,
+        title?: string,
+        message?: any,
+        content?: any,
+        customButton?: any
+    }>({
         isOpen: false,
-        status: "",
-        title: "",
-        message: "",
-    });
-    const [ subscribeDialogState, setSubscribeDialogState ] = useState<{isOpen: boolean, status?: string, title?: string, content?: any}>({
-        isOpen: false,
-        status: "",
-        title: "",
-        content: "",
     });
     const formOptions = { resolver: yupResolver(subscriberSchema) };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
@@ -116,16 +114,32 @@ const Calendar: NextPage = () => {
                 }
                 return response.json()
             })
+            .then(data => {
+                setMessageDialogState({
+                  isOpen: true,
+                  status: "success",
+                  title: "Successfully subscribed!",
+                  message: "You'll receive your weekly digest every Sunday afternoon",
+                })
+            })
+            .catch(error => {
+                setMessageDialogState({
+                    isOpen: true,
+                    status: "error",
+                    title: "Error",
+                    message: error.message,
+                })
+            })
         return false;
     }
     
     const reloadFailSubmit = (errors: Object) => {
-        setSubscribeDialogState({isOpen: false})
+        setMessageDialogState({isOpen: false})
         showForm(errors)
     }
 
     const showForm = (errors: any = {}) => {
-        setSubscribeDialogState({
+        setMessageDialogState({
             isOpen: true,
             status: "neutral",
             title: "Subscribe to the Weekly Forró Calendar",
@@ -146,12 +160,12 @@ const Calendar: NextPage = () => {
                     </div>
                 </div>
             </>,
+            customButton: {
+                callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
+                classes: "btn btn-emerald",
+                title: "Submit",
+            }
         })
-    }
-    const customAction = {
-        callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
-        classes: "btn btn-emerald",
-        title: "Submit",
     }
 
     useEffect(() => {
@@ -191,7 +205,6 @@ const Calendar: NextPage = () => {
 
     return (
         <>
-            <MessageDialog messageDialog={subscribeDialogState} setMessageDialog={setSubscribeDialogState} customAction={customAction} />
             <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
             <BigCalendar
                 components={{
