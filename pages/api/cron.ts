@@ -102,6 +102,14 @@ export default async function handler(
                     .then(({recipients, data}: {recipients: string[], data: any}) => {
                         sendBulkEmails(4304516, recipients, data)
                     })
+                let lastRun = moment()
+                let shiftSubscription = await prisma.subscription.update({
+                    where: { id: subscription.id },
+                    data: {
+                        lastRun: lastRun.toDate(),
+                        nextRun: moment(lastRun).add(frequencyIntervals[subscription.frequency]).toDate(),
+                    },
+                })
             }
             res.status(200).json("success")
         }
