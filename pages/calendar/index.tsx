@@ -120,7 +120,12 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     }>({
         isOpen: false,
     });
-    const formOptions = { resolver: yupResolver(subscriberSchema) };
+    const formOptions = {
+        resolver: yupResolver(subscriberSchema),
+        defaultValues: {
+            subscriptions: [],
+        }
+    };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
     const { errors } = formState;
 
@@ -197,8 +202,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                     }
                     {session &&
                         <>
-                            <input type="hidden" {...register("name")} value={session.user.name!} />
-                            <input type="hidden" {...register("email")} value={session.user.email!} />
+                            <input type="hidden" {...register("name")} defaultValue={session.user.name!} />
+                            <input type="hidden" {...register("email")} defaultValue={session.user.email!} />
                         </>
                     }
                     <div className="col-span-2">
