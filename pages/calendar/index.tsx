@@ -77,13 +77,13 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
                         </button>
                     </div>
                     <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-                      <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} className="focus:ring-indigo-500 focus:border-indigo-500 w-full rounded text-sm border-gray-300" data-filters-fts />
+                      <input type="text" key="fts-field" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} data-filters-fts />
                     </div>
                     <div className="col-span-5 lg:col-span-3 order-3 p-1">
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                             {categories.map((category: any, idx: number) => (
                                 <div key={idx} className="flex items-center basis-1/6">
-                                    <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeCategories} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
+                                    <input type="checkbox" id={`categories-${category}`} value={category} onChange={changeCategories} data-filters-categories checked={selectedCategories.includes(category)} />
                                     <label htmlFor={`categories-${category}`} className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}>{category}</label>
                                 </div>
                             ))}
@@ -209,7 +209,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 {subscriptions.map((subscription: Subscription) => (
                                     <div key={subscription.slug} className="flex items-start">
                                         <div className="flex items-center h-5">
-                                            <input id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} type="checkbox" className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" defaultChecked={selectedSubscriptions.includes(subscription.slug)} />
+                                            <input type="checkbox" id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} defaultChecked={selectedSubscriptions.includes(subscription.slug)} />
                                         </div>
                                         <div className="ml-3 text-sm">
                                             <label htmlFor={`subscriptions-${subscription.slug}`} className="font-medium text-gray-700">

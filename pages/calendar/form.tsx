@@ -9,9 +9,7 @@ import { MessageDialog } from 'components/MessageDialog'
 import { eventSchema } from 'schemas/event';
 
 
-const commonClassnames = "focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
-const checkboxClassnames = "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-
+const commonClassnames = "flex-1 block"
 
 const CalendarForm: NextPage = () => {
   const formOptions = { resolver: yupResolver(eventSchema) };
@@ -195,7 +193,7 @@ const CalendarForm: NextPage = () => {
                   <div className="mt-4 space-y-4">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="categories-party" {...register("categories")} value="party" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
+                        <input type="checkbox" id="categories-party" {...register("categories")} value="party" className={errors.categories ? 'border-red-500' : ''} />
                       </div>
                       <div className="ml-3 text-sm">
                         <label htmlFor="categories-party" className="font-medium text-gray-700">
@@ -206,7 +204,7 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="categories-pratica" {...register("categories")} value="pratica" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
+                        <input type="checkbox" id="categories-pratica" {...register("categories")} value="pratica" className={errors.categories ? 'border-red-500' : ''} />
                       </div>
                       <div className="ml-3 text-sm">
                         <label htmlFor="categories-pratica" className="font-medium text-gray-700">
@@ -217,7 +215,7 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="categories-class" {...register("categories")} value="class" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
+                        <input type="checkbox" id="categories-class" {...register("categories")} value="class" className={errors.categories ? 'border-red-500' : ''} />
                       </div>
                       <div className="ml-3 text-sm">
                         <label htmlFor="categories-class" className="font-medium text-gray-700">
@@ -228,7 +226,7 @@ const CalendarForm: NextPage = () => {
                     </div>
                    <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="categories-workshop" {...register("categories")} value="workshop" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
+                        <input type="checkbox" id="categories-workshop" {...register("categories")} value="workshop" className={errors.categories ? 'border-red-500' : ''} />
                       </div>
                       <div className="ml-3 text-sm">
                         <label htmlFor="categories-workshop" className="font-medium text-gray-700">
@@ -239,7 +237,7 @@ const CalendarForm: NextPage = () => {
                     </div>
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input id="categories-festival" {...register("categories")} value="festival" type="checkbox" className={`${checkboxClassnames} ${errors.categories ? 'border-red-500' : ''}`} />
+                        <input type="checkbox" id="categories-festival" {...register("categories")} value="festival" className={errors.categories ? 'border-red-500' : ''} />
                       </div>
                       <div className="ml-3 text-sm">
                         <label htmlFor="categories-festival" className="font-medium text-gray-700">

@@ -10,7 +10,7 @@ interface Props {
     providers: Provider[]
 }
 
-const commonClassnames = "focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+const commonClassnames = "flex-1 block"
 
 export const getStaticProps = async () => {
     const providers = await getProviders()
