@@ -4,15 +4,21 @@ import { Prisma, User } from '@prisma/client';
 import prisma, { Subscription } from 'lib/prisma';
 
 
-export async function GetSubscriptions(): Promise<Subscription[]> {
+export async function GetSubscriptions(public_only: Boolean = true): Promise<Subscription[]> {
     let subscriptions: Subscription[] = []
+    let where: Prisma.SubscriptionWhereInput = {
+        active: {
+            equals: true,
+        },
+    }
+    if (public_only) {
+        where.public = {
+            equals: true,
+        }
+    }
     try {
         subscriptions = await prisma.subscription.findMany({
-            where: {
-                active: {
-                    equals: true,
-                },
-            },
+            where: where,
             orderBy: [{
                 title: "asc",
             }],

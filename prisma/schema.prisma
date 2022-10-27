@@ -117,6 +117,7 @@ model Subscription {
   description String
   slug        String       @unique
   active      Boolean      @default(false)
+  public      Boolean      @default(false)
   nextRun     DateTime     @map("next_run") @db.Timestamp
   lastRun     DateTime?    @map("last_run") @db.Timestamp
   frequency   Frequency
