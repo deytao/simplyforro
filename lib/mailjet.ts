@@ -43,7 +43,7 @@ export const sendEmail = async (recipient: string, subject: string, text: string
 }
 
 
-export const sendBulkEmails = async (recipients: string[], template_id: number, data: any | undefined = {}) => {
+export const sendBulkEmails = async (template_id: number, recipients: string[], data: any | undefined = {}) => {
     return await sender([
         {
             TemplateID: template_id,
