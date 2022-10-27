@@ -2,6 +2,7 @@ import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useSession } from "next-auth/react"
+import type { Session } from "next-auth/core/types"
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
@@ -49,8 +50,7 @@ export const getStaticProps = async () => {
   };
 };
 
-const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string, showForm: any}) => {
-    const { data: session } = useSession()
+const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, status}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string, showForm: any, status: string}) => {
     const prevMonth = () => onNavigate("PREV")
     const currentMonth = () => onNavigate("TODAY")
     const nextMonth = () => onNavigate("NEXT")
@@ -91,8 +91,8 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
                         <button className="btn btn-neutral" onClick={showForm}>
-                            {!session && "Subscribe"}
-                            {session && "My Subscriptions"}
+                            {status !== "authenticated" && "Subscribe"}
+                            {status === "authenticated" && "My Subscriptions"}
                         </button>
                         <Link href="/calendar/form">
                             <a className="btn btn-violet">Add</a>
@@ -105,6 +105,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm}: {
 }
 
 const Calendar: NextPage<Props> = ({ subscriptions }) => {
+    const { data: session, status } = useSession()
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
@@ -167,25 +168,39 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     }
 
     const showForm = (errors: any = {}) => {
+        let selectedSubscriptions: string[] = []
+        if (session) {
+            selectedSubscriptions = session.user.subscriptions.map((subscription) => subscription.slug)
+        }
         setMessageDialogState({
             isOpen: true,
             status: "neutral",
-            title: "Subscribe to the Weekly Forró Calendar",
+            title: "Configuration",
             content: <>
                 <div className="grid grid-cols-2 gap-1">
-                    <div className="col-span-1">
-                        <div className="mt-1 flex rounded-md shadow-sm">
-                            <input type="text" {...register("name")} placeholder="John Doe" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
-                        </div>
-                        <div className="text-red-500 text-xs italic">{errors.name?.message}</div>
-                    </div>
+                    {!session &&
+                        <>
+                            <div className="col-span-1">
+                                <div className="mt-1 flex rounded-md shadow-sm">
+                                    <input type="text" {...register("name")} placeholder="John Doe" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
+                                </div>
+                                <div className="text-red-500 text-xs italic">{errors.name?.message}</div>
+                            </div>
 
-                    <div className="col-span-1">
-                        <div className="mt-1 flex rounded-md shadow-sm">
-                            <input type="text" {...register("email")} placeholder="john.doe@email.com" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
-                        </div>
-                        <div className="text-red-500 text-xs italic">{errors.email?.message}</div>
-                    </div>
+                            <div className="col-span-1">
+                                <div className="mt-1 flex rounded-md shadow-sm">
+                                    <input type="text" {...register("email")} placeholder="john.doe@email.com" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
+                                </div>
+                                <div className="text-red-500 text-xs italic">{errors.email?.message}</div>
+                            </div>
+                        </>
+                    }
+                    {session &&
+                        <>
+                            <input type="hidden" {...register("name")} value={session.user.name!} />
+                            <input type="hidden" {...register("email")} value={session.user.email!} />
+                        </>
+                    }
                     <div className="col-span-2">
                         <fieldset className="mt-2">
                             <legend className="text-base font-medium text-gray-900">Subscriptions</legend>
@@ -194,7 +209,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 {subscriptions.map((subscription: Subscription) => (
                                     <div key={subscription.slug} className="flex items-start">
                                         <div className="flex items-center h-5">
-                                            <input id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} type="checkbox" className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" />
+                                            <input id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} type="checkbox" className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" defaultChecked={selectedSubscriptions.includes(subscription.slug)} />
                                         </div>
                                         <div className="ml-3 text-sm">
                                             <label htmlFor={`subscriptions-${subscription.slug}`} className="font-medium text-gray-700">
@@ -258,7 +273,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
             <BigCalendar
                 components={{
                     event: EventDetailsSimple,
-                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue, showForm}),
+                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue, showForm, status}),
                 }}
                 defaultDate={currentDate}
                 defaultView="month"

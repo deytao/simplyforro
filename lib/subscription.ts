@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 import prisma, { Subscription } from 'lib/prisma';
 
@@ -54,33 +54,47 @@ export async function GetNextSubscriptions(): Promise<Subscription[]> {
 }
 
 
-export async function CreateSubscriber(subscriber: any) {
-    const user = await prisma.user.findUnique({
+export async function CreateSubscriber(data: any) {
+    let user: User | null = await prisma.user.findUnique({
         where: {
-            email: subscriber.email,
+            email: data.email,
         },
     })
-    if (user) {
-        console.log("User found, create subscriber only")
-        const createUserAndSubscriber = await prisma.subscriber.create({
-            data: {
-                subscriptionId: 1,
-                userId: user.id,
+    let subscriptions: Subscription[] = []
+    if (data.subscriptions) {
+        subscriptions = await prisma.subscription.findMany({
+            where: {
+                slug: {
+                    in: data.subscriptions,
+                },
             },
         })
     }
+    if (user) {
+        const deleteSubscribers = await prisma.subscriber.deleteMany({
+            where: {
+                user: {
+                    id: user.id,
+                }
+            }
+        })
+    }
     else {
-        console.log("User not found, create all")
-        const createUserAndSubscriber = await prisma.user.create({
+        user = await prisma.user.create({
             data: {
-                name: subscriber.name,
-                email: subscriber.email,
-                subscriptions: {
-                    create: [
-                        { subscriptionId: 1 },
-                    ],
-                },
+                name: data.name,
+                email: data.email,
             },
+        })
+    }
+    if (subscriptions) {
+        const createUserAndSubscriber = await prisma.subscriber.createMany({
+            data: subscriptions.map((subscription) => {
+                return {
+                    userId: user!.id,
+                    subscriptionId: subscription.id,
+                }
+            }),
         })
     }
     return true

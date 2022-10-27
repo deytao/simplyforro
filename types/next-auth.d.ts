@@ -1,5 +1,5 @@
 import NextAuth, { DefaultSession } from "next-auth"
-import { Role, Subscriber } from '@prisma/client';
+import { Role, Subscription } from '@prisma/client';
 
 declare module "next-auth" {
     /**
@@ -8,12 +8,12 @@ declare module "next-auth" {
     interface Session {
         user: {
             roles: Role[]
-            subscriptions: Subscriber[]
+            subscriptions: Subscription[]
         } & DefaultSession["user"]
     }
 
     interface User {
         roles: Role[]
-        subscriptions: Subscriber[]
+        subscriptions: Subscription[]
     }
 }

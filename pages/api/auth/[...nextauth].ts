@@ -92,6 +92,17 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async session({ session, user, token }: { session: Session, user: User, token: JWT}) {
             session.user.roles = user.roles
+            session.user.subscriptions = await prisma.subscription.findMany({
+                where: {
+                    subscribers: {
+                        some: {
+                            user: {
+                                id: user.id,
+                            },
+                        },
+                    },
+                },
+            })
             return session
         },
     },
