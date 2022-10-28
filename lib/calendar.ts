@@ -107,6 +107,25 @@ export async function GetLastUpdatedEvents(date: moment.Moment) {
     }
 }
 
+export async function CountPendingEvents() {
+    try {
+        return (await prisma.event.aggregate({
+            _count: {
+                id: true
+            },
+            where: {
+                validation_status: {
+                    equals: ValidationStatus.pending,
+                },
+            },
+        }))._count.id
+    }
+    catch (e) {
+        console.error(e)
+    }
+    return 0
+}
+
 export async function GetPendingEvents() {
     let events: Event[] = []
     try {

@@ -2,7 +2,7 @@ import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Category, Event } from '@prisma/client';
 
-import { GetEvents, GetLastUpdatedEvents, frequencyIntervals } from 'lib/calendar'
+import { GetEvents, GetLastUpdatedEvents, CountPendingEvents, frequencyIntervals } from 'lib/calendar'
 import { sendBulkEmails } from 'lib/mailjet';
 import { Subscription } from 'lib/prisma';
 import { GetNextSubscriptions } from 'lib/subscription';
@@ -100,7 +100,22 @@ const callbacks: {[key: string]: Function} = {
             recipients: recipients,
             data: {events: events}
         }
-    }
+    },
+    "events-to-review-daily": async (subscription: Subscription): Promise<{recipients: string[], data: any}> => {
+        const recipients = subscription.subscribers ? subscription.subscribers.map((subscriber) => subscriber.user.email) : []
+        const currentDate = moment()
+        const count = await CountPendingEvents()
+        if (!recipients || count == 0) {
+            return {
+                recipients: [],
+                data: {},
+            }
+        }
+        return {
+            recipients: recipients,
+            data: null
+        }
+    },
 }
 
 export default async function handler(
