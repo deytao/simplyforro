@@ -48,6 +48,10 @@ export const sendBulkEmails = async (template_id: number, recipients: string[], 
         {
             TemplateID: template_id,
             TemplateLanguage: true,
+            //TemplateErrorReporting: {
+                //Email: "",
+                //Name: "Admin",
+            //},
             To: [...recipients.map((recipient) => { return {Email: recipient}})],
             Variables: {
                 ...data,

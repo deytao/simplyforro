@@ -2,7 +2,7 @@ import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Category, Event } from '@prisma/client';
 
-import { GetEvents, frequencyIntervals } from 'lib/calendar'
+import { GetEvents, GetLastUpdatedEvents, frequencyIntervals } from 'lib/calendar'
 import { sendBulkEmails } from 'lib/mailjet';
 import { Subscription } from 'lib/prisma';
 import { GetNextSubscriptions } from 'lib/subscription';
@@ -75,10 +75,30 @@ const callbacks: {[key: string]: Function} = {
             })}
         }
     },
-    "last-updated-events-weekly": async (subscription: Subscription): Promise<{recipients: string[], data: any}> => {
+    "last-updated-events-daily": async (subscription: Subscription): Promise<{recipients: string[], data: any}> => {
+        const recipients = subscription.subscribers ? subscription.subscribers.map((subscriber) => subscriber.user.email) : []
+        if (!recipients) {
+            return {
+                recipients: [],
+                data: {},
+            }
+        }
+        const currentDate = moment()
+        const data = await GetLastUpdatedEvents(currentDate)
+        const events = data.map((event) => {
+            return {
+                title: event.title,
+                startDate: moment(event.start_at).format("ddd Do of MMM YYYY"),
+                endDate: event.end_at ? moment(event.end_at).format("ddd Do of MMM YYYY") : null,
+                url: event.url,
+                categories: event.categories,
+                city: event.city,
+                country: event.country,
+            }
+        })
         return {
-            recipients: [],
-            data: {},
+            recipients: recipients,
+            data: {events: events}
         }
     }
 }
@@ -100,7 +120,7 @@ export default async function handler(
             for (const subscription of subscriptions) {
                 let result = callbacks[subscription.slug](subscription)
                     .then(({recipients, data}: {recipients: string[], data: any}) => {
-                        sendBulkEmails(4304516, recipients, data)
+                        sendBulkEmails(subscription.templateId, recipients, data)
                     })
                 let lastRun = moment()
                 let shiftSubscription = await prisma.subscription.update({
