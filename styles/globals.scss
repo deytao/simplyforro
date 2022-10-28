@@ -76,7 +76,7 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
 
 .rbc-month-header {
     @extend .rbc-month-header;
-    @apply sticky top-[237px] md:top-[259px] lg:top-[226px] z-40 bg-white;
+    @apply sticky top-[243px] md:top-[265px] lg:top-[226px] z-40 bg-white;
 }
 
 .rbc-month-row {

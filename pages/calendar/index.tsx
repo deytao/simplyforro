@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
-import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, RssIcon } from '@heroicons/react/24/outline'
 
 import { EventDetailsSimple } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
@@ -64,9 +64,9 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
     }
     return (
         <>
-            <div className="sticky top-[66px] md:top-[81px] lg:top-[86px] z-40 bg-white">
+            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
                 <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
-                <div className="relative grid grid-cols-7 gap-x-4 mb-2">
+                <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
                     <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
                         <button type="button" onClick={prevMonth}>
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
@@ -91,11 +91,15 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
                         <button className="btn btn-neutral" onClick={showForm}>
-                            {status !== "authenticated" && "Subscribe"}
-                            {status === "authenticated" && "My Subscriptions"}
+                            {status !== "authenticated" && <span className="hidden lg:inline">Subscribe</span>}
+                            {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
+                            <RssIcon className="h-4 w-6 lg:hidden"/>
                         </button>
                         <Link href="/calendar/form">
-                            <a className="btn btn-violet">Add</a>
+                            <a className="btn btn-violet">
+                                <span className="hidden lg:inline">Add</span>
+                                <PlusIcon className="h-4 w-6 lg:hidden"/>
+                            </a>
                         </Link>
                     </div>
                 </div>
