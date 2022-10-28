@@ -120,7 +120,7 @@ export default async function handler(
             for (const subscription of subscriptions) {
                 let result = callbacks[subscription.slug](subscription)
                     .then(({recipients, data}: {recipients: string[], data: any}) => {
-                        sendBulkEmails(subscription.templateId, recipients, data)
+                        sendBulkEmails(recipients, data, subscription.templateId)
                     })
                 let lastRun = moment()
                 let shiftSubscription = await prisma.subscription.update({
