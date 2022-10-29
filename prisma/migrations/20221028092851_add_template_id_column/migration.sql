@@ -11,3 +11,7 @@ WHERE slug = 'last-updated-events-weekly';
 UPDATE subscription
 SET template_id = 4304516
 WHERE slug = 'weekly-forro-calendar';
+
+UPDATE subscription
+SET template_id = 4317249
+WHERE slug = 'events-to-review-daily';
