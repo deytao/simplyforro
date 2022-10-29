@@ -117,9 +117,11 @@ model Subscription {
   description String
   slug        String       @unique
   active      Boolean      @default(false)
+  public      Boolean      @default(false)
   nextRun     DateTime     @map("next_run") @db.Timestamp
   lastRun     DateTime?    @map("last_run") @db.Timestamp
   frequency   Frequency
+  templateId  Int?         @map("template_id")
   subscribers Subscriber[]
 
   @@map("subscription")
@@ -134,5 +136,6 @@ model Subscriber {
   subscriptionId Int          @map("subscription_id")
   subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
+  @@unique([subscriptionId, userId])
   @@map("subscriber")
 }

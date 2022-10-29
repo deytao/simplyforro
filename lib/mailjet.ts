@@ -43,16 +43,23 @@ export const sendEmail = async (recipient: string, subject: string, text: string
 }
 
 
-export const sendBulkEmails = async (recipients: string[], template_id: number, data: any | undefined = {}) => {
-    return await sender([
-        {
-            TemplateID: template_id,
-            TemplateLanguage: true,
-            To: [...recipients.map((recipient) => { return {Email: recipient}})],
-            Variables: {
-                ...data,
-                base_url: process.env.BASE_URL,
-            },
+export const sendBulkEmails = async (recipients: string[], data: any | undefined = {}, templateId: number | null = null) => {
+    let message: any = {
+        TemplateLanguage: true,
+        To: [...recipients.map((recipient) => { return {Email: recipient}})],
+        Variables: {
+            ...data,
+            base_url: process.env.BASE_URL,
         },
-    ])
+    }
+    if (templateId) {
+        message.TemplateID = templateId
+    }
+    if (process.env.NODE_ENV !== "production") {
+        message.TemplateErrorReporting = {
+            Email: "",
+            Name: "Admin",
+        }
+    }
+    return await sender([message])
 }

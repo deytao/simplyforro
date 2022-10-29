@@ -1,15 +1,22 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { useSession } from "next-auth/react"
+import type { Session } from "next-auth/core/types"
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
-import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, RssIcon } from '@heroicons/react/24/outline'
 
 import { EventDetailsSimple } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
 import { frequencyIntervals } from 'lib/calendar'
+import { Subscription } from 'lib/prisma'
 import { categories } from 'schemas/event';
+import { GetSubscriptions } from 'lib/subscription'
+import { subscriberSchema } from 'schemas/subscriber';
 
 
 moment.locale("en", {
@@ -20,67 +27,220 @@ moment.locale("en", {
 })
 const localizer = momentLocalizer(moment);
 
-const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string}) => {
-  const prevMonth = () => onNavigate("PREV")
-  const currentMonth = () => onNavigate("TODAY")
-  const nextMonth = () => onNavigate("NEXT")
-  const changeCategories = () => onNavigate()
-  let taskId: ReturnType<typeof setTimeout>;
-  const changeFTS = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (taskId) {
-          clearTimeout(taskId)
-      }
-      taskId = setTimeout(() => {
-          onNavigate()
-      }, 800)
-  }
-  return (
-      <div className="sticky top-[66px] md:top-[81px] lg:top-[86px] z-40 bg-white">
-        <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
-        <div className="relative grid grid-cols-7 gap-x-4 mb-2">
-            <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                <button type="button" onClick={prevMonth}>
-                    <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
-                </button>
-                <button type="button" onClick={currentMonth} className="btn btn-neutral">Today</button>
-                <button type="button" onClick={nextMonth}>
-                    <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
-                </button>
-            </div>
-            <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-              <input key="fts-field" type="text" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} className="focus:ring-indigo-500 focus:border-indigo-500 w-full rounded text-sm border-gray-300" data-filters-fts />
-            </div>
-            <div className="col-span-5 lg:col-span-3 order-3 p-1">
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {categories.map((category: any, idx: number) => (
-                      <div key={idx} className="flex items-center basis-1/6">
-                          <input id={`categories-${category}`} type="checkbox" value={category} onChange={changeCategories} className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded mr-1" data-filters-categories checked={selectedCategories.includes(category)} />
-                          <label htmlFor={`categories-${category}`} className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}>{category}</label>
-                      </div>
-                    ))}
+
+interface Props {
+    subscriptions: Subscription[]
+}
+
+export const getStaticProps = async () => {
+  const subscriptions = await GetSubscriptions();
+
+  return {
+    props: {
+      subscriptions: subscriptions.map((subscription) => ({
+          title: subscription.title,
+          description: subscription.description,
+          slug: subscription.slug,
+      })),
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every second
+    revalidate: 3600, // In seconds
+  };
+};
+
+const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, status}: {label: string, onNavigate: any, selectedCategories: string[], ftsValue: string, showForm: any, status: string}) => {
+    const prevMonth = () => onNavigate("PREV")
+    const currentMonth = () => onNavigate("TODAY")
+    const nextMonth = () => onNavigate("NEXT")
+    const changeCategories = () => onNavigate()
+    let taskId: ReturnType<typeof setTimeout>;
+    const changeFTS = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (taskId) {
+            clearTimeout(taskId)
+        }
+        taskId = setTimeout(() => onNavigate(), 800)
+    }
+    return (
+        <>
+            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
+                <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
+                <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
+                    <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
+                        <button type="button" onClick={prevMonth}>
+                            <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
+                        </button>
+                        <button type="button" onClick={currentMonth} className="btn btn-neutral">Today</button>
+                        <button type="button" onClick={nextMonth}>
+                            <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
+                        </button>
+                    </div>
+                    <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
+                      <input type="text" key="fts-field" onChange={changeFTS} placeholder="Search..." defaultValue={ftsValue} data-filters-fts />
+                    </div>
+                    <div className="col-span-5 lg:col-span-3 order-3 p-1">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                            {categories.map((category: any, idx: number) => (
+                                <div key={idx} className="flex items-center basis-1/6">
+                                    <input type="checkbox" id={`categories-${category}`} value={category} onChange={changeCategories} data-filters-categories checked={selectedCategories.includes(category)} />
+                                    <label htmlFor={`categories-${category}`} className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}>{category}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
+                        <button className="btn btn-neutral hidden" onClick={showForm}>
+                            {status !== "authenticated" && <span className="hidden lg:inline">Subscribe</span>}
+                            {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
+                            <RssIcon className="h-4 w-6 lg:hidden"/>
+                        </button>
+                        <Link href="/calendar/form">
+                            <a className="btn btn-violet">
+                                <span className="hidden lg:inline">Add</span>
+                                <PlusIcon className="h-4 w-6 lg:hidden"/>
+                            </a>
+                        </Link>
+                    </div>
                 </div>
             </div>
-            <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 grid items-center justify-items-end">
-              <Link href="/calendar/form">
-                  <a className="btn btn-violet md:mr-5">Add</a>
-              </Link>
-            </div>
-        </div>
-      </div>
+        </>
     )
 }
 
-const Calendar: NextPage = () => {
+const Calendar: NextPage<Props> = ({ subscriptions }) => {
+    const { data: session, status } = useSession()
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
-    const [ messageDialogState, setMessageDialogState ] = useState<{isOpen: boolean, status: string, title: string, message: any}>({
+    const [ messageDialogState, setMessageDialogState ] = useState<{
+        isOpen: boolean,
+        status?: string,
+        title?: string,
+        message?: any,
+        content?: any,
+        customButton?: any
+    }>({
         isOpen: false,
-        status: "",
-        title: "",
-        message: "",
     });
+    const formOptions = {
+        resolver: yupResolver(subscriberSchema),
+        defaultValues: {
+            subscriptions: [],
+        }
+    };
+    const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
+    const { errors } = formState;
+
+    async function submitForm(formData: object) {
+        const endpoint = '/api/subscribers'
+        const subscriber = subscriberSchema.cast(formData)
+        const JSONdata = JSON.stringify(subscriber)
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSONdata,
+        }
+        await fetch(endpoint, options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("An error occured, please try again later.")
+                }
+                return response.json()
+            })
+            .then(data => {
+                setMessageDialogState({
+                  isOpen: true,
+                  status: "success",
+                  title: "Subscriptions updated!",
+                  message: "Your subscriptions settings have updated.",
+                })
+            })
+            .catch(error => {
+                setMessageDialogState({
+                    isOpen: true,
+                    status: "error",
+                    title: "Error",
+                    message: error.message,
+                })
+            })
+        return false;
+    }
+
+    const reloadFailSubmit = (errors: Object) => {
+        setMessageDialogState({isOpen: false})
+        showForm(errors)
+    }
+
+    const showForm = (errors: any = {}) => {
+        let selectedSubscriptions: string[] = []
+        if (session) {
+            selectedSubscriptions = session.user.subscriptions.map((subscription) => subscription.slug)
+        }
+        setMessageDialogState({
+            isOpen: true,
+            status: "neutral",
+            title: "Configuration",
+            content: <>
+                <div className="grid grid-cols-2 gap-1">
+                    {!session &&
+                        <>
+                            <div className="col-span-1">
+                                <div className="mt-1 flex rounded-md shadow-sm">
+                                    <input type="text" {...register("name")} placeholder="John Doe" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
+                                </div>
+                                <div className="text-red-500 text-xs italic">{errors.name?.message}</div>
+                            </div>
+
+                            <div className="col-span-1">
+                                <div className="mt-1 flex rounded-md shadow-sm">
+                                    <input type="text" {...register("email")} placeholder="john.doe@email.com" className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300" />
+                                </div>
+                                <div className="text-red-500 text-xs italic">{errors.email?.message}</div>
+                            </div>
+                        </>
+                    }
+                    {session &&
+                        <>
+                            <input type="hidden" {...register("name")} defaultValue={session.user.name!} />
+                            <input type="hidden" {...register("email")} defaultValue={session.user.email!} />
+                        </>
+                    }
+                    <div className="col-span-2">
+                        <fieldset className="mt-2">
+                            <legend className="text-base font-medium text-gray-900">Subscriptions</legend>
+                            <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
+                            <div className="mt-2 space-y-4">
+                                {subscriptions.map((subscription: Subscription) => (
+                                    <div key={subscription.slug} className="flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input type="checkbox" id={`subscriptions-${subscription.slug}`} {...register("subscriptions")} value={subscription.slug} defaultChecked={selectedSubscriptions.includes(subscription.slug)} />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label htmlFor={`subscriptions-${subscription.slug}`} className="font-medium text-gray-700">
+                                                {subscription.title}
+                                                <p className="text-gray-500 font-normal">{subscription.description}</p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </>,
+            customButton: {
+                callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
+                classes: "btn btn-emerald",
+                title: "Submit",
+            }
+        })
+    }
+
     useEffect(() => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
@@ -122,7 +282,7 @@ const Calendar: NextPage = () => {
             <BigCalendar
                 components={{
                     event: EventDetailsSimple,
-                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue}),
+                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue, showForm, status}),
                 }}
                 defaultDate={currentDate}
                 defaultView="month"

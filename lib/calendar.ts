@@ -86,6 +86,46 @@ export async function GetEvents(
     }
 }
 
+export async function GetLastUpdatedEvents(date: moment.Moment) {
+    const lbound = moment().subtract(1, "days").startOf("day")
+    const ubound = moment()
+    try {
+        const events = await prisma.event.findMany({
+            where: {
+                updatedAt: {
+                    gte: lbound.toDate(),
+                    lte: ubound.toDate(),
+                },
+                validation_status: ValidationStatus.validated,
+            },
+        })
+        return events
+    }
+    catch (e) {
+        console.error(e)
+        return []
+    }
+}
+
+export async function CountPendingEvents() {
+    try {
+        return (await prisma.event.aggregate({
+            _count: {
+                id: true
+            },
+            where: {
+                validation_status: {
+                    equals: ValidationStatus.pending,
+                },
+            },
+        }))._count.id
+    }
+    catch (e) {
+        console.error(e)
+    }
+    return 0
+}
+
 export async function GetPendingEvents() {
     let events: Event[] = []
     try {
