@@ -90,7 +90,7 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
-                        <button className="btn btn-neutral" onClick={showForm}>
+                        <button className="btn btn-neutral hidden" onClick={showForm}>
                             {status !== "authenticated" && <span className="hidden lg:inline">Subscribe</span>}
                             {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
                             <RssIcon className="h-4 w-6 lg:hidden"/>
