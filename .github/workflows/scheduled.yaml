@@ -1,0 +1,13 @@
+name: hourly-cron-job
+on:
+  schedule:
+    - cron: '0 * * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: hourly-cron-job
+        run: |
+          curl --request POST \
+          --url 'https://www.simplyforro.dance/api/cron' \
+          --header 'Authorization: Bearer ${{ secrets.CRON_TOKEN }}'
