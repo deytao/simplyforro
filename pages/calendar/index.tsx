@@ -95,11 +95,9 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
                             {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
                             <RssIcon className="h-4 w-6 lg:hidden"/>
                         </button>
-                        <Link href="/calendar/form">
-                            <a className="btn btn-violet">
-                                <span className="hidden lg:inline">Add</span>
-                                <PlusIcon className="h-4 w-6 lg:hidden"/>
-                            </a>
+                        <Link href="/calendar/form" className="btn btn-violet">
+                            <span className="hidden lg:inline">Add</span>
+                            <PlusIcon className="h-4 w-6 lg:hidden"/>
                         </Link>
                     </div>
                 </div>

@@ -57,22 +57,16 @@ const Home: NextPage<Props> = ({ events }) => {
               </div>
             ))}
         </div>
-        <Link href="/calendar">
-          <a className="mt-4 text-xl hover:text-blue-600 focus:text-blue-600">
+        <Link href="/calendar" className="mt-4 text-xl hover:text-blue-600 focus:text-blue-600">
             See all
-          </a>
         </Link>
       </div>
 
-      <Link href="/calendar/form">
-          <a
-            className="rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Add events</h3>
-            <p className="mt-4 text-xl">
-                Help us inform the community about the next dances.
-            </p>
-          </a>
+      <Link href="/calendar/form" className="rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600">
+        <h3 className="text-2xl font-bold">Add events</h3>
+        <p className="mt-4 text-xl">
+            Help us inform the community about the next dances.
+        </p>
       </Link>
 
     </div>
