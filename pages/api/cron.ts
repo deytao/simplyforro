@@ -4,7 +4,7 @@ import { Category, Event } from '@prisma/client';
 
 import { GetEvents, GetLastUpdatedEvents, CountPendingEvents, frequencyIntervals } from 'lib/calendar'
 import { sendBulkEmails } from 'lib/mailjet';
-import { Subscription } from 'lib/prisma';
+import prisma, { Subscription } from 'lib/prisma';
 import { GetNextSubscriptions } from 'lib/subscription';
 
 
