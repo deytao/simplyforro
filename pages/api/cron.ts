@@ -129,31 +129,31 @@ export default async function handler(
     const token = req.headers.authorization!.split(" ")[1]
 
     try {
-        if (token === CRON_TOKEN) {
-            // Process the POST request
-            const subscriptions: Subscription[] = await GetNextSubscriptions()
-            for (const subscription of subscriptions) {
-                let result = callbacks[subscription.slug](subscription)
-                    .then(({recipients, data}: {recipients: string[], data: any}) => {
-                        if (recipients.length > 0) {
-                            sendBulkEmails(recipients, data, subscription.templateId)
-                        }
-                    })
-                let lastRun = moment()
-                let shiftSubscription = await prisma.subscription.update({
-                    where: { id: subscription.id },
-                    data: {
-                        lastRun: lastRun.toDate(),
-                        nextRun: moment(lastRun).add(frequencyIntervals[subscription.frequency]).toDate(),
-                    },
+        if (token !== CRON_TOKEN) {
+            res.status(401).end()
+        }
+        // Process the POST request
+        const subscriptions: Subscription[] = await GetNextSubscriptions()
+        for (const subscription of subscriptions) {
+            let result = callbacks[subscription.slug](subscription)
+                .then(({recipients, data}: {recipients: string[], data: any}) => {
+                    if (recipients.length > 0) {
+                        sendBulkEmails(recipients, data, subscription.templateId)
+                    }
                 })
-            }
-            res.status(200).json("success")
+            let lastRun = moment()
+            let shiftSubscription = await prisma.subscription.update({
+                where: { id: subscription.id },
+                data: {
+                    lastRun: lastRun.toDate(),
+                    nextRun: moment(lastRun).add(frequencyIntervals[subscription.frequency]).toDate(),
+                },
+            })
         }
-        else {
-            res.status(401)
-        }
-    } catch(err) {
+        res.status(200).json("success")
+    }
+    catch(err) {
+        console.error(err)
         res.status(500)
     }
     res.end()
