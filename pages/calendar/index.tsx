@@ -6,6 +6,7 @@ import type { Session } from "next-auth/core/types"
 import { Event } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
+import { LEFT, RIGHT, SwipeEventData, useSwipeable } from 'react-swipeable';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
 import { ArrowTopRightOnSquareIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, RssIcon } from '@heroicons/react/24/outline'
@@ -66,21 +67,21 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
         <>
             <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
                 <div className="grid grid-cols-4">
-                    <button type="button" onClick={prevMonth} className="col-span-1 grid place-items-center lg:hidden">
+                    <button type="button" onClick={prevMonth} className="col-span-1 grid place-items-center lg:hidden" data-previous-month>
                         <ChevronLeftIcon className="h-8 w-8"/>
                     </button>
                     <h1 className="col-span-2 lg:col-span-4 text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
-                    <button type="button" onClick={nextMonth} className="col-span-1 grid place-items-center lg:hidden">
+                    <button type="button" onClick={nextMonth} className="col-span-1 grid place-items-center lg:hidden" data-next-month>
                         <ChevronRightIcon className="h-8 w-8"/>
                     </button>
                 </div>
                 <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
                     <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <button type="button" onClick={prevMonth} className="hidden lg:block">
+                        <button type="button" onClick={prevMonth} className="hidden lg:block" data-previous-month>
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                         </button>
                         <button type="button" onClick={currentMonth} className="btn btn-neutral ml-2 lg:ml-0">Today</button>
-                        <button type="button" onClick={nextMonth} className="hidden lg:block">
+                        <button type="button" onClick={nextMonth} className="hidden lg:block" data-next-month>
                             <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
                         </button>
                     </div>
@@ -247,6 +248,27 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         })
     }
 
+    const handleSwiped = (eventData: SwipeEventData) => {
+        const selectors = Object.fromEntries([
+            [RIGHT, "data-previous-month"],
+            [LEFT, "data-next-month"],
+        ])
+        if (Object.hasOwn(selectors, eventData.dir)) {
+            const click = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            })
+            const selector = selectors[eventData.dir]
+            const button = document.querySelector(`[${selector}]`) as HTMLInputElement
+            button.dispatchEvent(click)
+        }
+    };
+
+    const swipeHandlers = useSwipeable({
+        onSwiped: handleSwiped,
+    });
+
     useEffect(() => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
@@ -285,59 +307,60 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     return (
         <>
             <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
-            <BigCalendar
-                components={{
-                    event: EventDetailsSimple,
-                    toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue, showForm, status}),
-                }}
-                defaultDate={currentDate}
-                defaultView="month"
-                events={events.map((event: any, idx: number) => {
-                    return {
-                        ...event,
-                        start_at: moment(event.start_at),
-                        end_at: moment(event.end_at || event.start_at).endOf('day'),
-                        allDay: true,
-                    }
-                })}
-                localizer={localizer}
-                onNavigate={(newDate) => {
-                    const elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
-                    const newCategories = [...elements].map( (el) =>  el.value )
-                    const ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
+            <div {...swipeHandlers} style={{ width: "100%" }}>
+                <BigCalendar
+                    components={{
+                        event: EventDetailsSimple,
+                        toolbar: (args) => Toolbar({...args, selectedCategories, ftsValue, showForm, status}),
+                    }}
+                    defaultDate={currentDate}
+                    defaultView="month"
+                    events={events.map((event: any, idx: number) => {
+                        return {
+                            ...event,
+                            start_at: moment(event.start_at),
+                            end_at: moment(event.end_at || event.start_at).endOf('day'),
+                            allDay: true,
+                        }
+                    })}
+                    localizer={localizer}
+                    onNavigate={(newDate) => {
+                        const elements = document.querySelectorAll('[data-filters-categories]:checked') as NodeListOf<HTMLInputElement>;
+                        const newCategories = [...elements].map( (el) =>  el.value )
+                        const ftsInput = document.querySelector('[data-filters-fts]') as HTMLInputElement;
 
-                    if (selectedCategories.length !== newCategories.length) {
-                        // useState doesn't check the values themselves but the signature of the array
-                        // which is different everytime
-                        setSelectedCategories(newCategories)
-                    }
-                    setFTSValue(ftsInput ? ftsInput.value : "")
-                    setCurrentDate(newDate)
-                }}
-                onSelectEvent={(event: Event) => {
-                    setMessageDialogState({
-                        isOpen: true,
-                        status: "neutral",
-                        title: event.title,
-                        message: <>
-                            {moment(event.start_at).format("dddd Do MMMM YYYY")}
-                            <br />
-                            {event.city}, {event.country}
-                            <br />
-                            {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
-                            <br />
-                            {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500">
-                                More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline"/>
-                            </a>}
-                        </>,
-                  })
-                }}
-                startAccessor="start_at"
-                endAccessor="end_at"
-                showAllEvents={true}
-                style={{ width: "100%" }}
-                views={['month']}
-            />
+                        if (selectedCategories.length !== newCategories.length) {
+                            // useState doesn't check the values themselves but the signature of the array
+                            // which is different everytime
+                            setSelectedCategories(newCategories)
+                        }
+                        setFTSValue(ftsInput ? ftsInput.value : "")
+                        setCurrentDate(newDate)
+                    }}
+                    onSelectEvent={(event: Event) => {
+                        setMessageDialogState({
+                            isOpen: true,
+                            status: "neutral",
+                            title: event.title,
+                            message: <>
+                                {moment(event.start_at).format("dddd Do MMMM YYYY")}
+                                <br />
+                                {event.city}, {event.country}
+                                <br />
+                                {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
+                                <br />
+                                {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500">
+                                    More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline"/>
+                                </a>}
+                            </>,
+                      })
+                    }}
+                    startAccessor="start_at"
+                    endAccessor="end_at"
+                    showAllEvents={true}
+                    views={['month']}
+                />
+            </div>
         </>
     )
 }
