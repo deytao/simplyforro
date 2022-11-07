@@ -65,14 +65,22 @@ const Toolbar = ({ label, onNavigate, selectedCategories, ftsValue, showForm, st
     return (
         <>
             <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
-                <h1 className="text-xl md:text-6xl font-bold py-4 text-center">{label}</h1>
+                <div className="grid grid-cols-4">
+                    <button type="button" onClick={prevMonth} className="col-span-1 grid place-items-center lg:hidden">
+                        <ChevronLeftIcon className="h-8 w-8"/>
+                    </button>
+                    <h1 className="col-span-2 lg:col-span-4 text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
+                    <button type="button" onClick={nextMonth} className="col-span-1 grid place-items-center lg:hidden">
+                        <ChevronRightIcon className="h-8 w-8"/>
+                    </button>
+                </div>
                 <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
                     <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <button type="button" onClick={prevMonth}>
+                        <button type="button" onClick={prevMonth} className="hidden lg:block">
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12"/>
                         </button>
-                        <button type="button" onClick={currentMonth} className="btn btn-neutral">Today</button>
-                        <button type="button" onClick={nextMonth}>
+                        <button type="button" onClick={currentMonth} className="btn btn-neutral ml-2 lg:ml-0">Today</button>
+                        <button type="button" onClick={nextMonth} className="hidden lg:block">
                             <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12"/>
                         </button>
                     </div>
