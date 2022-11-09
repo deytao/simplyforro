@@ -1,18 +1,57 @@
-import type { NextPage } from 'next'
+import moment from 'moment';
+import type { GetServerSideProps, NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Event } from '@prisma/client';
 
 import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
 import { eventSchema } from 'schemas/event';
 
 
+interface Props {
+    event: Event
+}
+
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { eventId } = context.query
+    let event: Event | null = null
+    if (eventId) {
+        event = await prisma.event.findUnique({
+            where: {
+                id: +eventId,
+            },
+        })
+    }
+
+    return {
+        props: {
+            event: event ? {
+                title: event.title,
+                url: event.url,
+                city: event.city,
+                country: event.country,
+                frequency: event.frequency,
+                categories: event.categories,
+                start_at: moment(event.start_at).format("YYYY-MM-DD"),
+                end_at: event.end_at ? moment(event.end_at).format("YYYY-MM-DD") : null,
+            } : null,
+        },
+    };
+};
+
+
 const commonClassnames = "flex-1 block"
 
-const CalendarForm: NextPage = () => {
-  const formOptions = { resolver: yupResolver(eventSchema) };
+const CalendarForm: NextPage<Props> = ({ event }) => {
+  const formOptions = {
+      resolver: yupResolver(eventSchema),
+      defaultValues: event,
+  };
   const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
   const { errors } = formState;
   const [ isSubmitting, setIsSubmitting ] = useState(false)
@@ -22,7 +61,7 @@ const CalendarForm: NextPage = () => {
     title: "",
     message: "",
   });
-  const event = {
+  const placeholderEvent = {
       title: "FENFIT",
       url: "https://www.example.com",
       start_at: "2022-04-23",
@@ -35,18 +74,18 @@ const CalendarForm: NextPage = () => {
         "class",
       ],
   }
-  const [ previewState, setPreviewState ] = useState(event);
+  const [ previewState, setPreviewState ] = useState(event || placeholderEvent);
 
   watch((data: any, options) => {
       const newEvent = {
-          title: data.title|| event.title,
-          url: data.url || event.url,
-          start_at: data.start_at || event.start_at,
-          end_at: data.end_at || event.end_at,
-          frequency: data.frequency || event.frequency,
-          city: data.city || event.city,
-          country: data.country || event.country,
-          categories: data.categories || event.categories,
+          title: data.title|| placeholderEvent.title,
+          url: data.url || placeholderEvent.url,
+          start_at: data.start_at || placeholderEvent.start_at,
+          end_at: data.end_at || placeholderEvent.end_at,
+          frequency: data.frequency || placeholderEvent.frequency,
+          city: data.city || placeholderEvent.city,
+          country: data.country || placeholderEvent.country,
+          categories: data.categories || placeholderEvent.categories,
       }
       setPreviewState(newEvent)
   })
@@ -125,7 +164,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4 md:col-span-2">
                     <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">Title</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder={`${event.title}`} />
+                      <input type="text" {...register("title")} id="event-title" className={`${commonClassnames} ${errors.title ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.title}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
                   </div>
@@ -133,7 +172,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-4">
                     <label htmlFor="event-url" className="block text-sm font-medium text-gray-700"> Tickets / Infos </label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="text" {...register("url")} id="event-url" className={`${commonClassnames} ${errors.url ? 'border-red-500' : ''}`} placeholder={`${event.url}`} />
+                      <input type="text" {...register("url")} id="event-url" className={`${commonClassnames} ${errors.url ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.url}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
                   </div>
@@ -141,7 +180,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-start-date" className="block text-sm font-medium text-gray-700">From</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("start_at")} id="event-start-date" className={`${commonClassnames} ${errors.start_at ? 'border-red-500' : ''}`} placeholder={`${event.start_at}`} />
+                      <input type="date" {...register("start_at")} id="event-start-date" className={`${commonClassnames} ${errors.start_at ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.start_at}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.start_at?.message}</p>
                   </div>
@@ -149,7 +188,7 @@ const CalendarForm: NextPage = () => {
                   <div className="col-span-2 md:col-span-1">
                     <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700">To</label>
                     <div className="mt-1 flex rounded-md shadow-sm">
-                      <input type="date" {...register("end_at")} id="event-end-date" className={`${commonClassnames} ${errors.end_at ? 'border-red-500' : ''}`} placeholder={`${event.end_at}`} />
+                      <input type="date" {...register("end_at")} id="event-end-date" className={`${commonClassnames} ${errors.end_at ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.end_at}`} />
                     </div>
                     <p className="text-red-500 text-xs italic">{errors.end_at?.message}</p>
                   </div>
@@ -172,7 +211,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-city" className="block text-sm font-medium text-gray-700">City</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder={`${event.city}`} />
+                        <input type="text" {...register("city")} id="event-city" className={`${commonClassnames} ${errors.city ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.city}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
                     </div>
@@ -180,7 +219,7 @@ const CalendarForm: NextPage = () => {
                     <div className="col-span-1">
                       <label htmlFor="event-country" className="block text-sm font-medium text-gray-700">Country</label>
                       <div className="mt-1 flex rounded-md shadow-sm">
-                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder={`${event.country}`} />
+                        <input type="text" {...register("country")} id="event-country" className={`${commonClassnames} ${errors.country ? 'border-red-500' : ''}`} placeholder={`${placeholderEvent.country}`} />
                       </div>
                       <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
                     </div>
