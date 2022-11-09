@@ -240,11 +240,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                     </div>
                 </div>
             </>,
-            customButton: {
+            customButtons: [{
                 callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
                 classes: "btn btn-emerald",
                 title: "Submit",
-            }
+            }]
         })
     }
 
