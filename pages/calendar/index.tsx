@@ -269,7 +269,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         onSwiped: handleSwiped,
     });
 
-    useEffect(() => {
+    const loadEvents = () => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
         let dates = [
@@ -279,30 +279,32 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         let categories = ([...selectedCategories].map( (category) =>  `categories=${encodeURIComponent(category)}` ))
         let params = [...dates, ...categories, `q=${encodeURIComponent(ftsValue)}`]
         fetch(`/api/events?${params.join("&")}`)
-          .then(res => res.json())
-          .then(data => {
-              let events = data.map((event: Event) => {
-                  if (!event.frequency) {
-                      return event
-                  }
-                  let eventDate = moment(event.start_at)
-                  let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
-                  let events: Event[] = []
-                  while (eventDate <= lastDate) {
-                      if (eventDate >= lbound) {
-                          events.push({
-                              ...event,
-                              start_at: eventDate.toDate(),
-                              end_at: eventDate.toDate(),
-                          })
-                      }
-                      eventDate.add(frequencyIntervals[event.frequency])
-                  }
-                  return events
-              }).flat(1)
-              setEvents(events)
-          })
-      }, [currentDate, selectedCategories, ftsValue])
+            .then(res => res.json())
+            .then(data => {
+                let events = data.map((event: Event) => {
+                    if (!event.frequency) {
+                        return event
+                    }
+                    let eventDate = moment(event.start_at)
+                    let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
+                    let events: Event[] = []
+                    while (eventDate <= lastDate) {
+                        if (eventDate >= lbound) {
+                            events.push({
+                                ...event,
+                                start_at: eventDate.toDate(),
+                                end_at: eventDate.toDate(),
+                            })
+                        }
+                        eventDate.add(frequencyIntervals[event.frequency])
+                    }
+                    return events
+                }).flat(1)
+                setEvents(events)
+            })
+    }
+
+    useEffect(loadEvents, [currentDate, selectedCategories, ftsValue])
 
     return (
         <>
