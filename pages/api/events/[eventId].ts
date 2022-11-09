@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { unstable_getServerSession } from 'next-auth/next'
 import { Category, Role } from '@prisma/client';
 
-import { UpdateEvent } from 'lib/calendar';
+import { DeleteEvent, UpdateEvent } from 'lib/calendar';
 import { authOptions } from "pages/api/auth/[...nextauth]"
 
 const allowedMethods = ["POST", "PATCH", "DELETE"]
@@ -27,7 +27,12 @@ export default async function handler(
         res.status(400).json({ message: "Invalid parameters" })
         return
     }
-    const event: Event = req.body
-    const result = UpdateEvent(+eventId, event)
+    if (method === "DELETE") {
+        const result = DeleteEvent(+eventId)
+    }
+    else {
+        const event: Event = req.body
+        const result = UpdateEvent(+eventId, event)
+    }
     res.status(200).json({"eventId": eventId})
 }

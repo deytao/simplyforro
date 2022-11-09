@@ -39,6 +39,15 @@ export async function UpdateEvent(eventId: number, data: any) {
     return result
 }
 
+export async function DeleteEvent(eventId: number) {
+    let result = await prisma.event.delete({
+        where: {
+            id: eventId,
+        },
+    })
+    return result
+}
+
 export async function GetEvents(
     lbound: moment.Moment,
     ubound: moment.Moment,
