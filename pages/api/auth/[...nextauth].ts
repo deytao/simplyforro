@@ -1,13 +1,12 @@
-import NextAuth from 'next-auth'
-import type { NextAuthOptions } from 'next-auth'
+import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import EmailProvider, { SendVerificationRequestParams } from "next-auth/providers/email";
-import type { Session, Theme, User } from "next-auth/core/types"
-import type { JWT } from "next-auth/jwt/types"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { createTransport } from "nodemailer"
+import type { Session, Theme, User } from "next-auth/core/types";
+import type { JWT } from "next-auth/jwt/types";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { createTransport } from "nodemailer";
 
-import prisma from 'lib/prisma';
-
+import prisma from "lib/prisma";
 
 /**
  * Email HTML body
@@ -18,11 +17,11 @@ import prisma from 'lib/prisma';
  * @note We don't add the email address to avoid needing to escape it, if you do, remember to sanitize it!
  */
 function html(params: { url: string; host: string; theme: Theme }) {
-    const { url, host, theme } = params
+    const { url, host, theme } = params;
 
-    const escapedHost = host.replace(/\./g, "&#8203;.")
+    const escapedHost = host.replace(/\./g, "&#8203;.");
 
-    const brandColor = theme.brandColor || "#346df1"
+    const brandColor = theme.brandColor || "#346df1";
     const color = {
         background: "#f9f9f9",
         text: "#444",
@@ -30,7 +29,7 @@ function html(params: { url: string; host: string; theme: Theme }) {
         buttonBackground: brandColor,
         buttonBorder: brandColor,
         buttonText: theme.buttonText || "#fff",
-    }
+    };
 
     return `
 <body style="background: ${color.background};">
@@ -48,6 +47,7 @@ function html(params: { url: string; host: string; theme: Theme }) {
           <tr>
             <td align="center" style="border-radius: 5px;" bgcolor="${color.buttonBackground}"><a href="${url}"
                 target="_blank"
+                rel="noreferrer"
                 style="font-size: 18px; font-family: Helvetica, Arial, sans-serif; color: ${color.buttonText}; text-decoration: none; border-radius: 5px; padding: 10px 20px; border: 1px solid ${color.buttonBorder}; display: inline-block; font-weight: bold;">Sign
                 in</a></td>
           </tr>
@@ -62,36 +62,36 @@ function html(params: { url: string; host: string; theme: Theme }) {
     </tr>
   </table>
 </body>
-`
+`;
 }
 
 /** Email Text body (fallback for email clients that don't render HTML, e.g. feature phones) */
 function text({ url, host }: { url: string; host: string }) {
-    return `Sign in to ${host}\n${url}\n\n`
+    return `Sign in to ${host}\n${url}\n\n`;
 }
 
 async function sendVerificationRequest(params: SendVerificationRequestParams) {
-    const { identifier, url, provider, theme } = params
-    const { host } = new URL(url)
-    const transport = createTransport(provider.server)
+    const { identifier, url, provider, theme } = params;
+    const { host } = new URL(url);
+    const transport = createTransport(provider.server);
     const result = await transport.sendMail({
         to: identifier,
         from: provider.from,
         subject: "Sign in to SimplyForró",
         text: text({ url, host: "SimplyForró" }),
         html: html({ url, host: "SimplyForró", theme }),
-    })
-    const failed = result.rejected.concat(result.pending).filter(Boolean)
+    });
+    const failed = result.rejected.concat(result.pending).filter(Boolean);
     if (failed.length) {
-        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
+        throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
     }
 }
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     callbacks: {
-        async session({ session, user, token }: { session: Session, user: User, token: JWT}) {
-            session.user.roles = user.roles
+        async session({ session, user, token }: { session: Session; user: User; token: JWT }) {
+            session.user.roles = user.roles;
             session.user.subscriptions = await prisma.subscription.findMany({
                 where: {
                     subscribers: {
@@ -102,12 +102,12 @@ export const authOptions: NextAuthOptions = {
                         },
                     },
                 },
-            })
-            return session
+            });
+            return session;
         },
     },
     pages: {
-        signIn: '/auth/signin',
+        signIn: "/auth/signin",
     },
     providers: [
         // Passwordless / email sign in
@@ -117,13 +117,13 @@ export const authOptions: NextAuthOptions = {
                 port: process.env.EMAIL_SERVER_PORT as unknown as number,
                 auth: {
                     user: process.env.EMAIL_SERVER_USER,
-                    pass: process.env.EMAIL_SERVER_PASSWORD
-                }
+                    pass: process.env.EMAIL_SERVER_PASSWORD,
+                },
             },
             from: process.env.EMAIL_FROM,
             sendVerificationRequest,
         }),
     ],
-}
+};
 
-export default NextAuth(authOptions)
+export default NextAuth(authOptions);

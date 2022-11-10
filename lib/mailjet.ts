@@ -1,10 +1,9 @@
-import Mailjet from 'node-mailjet';
+import Mailjet from "node-mailjet";
 
 const mailjet = new Mailjet({
     apiKey: process.env.EMAIL_SERVER_USER,
-    apiSecret: process.env.EMAIL_SERVER_PASSWORD
+    apiSecret: process.env.EMAIL_SERVER_PASSWORD,
 });
-
 
 const sender = async (messages: any) => {
     return mailjet
@@ -19,13 +18,12 @@ const sender = async (messages: any) => {
             Messages: messages,
         })
         .then((result) => {
-            console.log("success")
+            console.log("success");
         })
         .catch((err) => {
-            console.log(err)
+            console.log(err);
         });
-}
-
+};
 
 export const sendEmail = async (recipient: string, subject: string, text: string, html: string) => {
     return await sender([
@@ -39,27 +37,34 @@ export const sendEmail = async (recipient: string, subject: string, text: string
             TextPart: text,
             HTMLPart: html,
         },
-    ])
-}
+    ]);
+};
 
-
-export const sendBulkEmails = async (recipients: string[], data: any | undefined = {}, templateId: number | null = null) => {
+export const sendBulkEmails = async (
+    recipients: string[],
+    data: any | undefined = {},
+    templateId: number | null = null,
+) => {
     let message: any = {
         TemplateLanguage: true,
-        To: [...recipients.map((recipient) => { return {Email: recipient}})],
+        To: [
+            ...recipients.map((recipient) => {
+                return { Email: recipient };
+            }),
+        ],
         Variables: {
             ...data,
             base_url: process.env.BASE_URL,
         },
-    }
+    };
     if (templateId) {
-        message.TemplateID = templateId
+        message.TemplateID = templateId;
     }
     if (process.env.NODE_ENV !== "production") {
         message.TemplateErrorReporting = {
             Email: "",
             Name: "Admin",
-        }
+        };
     }
-    return await sender([message])
-}
+    return await sender([message]);
+};
