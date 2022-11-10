@@ -1,14 +1,16 @@
 import moment from 'moment';
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { unstable_getServerSession } from 'next-auth/next'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { Event } from '@prisma/client';
+import { Event, Role } from '@prisma/client';
 
 import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
+import { authOptions } from "pages/api/auth/[...nextauth]"
 import { eventSchema } from 'schemas/event';
 
 
@@ -18,9 +20,10 @@ interface Props {
 
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await unstable_getServerSession(context.req, context.res, authOptions)
     const { eventId } = context.query
     let event: Event | null = null
-    if (eventId) {
+    if (eventId && session && session.user.roles.includes(Role.contributor)) {
         event = await prisma.event.findUnique({
             where: {
                 id: +eventId,
@@ -31,11 +34,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             event: event ? {
+                id: event.id,
                 title: event.title,
                 url: event.url,
                 city: event.city,
                 country: event.country,
-                frequency: event.frequency,
+                frequency: event.frequency ? event.frequency : "",
                 categories: event.categories,
                 start_at: moment(event.start_at).format("YYYY-MM-DD"),
                 end_at: event.end_at ? moment(event.end_at).format("YYYY-MM-DD") : null,
@@ -97,8 +101,8 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
   async function submitForm(formData: object) {
       if (isSubmitting) return false
       setIsSubmitting(true)
-      const endpoint = '/api/events'
       const event = eventSchema.cast(formData)
+      const endpoint = `/api/events/${event.id}`
       const JSONdata = JSON.stringify(event)
 
       const options = {
@@ -158,6 +162,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
       <div className="relative md:grid md:grid-cols-4 md:gap-4">
         <div className="md:col-span-2">
           <form onSubmit={handleSubmit(submitForm)} method="POST">
+            <input type="hidden" {...register("id")} id="event-id" />
             <div className="shadow sm:rounded-md sm:overflow-hidden">
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
                 <div className="grid grid-cols-4 gap-4">

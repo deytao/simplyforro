@@ -2,7 +2,6 @@ import moment from 'moment';
 import { Category, Event, Frequency, Prisma, ValidationStatus } from '@prisma/client';
 
 import prisma from 'lib/prisma';
-import { EventInter } from 'schemas/event';
 
 
 export const frequencyIntervals: {[key: string]: object} = {
@@ -12,7 +11,7 @@ export const frequencyIntervals: {[key: string]: object} = {
     "monthly": {"weeks": 4},
 }
 
-export async function CreateEvent(event: EventInter) {
+export async function CreateEvent(event: Event) {
     let start_at: moment.Moment = moment(event.start_at)
     let end_at: moment.Moment = moment(event.end_at)
 
@@ -22,19 +21,29 @@ export async function CreateEvent(event: EventInter) {
             url: event.url ? event.url : null,
             start_at: start_at.toDate(),
             end_at: end_at.isValid() ? end_at.toDate() : null,
-            frequency: event.frequency ? event.frequency as Frequency : null,
-            categories: event.categories as Category[],
+            frequency: event.frequency ? event.frequency : null,
+            categories: event.categories,
         }
     })
     return result
 }
 
-export async function UpdateEvent(eventId: number, data: any) {
+export async function UpdateEvent(eventId: number, event: Event) {
+    let start_at: moment.Moment = moment(event.start_at)
+    let end_at: moment.Moment = moment(event.end_at)
+
     let result = await prisma.event.update({
         where: {
             id: eventId,
         },
-        data: data,
+        data: {
+            ...event,
+            url: event.url ? event.url : null,
+            start_at: start_at.toDate(),
+            end_at: end_at.isValid() ? end_at.toDate() : null,
+            frequency: event.frequency ? event.frequency as Frequency : null,
+            categories: event.categories as Category[],
+        }
     })
     return result
 }

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { unstable_getServerSession } from 'next-auth/next'
-import { Category, Role } from '@prisma/client';
+import { Category, Event, Role } from '@prisma/client';
 
 import { DeleteEvent, UpdateEvent } from 'lib/calendar';
 import { authOptions } from "pages/api/auth/[...nextauth]"
