@@ -10,6 +10,7 @@ import { Event, Role } from '@prisma/client';
 
 import { EventPreview } from 'components/EventPreview'
 import { MessageDialog } from 'components/MessageDialog'
+import prisma from 'lib/prisma';
 import { authOptions } from "pages/api/auth/[...nextauth]"
 import { eventSchema } from 'schemas/event';
 
