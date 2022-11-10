@@ -38,9 +38,11 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
           <button onClick={() => setMessageDialog({isOpen: false})} className={`${buttonClasses} btn`}>
             Close
           </button>
-          {messageDialog.customButton && <button onClick={messageDialog.customButton.callback} className={`${messageDialog.customButton.classes} ml-1`}>
-              {messageDialog.customButton.title}
-          </button>}
+          {messageDialog.customButtons && messageDialog.customButtons.map((button, idx) => {
+                return <button key={idx} onClick={button.callback} className={`${button.classes} ml-1`}>
+                    {button.title}
+                </button>
+          })}
         </Dialog.Panel>
       </div>
     </Dialog>

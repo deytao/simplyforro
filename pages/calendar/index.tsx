@@ -1,9 +1,10 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useSession } from "next-auth/react"
 import type { Session } from "next-auth/core/types"
-import { Event } from '@prisma/client';
+import { Event, Role } from '@prisma/client';
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from 'react-swipeable';
@@ -31,6 +32,16 @@ const localizer = momentLocalizer(moment);
 
 interface Props {
     subscriptions: Subscription[]
+}
+
+
+interface IMessageDialog {
+    isOpen: boolean,
+    status?: string,
+    title?: string,
+    message?: any,
+    content?: any,
+    customButtons?: object[]
 }
 
 export const getStaticProps = async () => {
@@ -121,14 +132,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [selectedCategories, setSelectedCategories] = useState(categories)
     const [ftsValue, setFTSValue] = useState("")
     const [events, setEvents] = useState([])
-    const [ messageDialogState, setMessageDialogState ] = useState<{
-        isOpen: boolean,
-        status?: string,
-        title?: string,
-        message?: any,
-        content?: any,
-        customButton?: any
-    }>({
+    const [ messageDialogState, setMessageDialogState ] = useState<IMessageDialog>({
         isOpen: false,
     });
     const formOptions = {
@@ -139,6 +143,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
     const { errors } = formState;
+    const router = useRouter();
 
     async function submitForm(formData: object) {
         const endpoint = '/api/subscribers'
@@ -240,11 +245,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                     </div>
                 </div>
             </>,
-            customButton: {
+            customButtons: [{
                 callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
                 classes: "btn btn-emerald",
                 title: "Submit",
-            }
+            }]
         })
     }
 
@@ -269,7 +274,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         onSwiped: handleSwiped,
     });
 
-    useEffect(() => {
+    const loadEvents = () => {
         let lbound = moment(currentDate).startOf('month').startOf('week')
         let ubound = moment(currentDate).endOf('month').endOf('week')
         let dates = [
@@ -279,30 +284,32 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         let categories = ([...selectedCategories].map( (category) =>  `categories=${encodeURIComponent(category)}` ))
         let params = [...dates, ...categories, `q=${encodeURIComponent(ftsValue)}`]
         fetch(`/api/events?${params.join("&")}`)
-          .then(res => res.json())
-          .then(data => {
-              let events = data.map((event: Event) => {
-                  if (!event.frequency) {
-                      return event
-                  }
-                  let eventDate = moment(event.start_at)
-                  let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
-                  let events: Event[] = []
-                  while (eventDate <= lastDate) {
-                      if (eventDate >= lbound) {
-                          events.push({
-                              ...event,
-                              start_at: eventDate.toDate(),
-                              end_at: eventDate.toDate(),
-                          })
-                      }
-                      eventDate.add(frequencyIntervals[event.frequency])
-                  }
-                  return events
-              }).flat(1)
-              setEvents(events)
-          })
-      }, [currentDate, selectedCategories, ftsValue])
+            .then(res => res.json())
+            .then(data => {
+                let events = data.map((event: Event) => {
+                    if (!event.frequency) {
+                        return event
+                    }
+                    let eventDate = moment(event.start_at)
+                    let lastDate = event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound
+                    let events: Event[] = []
+                    while (eventDate <= lastDate) {
+                        if (eventDate >= lbound) {
+                            events.push({
+                                ...event,
+                                start_at: eventDate.toDate(),
+                                end_at: eventDate.toDate(),
+                            })
+                        }
+                        eventDate.add(frequencyIntervals[event.frequency])
+                    }
+                    return events
+                }).flat(1)
+                setEvents(events)
+            })
+    }
+
+    useEffect(loadEvents, [currentDate, selectedCategories, ftsValue])
 
     return (
         <>
@@ -338,7 +345,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         setCurrentDate(newDate)
                     }}
                     onSelectEvent={(event: Event) => {
-                        setMessageDialogState({
+                        let state: IMessageDialog = {
                             isOpen: true,
                             status: "neutral",
                             title: event.title,
@@ -349,11 +356,50 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 <br />
                                 {event.categories && event.categories.map((category, idx) => <span key={`${idx}`} className={`event-tag event-tag-${category}`}>{category}</span>)}
                                 <br />
-                                {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500">
+                                {event.url && <a href={event.url} className="text-blue-400 hover:text-blue-500" target="_blank">
                                     More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline"/>
                                 </a>}
                             </>,
-                      })
+                        }
+                        if (session && session.user.roles.includes(Role.contributor)) {
+                            state["customButtons"] = [{
+                                callback: () => router.push(`/calendar/form?eventId=${event.id}`),
+                                classes: "btn btn-violet",
+                                title: "Edit",
+                            }, {
+                                callback: () => {
+                                    if (confirm("Sure?")) {
+                                        const endpoint = `/api/events/${event.id}`
+
+                                        const options = {
+                                            method: 'DELETE',
+                                        }
+                                        const result = fetch(endpoint, options)
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error("An error occured, please try again later.")
+                                                }
+                                                return response.json()
+                                            })
+                                            .then(data => {
+                                                loadEvents()
+                                                setMessageDialogState({isOpen: false})
+                                            })
+                                            .catch(error => {
+                                                setMessageDialogState({
+                                                    isOpen: true,
+                                                    status: "error",
+                                                    title: "Error",
+                                                    message: error.message,
+                                                })
+                                            })
+                                    }
+                                },
+                                classes: "btn btn-red",
+                                title: "Delete",
+                            }]
+                        }
+                        setMessageDialogState(state)
                     }}
                     startAccessor="start_at"
                     endAccessor="end_at"
