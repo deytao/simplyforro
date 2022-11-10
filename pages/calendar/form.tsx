@@ -78,7 +78,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         "class",
       ],
   }
-  const [ previewState, setPreviewState ] = useState(event || placeholderEvent);
+  const [ previewState, setPreviewState ] = useState<Event>(event || placeholderEvent);
 
   const router = useRouter();
   const refreshData = () => {
@@ -87,7 +87,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
 
   watch((data: any, options) => {
       const newEvent = {
-          title: data.title|| placeholderEvent.title,
+          title: data.title || placeholderEvent.title,
           url: data.url || placeholderEvent.url,
           start_at: data.start_at || placeholderEvent.start_at,
           end_at: data.end_at || placeholderEvent.end_at,
@@ -95,7 +95,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
           city: data.city || placeholderEvent.city,
           country: data.country || placeholderEvent.country,
           categories: data.categories || placeholderEvent.categories,
-      }
+      } as Event
       setPreviewState(newEvent)
   })
 
