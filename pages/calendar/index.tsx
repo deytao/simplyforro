@@ -1,6 +1,7 @@
 import moment from 'moment';
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useSession } from "next-auth/react"
 import type { Session } from "next-auth/core/types"
 import { Event, Role } from '@prisma/client';
@@ -142,6 +143,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
     const { errors } = formState;
+    const router = useRouter();
 
     async function submitForm(formData: object) {
         const endpoint = '/api/subscribers'
@@ -361,7 +363,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         }
                         if (session && session.user.roles.includes(Role.contributor)) {
                             state["customButtons"] = [{
-                                callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
+                                callback: () => router.push(`/calendar/form?eventId=${event.id}`),
                                 classes: "btn btn-violet",
                                 title: "Edit",
                             }, {
