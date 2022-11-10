@@ -80,6 +80,11 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
   }
   const [ previewState, setPreviewState ] = useState(event || placeholderEvent);
 
+  const router = useRouter();
+  const refreshData = () => {
+    router.replace(router.asPath);
+  }
+
   watch((data: any, options) => {
       const newEvent = {
           title: data.title|| placeholderEvent.title,
@@ -94,16 +99,13 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
       setPreviewState(newEvent)
   })
 
-  useEffect(() => {
-      reset()
-  }, [isSubmitting])
-
   async function submitForm(formData: object) {
       if (isSubmitting) return false
       setIsSubmitting(true)
       const event = eventSchema.cast(formData)
-      const endpoint = `/api/events/${event.id}`
-      const JSONdata = JSON.stringify(event)
+      const { id: eventId, ...eventData } = event;
+      const endpoint = `/api/events/${eventId}`
+      const JSONdata = JSON.stringify(eventData)
 
       const options = {
         method: 'POST',
@@ -127,6 +129,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
               title: "Thank you!",
               message: "Your event has been created. It will be validated and added to the calendar soon.",
             })
+            refreshData()
         })
         .catch(error => {
             setMessageDialogState({
@@ -154,7 +157,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
   return (
     <>
       <h1 className="text-xl md:text-6xl font-bold py-4 text-center">
-        New event
+        Event
       </h1>
 
       <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />

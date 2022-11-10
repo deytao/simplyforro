@@ -12,7 +12,7 @@ export const categories = ["party", "pratica", "class", "workshop", "festival"]
 export const frequencies = ["", "daily", "weekly", "biweekly", "monthly"]
 
 export const eventSchema = yup.object({
-  id: yup.number().positive().integer(),
+  id: yup.string().nullable(),
   title: yup.string().required("A title is required"),
   start_at: yup
   .string()
