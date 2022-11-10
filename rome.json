@@ -1,0 +1,22 @@
+{
+  "formatter": {
+    "enabled": true,
+    "ignore": [
+        "node_modules/",
+        ".next/"
+    ],
+    "indentSize": 4,
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true,
+    "ignore": [
+        "node_modules/",
+        ".next/"
+    ],
+    "rules": {
+      "recommended": true
+    }
+  }
+}

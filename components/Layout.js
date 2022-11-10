@@ -1,12 +1,10 @@
-import { Navbar } from 'components/Navbar'
+import { Navbar } from "components/Navbar";
 
 export default function Layout({ children }) {
-  return (
-    <>
-      <Navbar />
-      <main className="flex min-h-screen flex-col items-center">
-        {children}
-      </main>
-    </>
-  )
+    return (
+        <>
+            <Navbar />
+            <main className="flex min-h-screen flex-col items-center">{children}</main>
+        </>
+    );
 }

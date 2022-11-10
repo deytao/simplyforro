@@ -1,19 +1,18 @@
-import moment from 'moment';
-import { Category, Event, Frequency, Prisma, ValidationStatus } from '@prisma/client';
+import moment from "moment";
+import { Category, Event, Frequency, Prisma, ValidationStatus } from "@prisma/client";
 
-import prisma from 'lib/prisma';
+import prisma from "lib/prisma";
 
-
-export const frequencyIntervals: {[key: string]: object} = {
-    "daily": {"days": 1},
-    "weekly": {"weeks": 1},
-    "biweekly": {"weeks": 2},
-    "monthly": {"weeks": 4},
-}
+export const frequencyIntervals: { [key: string]: object } = {
+    daily: { days: 1 },
+    weekly: { weeks: 1 },
+    biweekly: { weeks: 2 },
+    monthly: { weeks: 4 },
+};
 
 export async function CreateEvent(event: Event) {
-    let start_at: moment.Moment = moment(event.start_at)
-    let end_at: moment.Moment = moment(event.end_at)
+    let start_at: moment.Moment = moment(event.start_at);
+    let end_at: moment.Moment = moment(event.end_at);
 
     let result = await prisma.event.create({
         data: {
@@ -23,14 +22,14 @@ export async function CreateEvent(event: Event) {
             end_at: end_at.isValid() ? end_at.toDate() : null,
             frequency: event.frequency ? event.frequency : null,
             categories: event.categories,
-        }
-    })
-    return result
+        },
+    });
+    return result;
 }
 
 export async function UpdateEvent(eventId: number, event: Event) {
-    let start_at: moment.Moment = moment(event.start_at)
-    let end_at: moment.Moment = moment(event.end_at)
+    let start_at: moment.Moment = moment(event.start_at);
+    let end_at: moment.Moment = moment(event.end_at);
 
     let result = await prisma.event.update({
         where: {
@@ -41,11 +40,11 @@ export async function UpdateEvent(eventId: number, event: Event) {
             url: event.url ? event.url : null,
             start_at: start_at.toDate(),
             end_at: end_at.isValid() ? end_at.toDate() : null,
-            frequency: event.frequency ? event.frequency as Frequency : null,
+            frequency: event.frequency ? (event.frequency as Frequency) : null,
             categories: event.categories as Category[],
-        }
-    })
-    return result
+        },
+    });
+    return result;
 }
 
 export async function DeleteEvent(eventId: number) {
@@ -53,8 +52,8 @@ export async function DeleteEvent(eventId: number) {
         where: {
             id: eventId,
         },
-    })
-    return result
+    });
+    return result;
 }
 
 export async function GetEvents(
@@ -64,8 +63,8 @@ export async function GetEvents(
     searchedText: string = "",
     validationStatus: ValidationStatus = "validated",
 ) {
-    const formatDate = (date: moment.Moment) => date.format("YYYY-MM-DD")
-    const fts = searchedText.replace(/\W/g, " ").replace(/\s+/g, " ").trim().split(" ").join(" | ")
+    const formatDate = (date: moment.Moment) => date.format("YYYY-MM-DD");
+    const fts = searchedText.replace(/\W/g, " ").replace(/\s+/g, " ").trim().split(" ").join(" | ");
     try {
         const events = prisma.$queryRaw<Event[]>`
             SELECT *
@@ -81,7 +80,8 @@ export async function GetEvents(
                 )
             )
             ${
-                fts ? Prisma.sql`AND (
+                fts
+                    ? Prisma.sql`AND (
                     to_tsvector('english', title) @@ to_tsquery('english', ${fts})
                 OR to_tsvector('english', city) @@ to_tsquery('english', ${fts})
                 OR to_tsvector('english', country) @@ to_tsquery('english', ${fts})
@@ -94,19 +94,20 @@ export async function GetEvents(
                 OR to_tsvector('portuguese', title) @@ to_tsquery('portuguese', ${fts})
                 OR to_tsvector('portuguese', city) @@ to_tsquery('portuguese', ${fts})
                 OR to_tsvector('portuguese', country) @@ to_tsquery('portuguese', ${fts})
-            )` : Prisma.empty}
-        `
-        return events
-    }
-    catch (e) {
-        console.error(e)
-        return []
+            )`
+                    : Prisma.empty
+            }
+        `;
+        return events;
+    } catch (e) {
+        console.error(e);
+        return [];
     }
 }
 
 export async function GetLastUpdatedEvents(date: moment.Moment) {
-    const lbound = moment().subtract(1, "days").startOf("day")
-    const ubound = moment()
+    const lbound = moment().subtract(1, "days").startOf("day");
+    const ubound = moment();
     try {
         const events = await prisma.event.findMany({
             where: {
@@ -116,36 +117,36 @@ export async function GetLastUpdatedEvents(date: moment.Moment) {
                 },
                 validation_status: ValidationStatus.validated,
             },
-        })
-        return events
-    }
-    catch (e) {
-        console.error(e)
-        return []
+        });
+        return events;
+    } catch (e) {
+        console.error(e);
+        return [];
     }
 }
 
 export async function CountPendingEvents() {
     try {
-        return (await prisma.event.aggregate({
-            _count: {
-                id: true
-            },
-            where: {
-                validation_status: {
-                    equals: ValidationStatus.pending,
+        return (
+            await prisma.event.aggregate({
+                _count: {
+                    id: true,
                 },
-            },
-        }))._count.id
+                where: {
+                    validation_status: {
+                        equals: ValidationStatus.pending,
+                    },
+                },
+            })
+        )._count.id;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) {
-        console.error(e)
-    }
-    return 0
+    return 0;
 }
 
 export async function GetPendingEvents() {
-    let events: Event[] = []
+    let events: Event[] = [];
     try {
         events = await prisma.event.findMany({
             where: {
@@ -153,10 +154,9 @@ export async function GetPendingEvents() {
                     equals: ValidationStatus.pending,
                 },
             },
-        })
+        });
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) {
-        console.error(e)
-    }
-    return events
+    return events;
 }
