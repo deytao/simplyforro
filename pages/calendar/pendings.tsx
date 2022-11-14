@@ -1,19 +1,28 @@
-import { ArrowSmallRightIcon } from "@heroicons/react/24/outline";
 import moment from "moment";
-import type { NextPage } from "next";
-import { useSession, signIn } from "next-auth/react";
+import type { GetServerSideProps, NextPage } from "next";
+import { unstable_getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowSmallRightIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Event, Role } from "@prisma/client";
 
 import { MessageDialog } from "components/MessageDialog";
 import { GetPendingEvents } from "lib/calendar";
+import { authOptions } from "pages/api/auth/[...nextauth]";
 
 interface Props {
     events: any;
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await unstable_getServerSession(context.req, context.res, authOptions);
+    if (!session?.user.roles.includes(Role.contributor)) {
+        return {
+            redirect: {
+                destination: '/auth/signin',
+                permanent: false,
+            }
+        }
+    }
     const events: Event[] = await GetPendingEvents();
 
     return {
@@ -36,16 +45,12 @@ export const getStaticProps = async () => {
 };
 
 const Pendings: NextPage<Props> = ({ events }) => {
-    const { data: session, status } = useSession({ required: true });
     const [messageDialogState, setMessageDialogState] = useState({
         isOpen: false,
         status: "",
         title: "",
         message: "",
     });
-    if (status === "loading") {
-        return <>Loading</>;
-    }
     const statuteEvent = (e: any) => {
         const button = e.target;
         const validation_status = {
