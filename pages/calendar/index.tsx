@@ -205,7 +205,9 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const formOptions = {
         resolver: yupResolver(subscriberSchema),
         defaultValues: {
-            subscriptions: [],
+            name: session?.user.name,
+            email: session?.user.email,
+            subscriptions: session?.user.subscriptions?.map((subscription) => subscription.slug),
         },
     };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
@@ -256,10 +258,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
 
     const showForm = (errors: any = {}) => {
-        let selectedSubscriptions: string[] = [];
-        if (session) {
-            selectedSubscriptions = session.user.subscriptions.map((subscription) => subscription.slug);
-        }
         setMessageDialogState({
             isOpen: true,
             status: "neutral",
@@ -296,8 +294,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         {session && (
                             <>
-                                <input type="hidden" {...register("name")} defaultValue={session.user.name!} />
-                                <input type="hidden" {...register("email")} defaultValue={session.user.email!} />
+                                <input type="hidden" {...register("name")} />
+                                <input type="hidden" {...register("email")} />
                             </>
                         )}
                         <div className="col-span-2">
@@ -313,7 +311,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                                     id={`subscriptions-${subscription.slug}`}
                                                     {...register("subscriptions")}
                                                     value={subscription.slug}
-                                                    defaultChecked={selectedSubscriptions.includes(subscription.slug)}
                                                 />
                                             </div>
                                             <div className="ml-3 text-sm">
