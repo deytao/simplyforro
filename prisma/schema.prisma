@@ -36,6 +36,7 @@ enum Role {
   contributor
   teacher
   student
+  admin
 }
 
 model Event {
