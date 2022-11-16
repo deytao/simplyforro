@@ -18,10 +18,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!session?.user.roles.includes(Role.contributor)) {
         return {
             redirect: {
-                destination: '/auth/signin',
+                destination: "/auth/signin",
                 permanent: false,
-            }
-        }
+            },
+        };
     }
     const events: Event[] = await GetPendingEvents();
 

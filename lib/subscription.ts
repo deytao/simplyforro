@@ -22,7 +22,7 @@ export async function GetSubscriptions(active_only: Boolean = true, roles?: Role
         where.OR.push({
             roles: {
                 hasSome: roles,
-            }
+            },
         });
     }
     try {

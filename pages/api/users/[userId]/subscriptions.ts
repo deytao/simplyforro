@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(404).json({ message: "Route not found" });
         return;
     }
-    const data: {[key: string]: string[]} = req.body;
+    const data: { [key: string]: string[] } = req.body;
     const deleteSubscribers = await prisma.subscriber.deleteMany({
         where: {
             user: {

@@ -23,10 +23,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!session) {
         return {
             redirect: {
-                destination: '/auth/signin',
+                destination: "/auth/signin",
                 permanent: false,
-            }
-        }
+            },
+        };
     }
 
     const subscriptions = await GetSubscriptions(undefined, session.user.roles);
@@ -45,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 image: session.user.image,
                 roles: session.user.roles,
                 subscriptions: session.user.subscriptions?.map((subscription) => subscription.slug),
-            }
+            },
         },
     };
 };
@@ -63,12 +63,20 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
     const subscriptionsFormOptions = {
         resolver: yupResolver(subscriptionsSchema),
         defaultValues: {
-            subscriptions: user.subscriptions
+            subscriptions: user.subscriptions,
         },
     };
-    const { register: registerUser, handleSubmit: handleUserSubmit, formState: userFormState } = useForm(userFormOptions);
+    const {
+        register: registerUser,
+        handleSubmit: handleUserSubmit,
+        formState: userFormState,
+    } = useForm(userFormOptions);
     const { errors: userErrors } = userFormState;
-    const { register: registerSubscriptions, handleSubmit: handleSubscriptionsSubmit, formState: subscriptionsFormState } = useForm(subscriptionsFormOptions);
+    const {
+        register: registerSubscriptions,
+        handleSubmit: handleSubscriptionsSubmit,
+        formState: subscriptionsFormState,
+    } = useForm(subscriptionsFormOptions);
     const { errors: subscriptionsErrors } = subscriptionsFormState;
 
     const router = useRouter();
@@ -102,10 +110,10 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                 return response.json();
             })
             .then((data) => {
-                console.log("good")
+                console.log("good");
             })
             .catch((error) => {
-                console.log("bad")
+                console.log("bad");
             });
         return false;
     }
@@ -115,14 +123,17 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
-            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" action={`/api/users/${user.id}`} data-schema="user">
+            <form
+                method="POST"
+                onSubmit={handleUserSubmit(submitForm)}
+                className="w-full"
+                action={`/api/users/${user.id}`}
+                data-schema="user"
+            >
                 <input type="hidden" {...registerUser("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <div className="col-span-2">
-                        <label
-                            htmlFor="event-title"
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">
                             Name
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
@@ -135,10 +146,7 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                         </div>
                     </div>
                     <div className="col-span-2">
-                        <label
-                            htmlFor="event-email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor="event-email" className="block text-sm font-medium text-gray-700">
                             Email
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
@@ -150,41 +158,51 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                             />
                         </div>
                     </div>
-                    {user.roles.includes(Role.admin) && <fieldset>
-                        <legend className="text-base font-medium text-gray-900">Roles</legend>
-                        <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
-                        <div className="mt-4 space-y-4">
-                            {Object.keys(Role).map((role: string, idx: number) => (
-                                <div key={idx} className="flex items-start">
-                                    <div className="flex items-center h-5">
-                                        <input
-                                            type="checkbox"
-                                            id={`roles-${role}`}
-                                            {...registerUser("roles")}
-                                            value={role}
-                                            className={userErrors.roles ? "border-red-500" : ""}
-                                        />
+                    {user.roles.includes(Role.admin) && (
+                        <fieldset>
+                            <legend className="text-base font-medium text-gray-900">Roles</legend>
+                            <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
+                            <div className="mt-4 space-y-4">
+                                {Object.keys(Role).map((role: string, idx: number) => (
+                                    <div key={idx} className="flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                type="checkbox"
+                                                id={`roles-${role}`}
+                                                {...registerUser("roles")}
+                                                value={role}
+                                                className={userErrors.roles ? "border-red-500" : ""}
+                                            />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label
+                                                htmlFor={`roles-${role}`}
+                                                className="font-medium text-gray-700 capitalize"
+                                            >
+                                                {role}
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div className="ml-3 text-sm">
-                                        <label
-                                            htmlFor={`roles-${role}`}
-                                            className="font-medium text-gray-700 capitalize"
-                                        >
-                                            {role}
-                                        </label>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </fieldset>}
+                                ))}
+                            </div>
+                        </fieldset>
+                    )}
                 </div>
                 <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
-                    <button type="submit" className="btn btn-violet inline-flex justify-center">Save</button>
+                    <button type="submit" className="btn btn-violet inline-flex justify-center">
+                        Save
+                    </button>
                 </div>
             </form>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
-            <form method="POST" onSubmit={handleSubscriptionsSubmit(submitForm)} className="w-full" action={`/api/users/${user.id}/subscriptions`} data-schema="subscriptions">
+            <form
+                method="POST"
+                onSubmit={handleSubscriptionsSubmit(submitForm)}
+                className="w-full"
+                action={`/api/users/${user.id}/subscriptions`}
+                data-schema="subscriptions"
+            >
                 <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <fieldset>
@@ -208,9 +226,7 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                                             className="font-medium text-gray-700"
                                         >
                                             {subscription.title}
-                                            <p className="text-gray-500 font-normal">
-                                                {subscription.description}
-                                            </p>
+                                            <p className="text-gray-500 font-normal">{subscription.description}</p>
                                         </label>
                                     </div>
                                 </div>
@@ -219,7 +235,9 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                     </fieldset>
                 </div>
                 <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
-                    <button type="submit" className="btn btn-violet inline-flex justify-center">Save</button>
+                    <button type="submit" className="btn btn-violet inline-flex justify-center">
+                        Save
+                    </button>
                 </div>
             </form>
         </>

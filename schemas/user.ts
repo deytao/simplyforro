@@ -1,7 +1,6 @@
 import * as yup from "yup";
 import { Role } from "@prisma/client";
 
-
 export const userSchema = yup.object({
     id: yup.string().nullable(),
     name: yup.string().required("A name is required"),
