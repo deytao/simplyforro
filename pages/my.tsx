@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useForm } from "react-hook-form";
+import { SchemaOf } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Role, Subscription, User } from "@prisma/client";
 import { ArrowSmallRightIcon } from "@heroicons/react/24/outline";
@@ -13,7 +14,7 @@ import { authOptions } from "pages/api/auth/[...nextauth]";
 import { subscriptionsSchema, userSchema } from "schemas/user";
 
 interface Props {
-    user: User;
+    user: { subscriptions: string[] } & User;
     subscriptions: Subscription[];
 }
 
@@ -52,26 +53,39 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Me: NextPage<Props> = ({ subscriptions, user }) => {
     const userFormOptions = {
         resolver: yupResolver(userSchema),
-        defaultValues: user,
+        defaultValues: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            roles: user.roles,
+        },
     };
     const subscriptionsFormOptions = {
         resolver: yupResolver(subscriptionsSchema),
-        defaultValues: user,
+        defaultValues: {
+            subscriptions: user.subscriptions
+        },
     };
     const { register: registerUser, handleSubmit: handleUserSubmit, formState: userFormState } = useForm(userFormOptions);
     const { errors: userErrors } = userFormState;
     const { register: registerSubscriptions, handleSubmit: handleSubscriptionsSubmit, formState: subscriptionsFormState } = useForm(subscriptionsFormOptions);
+    const { errors: subscriptionsErrors } = subscriptionsFormState;
 
     const router = useRouter();
     const refreshData = () => {
         router.replace(router.asPath);
     };
 
-    async function submitUser(formData: object) {
-        const user = userSchema.cast(formData);
-        const { id: userId, ...userData } = user;
+    async function submitForm(formData: object, e: any) {
+        const schemas: {[key: string]: any} = {
+            "user": userSchema,
+            "subscriptions": subscriptionsSchema,
+        }
+        const target = e.target as HTMLElement
+        const castedData = schemas[target.dataset.form!].cast(formData);
+        const { id: userId, ...data } = castedData;
         const endpoint = `/api/users/${userId}`;
-        const JSONdata = JSON.stringify(userData);
+        const JSONdata = JSON.stringify(data);
 
         const options = {
             method: "POST",
@@ -96,13 +110,12 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
         return false;
     }
 
-    const { errors: subscriptionsErrors } = subscriptionsFormState;
     return (
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
-            <form onSubmit={handleUserSubmit(submitUser)} method="POST" className="w-full">
+            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" data-form="user">
                 <input type="hidden" {...registerUser("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <div className="col-span-2">
@@ -171,7 +184,7 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
             </form>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
-            <form method="POST" className="w-full">
+            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" data-form="subscriptions">
                 <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <fieldset>
