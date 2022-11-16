@@ -1,6 +1,7 @@
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,7 +10,7 @@ import { ArrowSmallRightIcon } from "@heroicons/react/24/outline";
 
 import { GetSubscriptions } from "lib/subscription";
 import { authOptions } from "pages/api/auth/[...nextauth]";
-import { userSchema } from "schemas/user";
+import { subscriptionsSchema, userSchema } from "schemas/user";
 
 interface Props {
     user: User;
@@ -48,18 +49,60 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Me: NextPage<Props> = ({ subscriptions, user }) => {
-    const formOptions = {
+    const userFormOptions = {
         resolver: yupResolver(userSchema),
         defaultValues: user,
     };
-    const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
+    const subscriptionsFormOptions = {
+        resolver: yupResolver(subscriptionsSchema),
+        defaultValues: user,
+    };
+    const { register: registerUser, handleSubmit: handleUserSubmit, formState: userFormState } = useForm(userFormOptions);
+    const { errors: userErrors } = userFormState;
+    const { register: registerSubscriptions, handleSubmit: handleSubscriptionsSubmit, formState: subscriptionsFormState } = useForm(subscriptionsFormOptions);
+
+    const router = useRouter();
+    const refreshData = () => {
+        router.replace(router.asPath);
+    };
+
+    async function submitUser(formData: object) {
+        const user = userSchema.cast(formData);
+        const { id: userId, ...userData } = user;
+        const endpoint = `/api/users/${userId}`;
+        const JSONdata = JSON.stringify(userData);
+
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSONdata,
+        };
+        await fetch(endpoint, options)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("An error occured, please try again later.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("good")
+            })
+            .catch((error) => {
+                console.log("bad")
+            });
+        return false;
+    }
+
+    const { errors: subscriptionsErrors } = subscriptionsFormState;
     return (
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
-            <form method="POST" className="w-full">
-                <input type="hidden" {...register("id")} id="user-id" />
+            <form onSubmit={handleUserSubmit(submitUser)} method="POST" className="w-full">
+                <input type="hidden" {...registerUser("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <div className="col-span-2">
                         <label
@@ -71,8 +114,9 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                         <div className="mt-1 flex rounded-md shadow-sm">
                             <input
                                 type="text"
-                                {...register("name")}
+                                {...registerUser("name")}
                                 id="user-name"
+                                className={`${userErrors.name ? "border-red-500" : ""}`}
                             />
                         </div>
                     </div>
@@ -86,13 +130,15 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                         <div className="mt-1 flex rounded-md shadow-sm">
                             <input
                                 type="text"
-                                {...register("email")}
+                                {...registerUser("email")}
                                 id="user-email"
+                                className={`${userErrors.email ? "border-red-500" : ""}`}
                             />
                         </div>
                     </div>
-                    {user.roles.includes(Role.contributor) && <fieldset>
+                    {user.roles.includes(Role.admin) && <fieldset>
                         <legend className="text-base font-medium text-gray-900">Roles</legend>
+                        <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
                         <div className="mt-4 space-y-4">
                             {Object.keys(Role).map((role: string, idx: number) => (
                                 <div key={idx} className="flex items-start">
@@ -100,8 +146,9 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                                         <input
                                             type="checkbox"
                                             id={`roles-${role}`}
-                                            {...register("roles")}
+                                            {...registerUser("roles")}
                                             value={role}
+                                            className={userErrors.roles ? "border-red-500" : ""}
                                         />
                                     </div>
                                     <div className="ml-3 text-sm">
@@ -117,17 +164,18 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                         </div>
                     </fieldset>}
                 </div>
-                <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
                     <button type="submit" className="btn btn-violet inline-flex justify-center">Save</button>
                 </div>
             </form>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
             <form method="POST" className="w-full">
-                <input type="hidden" {...register("id")} id="user-id" />
+                <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <fieldset>
                         <legend className="text-base font-medium text-gray-900">Roles</legend>
+                        <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
                         <div className="mt-4 space-y-4">
                             {subscriptions.map((subscription: Subscription, idx: number) => (
                                 <div key={idx} className="flex items-start">
@@ -135,8 +183,9 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                                         <input
                                             type="checkbox"
                                             id={`subscriptions-${subscription.slug}`}
-                                            {...register("subscriptions")}
+                                            {...registerSubscriptions("subscriptions")}
                                             value={subscription.slug}
+                                            className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
                                         />
                                     </div>
                                     <div className="ml-3 text-sm">
@@ -155,7 +204,7 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
                         </div>
                     </fieldset>
                 </div>
-                <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
                     <button type="submit" className="btn btn-violet inline-flex justify-center">Save</button>
                 </div>
             </form>

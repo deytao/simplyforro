@@ -56,7 +56,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         resolver: yupResolver(eventSchema),
         defaultValues: event,
     };
-    const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
+    const { register, handleSubmit, formState, watch } = useForm(formOptions);
     const { errors } = formState;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [messageDialogState, setMessageDialogState] = useState({

@@ -1,17 +1,23 @@
 import * as yup from "yup";
+import { Role } from "@prisma/client";
 
-
-export const roles = ["contributor", "student", "teacher"];
 
 export const userSchema = yup.object({
     id: yup.string().nullable(),
     name: yup.string().required("A name is required"),
     email: yup.string().email("You need a valid email").required("Your email is required"),
-    subscriptions: yup
+    roles: yup
         .array()
-        .of(yup.string().oneOf(roles))
+        .of(yup.string().oneOf(Object.keys(Role)))
         .nullable()
         .transform((curr, orig) => (orig === false ? null : curr)),
 });
 
-export interface UserInter extends yup.InferType<typeof userSchema> {}
+export const subscriptionsSchema = yup.object({
+    id: yup.string().nullable(),
+    subscriptions: yup
+        .array()
+        .of(yup.string())
+        .nullable()
+        .transform((curr, orig) => (orig === false ? null : curr)),
+});
