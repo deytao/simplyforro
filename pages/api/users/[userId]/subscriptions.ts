@@ -10,7 +10,7 @@ const allowedMethods = ["POST", "PATCH"];
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await unstable_getServerSession(req, res, authOptions);
     const { userId } = req.query;
-    if (!(session?.user.id === userId && session?.user.roles.includes(Role.admin))) {
+    if (!(session?.user.id === userId || session?.user.roles.includes(Role.admin))) {
         res.status(401).json({ message: "Insufficient rights" });
         return;
     }

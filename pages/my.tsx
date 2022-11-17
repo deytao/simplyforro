@@ -3,11 +3,12 @@ import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SchemaOf } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Role, Subscription, User } from "@prisma/client";
-import { ArrowSmallRightIcon } from "@heroicons/react/24/outline";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 import { GetSubscriptions } from "lib/subscription";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -84,6 +85,7 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
         router.replace(router.asPath);
     };
 
+    const [formIsSuccess, setFormIsSuccess] = useState(false);
     async function submitForm(formData: object, e: any) {
         const schemas: { [key: string]: any } = {
             user: userSchema,
@@ -110,7 +112,8 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                 return response.json();
             })
             .then((data) => {
-                console.log("good");
+                setFormIsSuccess(true);
+                setTimeout(() => setFormIsSuccess(false), 2000);
             })
             .catch((error) => {
                 console.log("bad");
@@ -122,124 +125,134 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
-            <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
-            <form
-                method="POST"
-                onSubmit={handleUserSubmit(submitForm)}
-                className="w-full"
-                action={`/api/users/${user.id}`}
-                data-schema="user"
-            >
-                <input type="hidden" {...registerUser("id")} id="user-id" />
-                <div className="grid grid-cols-2 gap-2 px-4 py-5">
-                    <div className="col-span-2">
-                        <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">
-                            Name
-                        </label>
-                        <div className="mt-1 flex rounded-md shadow-sm">
-                            <input
-                                type="text"
-                                {...registerUser("name")}
-                                id="user-name"
-                                className={`${userErrors.name ? "border-red-500" : ""}`}
-                            />
+            <div className="w-full pr-2 pl-2">
+                <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
+                <form
+                    method="POST"
+                    onSubmit={handleUserSubmit(submitForm)}
+                    action={`/api/users/${user.id}`}
+                    data-schema="user"
+                >
+                    <input type="hidden" {...registerUser("id")} id="user-id" />
+                    <div className="grid grid-cols-2 gap-2 px-4 py-5">
+                        <div className="col-span-2">
+                            <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">
+                                Name
+                            </label>
+                            <div className="mt-1 flex rounded-md shadow-sm">
+                                <input
+                                    type="text"
+                                    {...registerUser("name")}
+                                    id="user-name"
+                                    className={`${userErrors.name ? "border-red-500" : ""}`}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="col-span-2">
-                        <label htmlFor="event-email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
-                        <div className="mt-1 flex rounded-md shadow-sm">
-                            <input
-                                type="text"
-                                {...registerUser("email")}
-                                id="user-email"
-                                className={`${userErrors.email ? "border-red-500" : ""}`}
-                            />
+                        <div className="col-span-2">
+                            <label htmlFor="event-email" className="block text-sm font-medium text-gray-700">
+                                Email
+                            </label>
+                            <div className="mt-1 flex rounded-md shadow-sm">
+                                <input
+                                    type="text"
+                                    {...registerUser("email")}
+                                    id="user-email"
+                                    className={`${userErrors.email ? "border-red-500" : ""}`}
+                                />
+                            </div>
                         </div>
+                        {user.roles.includes(Role.admin) && (
+                            <fieldset>
+                                <legend className="text-base font-medium text-gray-900">Roles</legend>
+                                <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
+                                <div className="mt-4 space-y-4">
+                                    {Object.keys(Role).map((role: string, idx: number) => (
+                                        <div key={idx} className="flex items-start">
+                                            <div className="flex items-center h-5">
+                                                <input
+                                                    type="checkbox"
+                                                    id={`roles-${role}`}
+                                                    {...registerUser("roles")}
+                                                    value={role}
+                                                    className={userErrors.roles ? "border-red-500" : ""}
+                                                />
+                                            </div>
+                                            <div className="ml-3 text-sm">
+                                                <label
+                                                    htmlFor={`roles-${role}`}
+                                                    className="font-medium text-gray-700 capitalize"
+                                                >
+                                                    {role}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </fieldset>
+                        )}
                     </div>
-                    {user.roles.includes(Role.admin) && (
+                    <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
+                        <div className={`text-xs font-bold text-green-600 ${formIsSuccess ? "" : "hidden"}`}>
+                            <CheckIcon className="h-5 w-5 -mt-1 inline" />
+                            Success
+                        </div>
+                        <button type="submit" className="btn btn-violet">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div className="w-full pr-2 pl-2 mt-5">
+                <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
+                <form
+                    method="POST"
+                    onSubmit={handleSubscriptionsSubmit(submitForm)}
+                    action={`/api/users/${user.id}/subscriptions`}
+                    data-schema="subscriptions"
+                >
+                    <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
+                    <div className="grid grid-cols-2 gap-2 px-4 py-5">
                         <fieldset>
                             <legend className="text-base font-medium text-gray-900">Roles</legend>
-                            <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
+                            <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
                             <div className="mt-4 space-y-4">
-                                {Object.keys(Role).map((role: string, idx: number) => (
+                                {subscriptions.map((subscription: Subscription, idx: number) => (
                                     <div key={idx} className="flex items-start">
                                         <div className="flex items-center h-5">
                                             <input
                                                 type="checkbox"
-                                                id={`roles-${role}`}
-                                                {...registerUser("roles")}
-                                                value={role}
-                                                className={userErrors.roles ? "border-red-500" : ""}
+                                                id={`subscriptions-${subscription.slug}`}
+                                                {...registerSubscriptions("subscriptions")}
+                                                value={subscription.slug}
+                                                className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
                                             />
                                         </div>
                                         <div className="ml-3 text-sm">
                                             <label
-                                                htmlFor={`roles-${role}`}
-                                                className="font-medium text-gray-700 capitalize"
+                                                htmlFor={`subscriptions-${subscription.slug}`}
+                                                className="font-medium text-gray-700"
                                             >
-                                                {role}
+                                                {subscription.title}
+                                                <p className="text-gray-500 font-normal">{subscription.description}</p>
                                             </label>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </fieldset>
-                    )}
-                </div>
-                <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
-                    <button type="submit" className="btn btn-violet inline-flex justify-center">
-                        Save
-                    </button>
-                </div>
-            </form>
-
-            <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
-            <form
-                method="POST"
-                onSubmit={handleSubscriptionsSubmit(submitForm)}
-                className="w-full"
-                action={`/api/users/${user.id}/subscriptions`}
-                data-schema="subscriptions"
-            >
-                <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
-                <div className="grid grid-cols-2 gap-2 px-4 py-5">
-                    <fieldset>
-                        <legend className="text-base font-medium text-gray-900">Roles</legend>
-                        <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
-                        <div className="mt-4 space-y-4">
-                            {subscriptions.map((subscription: Subscription, idx: number) => (
-                                <div key={idx} className="flex items-start">
-                                    <div className="flex items-center h-5">
-                                        <input
-                                            type="checkbox"
-                                            id={`subscriptions-${subscription.slug}`}
-                                            {...registerSubscriptions("subscriptions")}
-                                            value={subscription.slug}
-                                            className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
-                                        />
-                                    </div>
-                                    <div className="ml-3 text-sm">
-                                        <label
-                                            htmlFor={`subscriptions-${subscription.slug}`}
-                                            className="font-medium text-gray-700"
-                                        >
-                                            {subscription.title}
-                                            <p className="text-gray-500 font-normal">{subscription.description}</p>
-                                        </label>
-                                    </div>
-                                </div>
-                            ))}
+                    </div>
+                    <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
+                        <div className={`text-xs font-bold text-green-600 ${formIsSuccess ? "" : "hidden"}`}>
+                            <CheckIcon className="h-5 w-5 -mt-1 inline" />
+                            Success
                         </div>
-                    </fieldset>
-                </div>
-                <div className="px-4 py-3 bg-gray-100 text-right sm:px-6">
-                    <button type="submit" className="btn btn-violet inline-flex justify-center">
-                        Save
-                    </button>
-                </div>
-            </form>
+                        <button type="submit" className="btn btn-violet">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
         </>
     );
 };
