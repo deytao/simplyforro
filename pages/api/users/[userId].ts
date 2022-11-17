@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const data: User = req.body;
     let result = await prisma.user.update({
         where: {
-            id: userId,
+            id: userId as string,
         },
         data: data,
     });
