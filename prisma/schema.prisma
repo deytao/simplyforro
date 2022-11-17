@@ -123,6 +123,7 @@ model Subscription {
   lastRun     DateTime?    @map("last_run") @db.Timestamp
   frequency   Frequency
   templateId  Int?         @map("template_id")
+  roles       Role[]       @default([])
   subscribers Subscriber[]
 
   @@map("subscription")
