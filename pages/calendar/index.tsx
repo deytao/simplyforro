@@ -1,7 +1,8 @@
 import moment from "moment";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
@@ -22,6 +23,7 @@ import { EventDetailsSimple } from "components/EventPreview";
 import { MessageDialog } from "components/MessageDialog";
 import { frequencyIntervals } from "lib/calendar";
 import { Subscription } from "lib/prisma";
+import { authOptions } from "pages/api/auth/[...nextauth]";
 import { categories } from "schemas/event";
 import { GetSubscriptions } from "lib/subscription";
 import { subscriberSchema } from "schemas/subscriber";
@@ -47,8 +49,9 @@ interface IMessageDialog {
     customButtons?: object[];
 }
 
-export const getStaticProps = async () => {
-    const subscriptions = await GetSubscriptions();
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await unstable_getServerSession(context.req, context.res, authOptions);
+    const subscriptions = await GetSubscriptions(undefined, session?.user.roles);
 
     return {
         props: {
@@ -58,10 +61,6 @@ export const getStaticProps = async () => {
                 slug: subscription.slug,
             })),
         },
-        // Next.js will attempt to re-generate the page:
-        // - When a request comes in
-        // - At most once every second
-        revalidate: 3600, // In seconds
     };
 };
 

@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    const subscriptions = await GetSubscriptions();
+    const subscriptions = await GetSubscriptions(undefined, session.user.roles);
 
     return {
         props: {
