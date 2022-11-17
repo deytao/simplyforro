@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-const Me: NextPage<Props> = ({ subscriptions, user }) => {
+const My: NextPage<Props> = ({ subscriptions, user }) => {
     const userFormOptions = {
         resolver: yupResolver(userSchema),
         defaultValues: {
@@ -77,14 +77,14 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
     };
 
     async function submitForm(formData: object, e: any) {
-        const schemas: {[key: string]: any} = {
-            "user": userSchema,
-            "subscriptions": subscriptionsSchema,
-        }
-        const target = e.target as HTMLElement
-        const castedData = schemas[target.dataset.form!].cast(formData);
+        const schemas: { [key: string]: any } = {
+            user: userSchema,
+            subscriptions: subscriptionsSchema,
+        };
+        const target = e.target as HTMLFormElement;
+        const castedData = schemas[target.dataset.schema!].cast(formData);
         const { id: userId, ...data } = castedData;
-        const endpoint = `/api/users/${userId}`;
+        const endpoint = target.action;
         const JSONdata = JSON.stringify(data);
 
         const options = {
@@ -115,7 +115,7 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
-            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" data-form="user">
+            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" action={`/api/users/${user.id}`} data-schema="user">
                 <input type="hidden" {...registerUser("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <div className="col-span-2">
@@ -184,7 +184,7 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
             </form>
 
             <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
-            <form method="POST" onSubmit={handleUserSubmit(submitForm)} className="w-full" data-form="subscriptions">
+            <form method="POST" onSubmit={handleSubscriptionsSubmit(submitForm)} className="w-full" action={`/api/users/${user.id}/subscriptions`} data-schema="subscriptions">
                 <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
                 <div className="grid grid-cols-2 gap-2 px-4 py-5">
                     <fieldset>
@@ -226,4 +226,4 @@ const Me: NextPage<Props> = ({ subscriptions, user }) => {
     );
 };
 
-export default Me;
+export default My;
