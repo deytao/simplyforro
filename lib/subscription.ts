@@ -1,19 +1,29 @@
 import moment from "moment";
-import { Prisma, User } from "@prisma/client";
+import { Prisma, Role, User } from "@prisma/client";
 
 import prisma, { Subscription } from "lib/prisma";
 
-export async function GetSubscriptions(public_only: Boolean = true): Promise<Subscription[]> {
+export async function GetSubscriptions(active_only: Boolean = true, roles?: Role[]): Promise<Subscription[]> {
     let subscriptions: Subscription[] = [];
-    let where: Prisma.SubscriptionWhereInput = {
-        active: {
-            equals: true,
-        },
-    };
-    if (public_only) {
-        where.public = {
+    let where: Prisma.SubscriptionWhereInput = {};
+    if (active_only) {
+        where.active = {
             equals: true,
         };
+    }
+    where.OR = [
+        {
+            roles: {
+                isEmpty: true,
+            },
+        },
+    ];
+    if (roles) {
+        where.OR.push({
+            roles: {
+                hasSome: roles,
+            },
+        });
     }
     try {
         subscriptions = await prisma.subscription.findMany({

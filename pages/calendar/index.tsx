@@ -1,7 +1,8 @@
 import moment from "moment";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
@@ -22,6 +23,7 @@ import { EventDetailsSimple } from "components/EventPreview";
 import { MessageDialog } from "components/MessageDialog";
 import { frequencyIntervals } from "lib/calendar";
 import { Subscription } from "lib/prisma";
+import { authOptions } from "pages/api/auth/[...nextauth]";
 import { categories } from "schemas/event";
 import { GetSubscriptions } from "lib/subscription";
 import { subscriberSchema } from "schemas/subscriber";
@@ -47,8 +49,9 @@ interface IMessageDialog {
     customButtons?: object[];
 }
 
-export const getStaticProps = async () => {
-    const subscriptions = await GetSubscriptions();
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await unstable_getServerSession(context.req, context.res, authOptions);
+    const subscriptions = await GetSubscriptions(undefined, session?.user.roles);
 
     return {
         props: {
@@ -58,10 +61,6 @@ export const getStaticProps = async () => {
                 slug: subscription.slug,
             })),
         },
-        // Next.js will attempt to re-generate the page:
-        // - When a request comes in
-        // - At most once every second
-        revalidate: 3600, // In seconds
     };
 };
 
@@ -205,7 +204,9 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const formOptions = {
         resolver: yupResolver(subscriberSchema),
         defaultValues: {
-            subscriptions: [],
+            name: session?.user.name,
+            email: session?.user.email,
+            subscriptions: session?.user.subscriptions?.map((subscription) => subscription.slug),
         },
     };
     const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
@@ -256,10 +257,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
 
     const showForm = (errors: any = {}) => {
-        let selectedSubscriptions: string[] = [];
-        if (session) {
-            selectedSubscriptions = session.user.subscriptions.map((subscription) => subscription.slug);
-        }
         setMessageDialogState({
             isOpen: true,
             status: "neutral",
@@ -296,8 +293,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         {session && (
                             <>
-                                <input type="hidden" {...register("name")} defaultValue={session.user.name!} />
-                                <input type="hidden" {...register("email")} defaultValue={session.user.email!} />
+                                <input type="hidden" {...register("name")} />
+                                <input type="hidden" {...register("email")} />
                             </>
                         )}
                         <div className="col-span-2">
@@ -313,7 +310,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                                     id={`subscriptions-${subscription.slug}`}
                                                     {...register("subscriptions")}
                                                     value={subscription.slug}
-                                                    defaultChecked={selectedSubscriptions.includes(subscription.slug)}
                                                 />
                                             </div>
                                             <div className="ml-3 text-sm">

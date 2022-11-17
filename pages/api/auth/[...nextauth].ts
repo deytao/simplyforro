@@ -91,6 +91,7 @@ export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     callbacks: {
         async session({ session, user, token }: { session: Session; user: User; token: JWT }) {
+            session.user.id = user.id;
             session.user.roles = user.roles;
             session.user.subscriptions = await prisma.subscription.findMany({
                 where: {
