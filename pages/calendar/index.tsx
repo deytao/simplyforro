@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
 import { useEffect, useState } from "react";
+import Select from 'react-select'
 import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -150,23 +151,21 @@ const Toolbar = ({
                             data-filters-fts={true}
                         />
                     </div>
-                    <div className="col-span-5 lg:col-span-3 order-3 p-1">
-                        <div className="mt-2 flex flex-wrap items-center gap-2">
-                            {categories.map((category: any, idx: number) => (
-                                <div key={idx} className="flex items-center basis-1/6">
-                                    <Checkbox
-                                        id={`categories-${category}`}
-                                        value={category}
-                                        onChange={changeCategories}
-                                        checked={selectedCategories.includes(category)}
-                                        data-filters-categories={true}
-                                    />
-                                    <Label htmlFor={`categories-${category}`} className="capitalize">
-                                        <Badge color={category}>{category}</Badge>
-                                    </Label>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="col-span-5 lg:col-span-3 order-3">
+                        <Select
+                            isMulti
+                            closeMenuOnSelect={false}
+                            options={categories.map((category: any, idx: number) => ({
+                                value: category,
+                                label: category,
+                            }))}
+                            defaultValue={categories.map((category: any, idx: number) => ({
+                                value: category,
+                                label: category,
+                            }))}
+                            data-filters-categories={true}
+                            placeholder="Categories"
+                        />
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
                         <Dropdown
