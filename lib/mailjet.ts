@@ -47,7 +47,7 @@ export const sendBulkEmails = async (
 ) => {
     let message: any = {
         TemplateLanguage: true,
-        To: [
+        Bcc: [
             ...recipients.map((recipient) => {
                 return { Email: recipient };
             }),

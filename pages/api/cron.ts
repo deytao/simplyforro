@@ -84,12 +84,6 @@ const callbacks: { [key: string]: Function } = {
         const recipients = subscription.subscribers
             ? subscription.subscribers.map((subscriber) => subscriber.user.email)
             : [];
-        if (!recipients) {
-            return {
-                recipients: [],
-                data: {},
-            };
-        }
         const currentDate = moment();
         const data = await GetLastUpdatedEvents(currentDate);
         const events = data.map((event) => {
@@ -103,9 +97,15 @@ const callbacks: { [key: string]: Function } = {
                 country: event.country,
             };
         });
+        if (events && recipients) {
+            return {
+                recipients: recipients,
+                data: { events: events },
+            };
+        }
         return {
-            recipients: recipients,
-            data: { events: events },
+            recipients: [],
+            data: {},
         };
     },
     "events-to-review-daily": async (subscription: Subscription): Promise<{ recipients: string[]; data: any }> => {
