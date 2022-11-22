@@ -90,6 +90,29 @@ const Toolbar = ({
         }
         taskId = setTimeout(() => onNavigate(), 800);
     };
+    const categoriesStyles: {[key: string]: {color: string, backgroundColor: string}} = {
+        "party": {
+            color: "#7F1D1D",
+            backgroundColor: "#FEE2E2",
+        },
+        "pratica": {
+            color: "#1E3A8A",
+            backgroundColor: "#DBEAFE",
+        },
+        "class": {
+            color: "#581C87",
+            backgroundColor: "#F3E8FF",
+        },
+        "workshop": {
+            color: "#7C2D12",
+            backgroundColor: "#FFEDD5",
+        },
+        "festival": {
+            color: "#14532D",
+            backgroundColor: "#DCFCE7",
+        },
+    }
+
     return (
         <>
             <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
@@ -153,17 +176,36 @@ const Toolbar = ({
                     </div>
                     <div className="col-span-5 lg:col-span-3 order-3">
                         <Select
-                            isMulti
+                            styles={{
+                                multiValue: (baseStyles, { data }) => ({
+                                    ...baseStyles,
+                                    ...categoriesStyles[data.value],
+                                }),
+                                option: (baseStyles, { data, isFocused }) => ({
+                                    ...baseStyles,
+                                    color: categoriesStyles[data.value].color,
+                                    backgroundColor: undefined,
+                                }),
+                                valueContainer: (baseStyles) => ({
+                                    ...baseStyles,
+                                    flexWrap: "nowrap",
+                                }),
+                            }}
                             closeMenuOnSelect={false}
-                            options={categories.map((category: any, idx: number) => ({
-                                value: category,
-                                label: category,
-                            }))}
+                            data-filters-categories={true}
                             defaultValue={categories.map((category: any, idx: number) => ({
                                 value: category,
                                 label: category,
                             }))}
-                            data-filters-categories={true}
+                            hideSelectedOptions={false}
+                            isClearable={false}
+                            isMulti={true}
+                            isSearchable={false}
+                            name="categories"
+                            options={categories.map((category: any, idx: number) => ({
+                                value: category,
+                                label: category,
+                            }))}
                             placeholder="Categories"
                         />
                     </div>
