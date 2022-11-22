@@ -7,8 +7,8 @@ import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
-import { useEffect, useState } from "react";
-import Select from 'react-select'
+import { useEffect, useRef, useState } from "react";
+import Select, { ActionMeta, MultiValue } from 'react-select'
 import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -47,6 +47,28 @@ interface Props {
     subscriptions: Subscription[];
 }
 
+interface CategoryOption {
+    label: string;
+    value: string;
+}
+
+interface IMessageDialog {
+    isOpen: boolean;
+    status?: string;
+    title?: string;
+    message?: any;
+    content?: any;
+    customButtons?: object[];
+}
+
+interface ToolbarProps {
+    calendarRef: any;
+    ftsValue: string;
+    showForm: any;
+    status: string;
+    setEvents: Function;
+}
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await unstable_getServerSession(context.req, context.res, authOptions);
     const subscriptions = await GetSubscriptions(undefined, session?.user.roles);
@@ -62,34 +84,69 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-const Toolbar = ({
-    label,
-    onNavigate,
-    session,
-    selectedCategories,
-    ftsValue,
-    showForm,
-    status,
-}: {
-    label: string;
-    onNavigate: any;
-    session: any;
-    selectedCategories: string[];
-    ftsValue: string;
-    showForm: any;
-    status: string;
-}) => {
-    const prevMonth = () => onNavigate("PREV");
-    const currentMonth = () => onNavigate("TODAY");
-    const nextMonth = () => onNavigate("NEXT");
-    const changeCategories = () => onNavigate();
+const loadEvents = (date: Date, selectedCategories: string[], q: string, setEvents: Function) => {
+    let lbound = moment(date).startOf("month").startOf("week");
+    let ubound = moment(date).endOf("month").endOf("week");
+    let dates = [
+        `lbound=${encodeURIComponent(lbound.format("YYYY-MM-DD"))}`,
+        `ubound=${encodeURIComponent(ubound.format("YYYY-MM-DD"))}`,
+    ];
+    let params = [
+        ...dates,
+        ...([...selectedCategories].map((category) => `categories=${encodeURIComponent(category)}`)),
+        `q=${encodeURIComponent(q)}`,
+    ];
+    fetch(`/api/events?${params.join("&")}`)
+        .then((res) => res.json())
+        .then((data) => {
+            let events = data
+                .map((event: Event) => {
+                    if (!event.frequency) {
+                        return event;
+                    }
+                    let eventDate = moment(event.start_at);
+                    let lastDate =
+                        event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
+                    let events: Event[] = [];
+                    while (eventDate.isSameOrBefore(lastDate)) {
+                        let isExcluded = event.excluded_on?.filter((excluded_date) => {
+                            return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
+                        });
+                        if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
+                            events.push({
+                                ...event,
+                                start_at: eventDate.toDate(),
+                                end_at: eventDate.toDate(),
+                            });
+                        }
+                        eventDate.add(frequencyIntervals[event.frequency]);
+                    }
+                    return events;
+                })
+                .flat(1);
+            setEvents(events);
+        });
+};
+
+const Toolbar = ({ calendarRef, session, ftsValue, showForm, status, setEvents }: ToolbarProps) => {
+    if (!calendarRef.current) {
+        return <></>
+    }
+    const calendar = calendarRef.current
+    const prevMonth = () => calendar.handleNavigate("PREV");
+    const currentMonth = () => calendar.handleNavigate("TODAY");
+    const nextMonth = () => calendar.handleNavigate("NEXT");
+    const changeCategories = () => calendar.handleNavigate();
     let taskId: ReturnType<typeof setTimeout>;
     const changeFTS = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (taskId) {
             clearTimeout(taskId);
         }
-        taskId = setTimeout(() => onNavigate(), 800);
+        taskId = setTimeout(() => calendar.handleNavigate(), 800);
     };
+
+    const [selectedCategories, setSelectedCategories] = useState(categories);
+
     const categoriesStyles: {[key: string]: {color: string, backgroundColor: string}} = {
         "party": {
             color: "#7F1D1D",
@@ -113,6 +170,11 @@ const Toolbar = ({
         },
     }
 
+    useEffect(
+        () => loadEvents(calendar.props.date, selectedCategories, ftsValue, setEvents),
+        []
+    );
+
     return (
         <>
             <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
@@ -127,7 +189,7 @@ const Toolbar = ({
                     >
                         <HiChevronLeft className="h-8 w-8" />
                     </Button>
-                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
+                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{moment(calendar.props.date).format("MMMM YYYY")}</h1>
                     <Button
                         color=""
                         size="sm"
@@ -197,7 +259,7 @@ const Toolbar = ({
                             }}
                             closeMenuOnSelect={false}
                             data-filters-categories={true}
-                            defaultValue={categories.map((category: any, idx: number) => ({
+                            defaultValue={selectedCategories.map((category: any, idx: number) => ({
                                 value: category,
                                 label: category,
                             }))}
@@ -206,6 +268,7 @@ const Toolbar = ({
                             isMulti={true}
                             isSearchable={false}
                             name="categories"
+                            onChange={changeCategories}
                             options={categories.map((category: any, idx: number) => ({
                                 value: category,
                                 label: category,
@@ -242,7 +305,6 @@ const Toolbar = ({
 const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { data: session, status } = useSession();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedCategories, setSelectedCategories] = useState(categories);
     const [ftsValue, setFTSValue] = useState("");
     const [events, setEvents] = useState([]);
     const [modal, setModal] = useState<IModal>({
@@ -252,6 +314,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(subscriberSchema) });
     const { errors } = formState;
     const router = useRouter();
+
+    const calendarRef = useRef(null)
 
     async function submitForm(formData: object) {
         const endpoint = "/api/subscribers";
@@ -398,60 +462,25 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         onSwiped: handleSwiped,
     });
 
-    const loadEvents = () => {
-        let lbound = moment(currentDate).startOf("month").startOf("week");
-        let ubound = moment(currentDate).endOf("month").endOf("week");
-        let dates = [
-            `lbound=${encodeURIComponent(lbound.format("YYYY-MM-DD"))}`,
-            `ubound=${encodeURIComponent(ubound.format("YYYY-MM-DD"))}`,
-        ];
-        let categories = [...selectedCategories].map((category) => `categories=${encodeURIComponent(category)}`);
-        let params = [...dates, ...categories, `q=${encodeURIComponent(ftsValue)}`];
-        fetch(`/api/events?${params.join("&")}`)
-            .then((res) => res.json())
-            .then((data) => {
-                let events = data
-                    .map((event: Event) => {
-                        if (!event.frequency) {
-                            return event;
-                        }
-                        let eventDate = moment(event.start_at);
-                        let lastDate =
-                            event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
-                        let events: Event[] = [];
-                        while (eventDate.isSameOrBefore(lastDate)) {
-                            let isExcluded = event.excluded_on?.filter((excluded_date) => {
-                                return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
-                            });
-                            if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
-                                events.push({
-                                    ...event,
-                                    start_at: eventDate.toDate(),
-                                    end_at: eventDate.toDate(),
-                                });
-                            }
-                            eventDate.add(frequencyIntervals[event.frequency]);
-                        }
-                        return events;
-                    })
-                    .flat(1);
-                setEvents(events);
-            });
-    };
-
-    useEffect(loadEvents, [currentDate, selectedCategories, ftsValue]);
-
     return (
         <>
             <Modal modal={modal} setModal={setModal} />
             <Popup popup={popup} setPopup={setPopup} />
             <div {...swipeHandlers} style={{ width: "100%" }}>
+                <Toolbar
+                    calendarRef={calendarRef}
+                    session={session}
+                    ftsValue={ftsValue}
+                    showForm={showForm}
+                    status={status}
+                    setEvents={setEvents}
+                />
                 <BigCalendar
+                    ref={calendarRef}
                     components={{
                         event: EventDetailsSimple,
-                        toolbar: (args) =>
-                            Toolbar({ ...args, session, selectedCategories, ftsValue, showForm, status }),
                     }}
+                    toolbar={false}
                     defaultDate={currentDate}
                     defaultView="month"
                     events={events.map((event: any, idx: number) => {
@@ -470,11 +499,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         const newCategories = [...elements].map((el) => el.value);
                         const ftsInput = document.querySelector("[data-filters-fts]") as HTMLInputElement;
 
-                        if (selectedCategories.length !== newCategories.length) {
-                            // useState doesn't check the values themselves but the signature of the array
-                            // which is different everytime
-                            setSelectedCategories(newCategories);
-                        }
                         setFTSValue(ftsInput ? ftsInput.value : "");
                         setCurrentDate(newDate);
                     }}
