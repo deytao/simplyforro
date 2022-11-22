@@ -177,6 +177,10 @@ const Toolbar = ({
                     <div className="col-span-5 lg:col-span-3 order-3">
                         <Select
                             styles={{
+                                container: (baseStyles) => ({
+                                    ...baseStyles,
+                                    zIndex: "30",
+                                }),
                                 multiValue: (baseStyles, { data }) => ({
                                     ...baseStyles,
                                     ...categoriesStyles[data.value],
