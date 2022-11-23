@@ -3,7 +3,7 @@ import moment from "moment";
 import Link from "next/link";
 import { Event, Role } from "@prisma/client";
 import { useEffect, useState } from "react";
-import Select, { ActionMeta, MultiValue } from 'react-select'
+import Select, { ActionMeta, MultiValue } from "react-select";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
     HiChevronLeft,
@@ -20,6 +20,8 @@ import { subscriberSchema } from "schemas/subscriber";
 interface CategoryOption {
     label: string;
     value: string;
+    color: string;
+    backgroundColor: string;
 }
 
 interface ToolbarProps {
@@ -30,7 +32,35 @@ interface ToolbarProps {
     session: any;
 }
 
-export const loadEvents = (date: moment.Moment, selectedCategories: string[], q: string, setEvents: Function) => {
+const categoriesStyles: { [key: string]: { color: string; backgroundColor: string } } = {
+    party: {
+        color: "#7F1D1D",
+        backgroundColor: "#FEE2E2",
+    },
+    pratica: {
+        color: "#1E3A8A",
+        backgroundColor: "#DBEAFE",
+    },
+    class: {
+        color: "#581C87",
+        backgroundColor: "#F3E8FF",
+    },
+    workshop: {
+        color: "#7C2D12",
+        backgroundColor: "#FFEDD5",
+    },
+    festival: {
+        color: "#14532D",
+        backgroundColor: "#DCFCE7",
+    },
+};
+
+export const loadEvents = (
+    date: moment.Moment,
+    selectedCategories: MultiValue<CategoryOption>,
+    q: string,
+    setEvents: Function,
+) => {
     let lbound = moment(date).startOf("month").startOf("week");
     let ubound = moment(date).endOf("month").endOf("week");
     let dates = [
@@ -39,7 +69,7 @@ export const loadEvents = (date: moment.Moment, selectedCategories: string[], q:
     ];
     let params = [
         ...dates,
-        ...([...selectedCategories].map((category) => `categories=${encodeURIComponent(category)}`)),
+        ...[...selectedCategories].map((category) => `categories=${encodeURIComponent(category.value)}`),
         `q=${encodeURIComponent(q)}`,
     ];
     fetch(`/api/events?${params.join("&")}`)
@@ -76,59 +106,42 @@ export const loadEvents = (date: moment.Moment, selectedCategories: string[], q:
 
 export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: ToolbarProps) => {
     if (!calendarRef.current) {
-        return <></>
+        return <></>;
     }
-    const calendar = calendarRef.current
+    const calendar = calendarRef.current;
     const [currentDate, setCurrentDate] = useState(moment(calendar.props.date));
     const changeCategories = () => calendar.handleNavigate();
     let taskId: ReturnType<typeof setTimeout>;
     const changeDate = (e: any) => {
-        const actions: {[key: string]: [string, Function]} = {
+        const actions: { [key: string]: [string, Function] } = {
             previous: ["PREV", (date: moment.Moment) => moment(date).subtract(1, "month")],
             current: ["TODAY", (date: moment.Moment) => moment()],
             next: ["NEXT", (date: moment.Moment) => moment(date).add(1, "month")],
-        }
-        const monthDirection = e.currentTarget.dataset.month
-        const [calendarAction, modifier] = actions[monthDirection]
-        setCurrentDate(modifier(currentDate))
-        calendar.handleNavigate(calendarAction)
+        };
+        const monthDirection = e.currentTarget.dataset.month;
+        const [calendarAction, modifier] = actions[monthDirection];
+        setCurrentDate(modifier(currentDate));
+        calendar.handleNavigate(calendarAction);
     };
     const changeFTS = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (taskId) {
             clearTimeout(taskId);
         }
-        taskId = setTimeout(() => calendar.handleNavigate(), 800);
+        taskId = setTimeout(() => setFTSValue(e.target.value), 800);
     };
 
-    const [selectedCategories, setSelectedCategories] = useState(categories);
+    const [selectedCategories, setSelectedCategories] = useState<MultiValue<CategoryOption>>(
+        categories.map((category: any, idx: number) => ({
+            value: category,
+            label: category,
+            ...categoriesStyles[category],
+        })),
+    );
     const [ftsValue, setFTSValue] = useState("");
-
-    const categoriesStyles: {[key: string]: {color: string, backgroundColor: string}} = {
-        "party": {
-            color: "#7F1D1D",
-            backgroundColor: "#FEE2E2",
-        },
-        "pratica": {
-            color: "#1E3A8A",
-            backgroundColor: "#DBEAFE",
-        },
-        "class": {
-            color: "#581C87",
-            backgroundColor: "#F3E8FF",
-        },
-        "workshop": {
-            color: "#7C2D12",
-            backgroundColor: "#FFEDD5",
-        },
-        "festival": {
-            color: "#14532D",
-            backgroundColor: "#DCFCE7",
-        },
-    }
 
     useEffect(
         () => loadEvents(currentDate, selectedCategories, ftsValue, setEvents),
-        [currentDate, selectedCategories, ftsValue]
+        [currentDate, selectedCategories, ftsValue],
     );
 
     return (
@@ -195,39 +208,50 @@ export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: T
                     <div className="col-span-5 lg:col-span-3 order-3">
                         <Select
                             styles={{
-                                container: (baseStyles) => ({
-                                    ...baseStyles,
+                                container: (styles) => ({
+                                    ...styles,
                                     zIndex: "30",
                                 }),
-                                multiValue: (baseStyles, { data }) => ({
-                                    ...baseStyles,
-                                    ...categoriesStyles[data.value],
+                                multiValue: (styles, { data }) => ({
+                                    ...styles,
+                                    color: data.color,
+                                    backgroundColor: data.backgroundColor,
                                 }),
-                                option: (baseStyles, { data, isFocused }) => ({
-                                    ...baseStyles,
-                                    color: categoriesStyles[data.value].color,
-                                    backgroundColor: undefined,
+                                multiValueRemove: (styles, { data }) => ({
+                                    ...styles,
+                                    color: data.color,
+                                    ":hover": {
+                                        backgroundColor: data.backgroundColor,
+                                    },
                                 }),
-                                valueContainer: (baseStyles) => ({
-                                    ...baseStyles,
+                                option: (styles, { data, isFocused, isSelected }) => ({
+                                    ...styles,
+                                    color: data.color,
+                                    backgroundColor: isFocused ? data.backgroundColor: undefined,
+                                    opacity: isSelected ? 0.5 : undefined,
+                                    ":active": {
+                                        ...styles[":active"],
+                                        backgroundColor: data.backgroundColor,
+                                    },
+                                }),
+                                valueContainer: (styles) => ({
+                                    ...styles,
                                     flexWrap: "nowrap",
                                 }),
                             }}
                             closeMenuOnSelect={false}
                             data-filters-categories={true}
-                            defaultValue={selectedCategories.map((category: any, idx: number) => ({
-                                value: category,
-                                label: category,
-                            }))}
+                            defaultValue={selectedCategories}
                             hideSelectedOptions={false}
                             isClearable={false}
                             isMulti={true}
                             isSearchable={false}
                             name="categories"
-                            onChange={changeCategories}
+                            onChange={(newValue: MultiValue<CategoryOption>) => setSelectedCategories(newValue)}
                             options={categories.map((category: any, idx: number) => ({
                                 value: category,
                                 label: category,
+                                ...categoriesStyles[category],
                             }))}
                             placeholder="Categories"
                         />

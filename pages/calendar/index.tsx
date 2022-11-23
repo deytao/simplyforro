@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
-import Select, { ActionMeta, MultiValue } from 'react-select'
+import Select, { ActionMeta, MultiValue } from "react-select";
 import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -77,7 +77,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { errors } = formState;
     const router = useRouter();
 
-    const calendarRef = useRef(null)
+    const calendarRef = useRef(null);
 
     async function submitForm(formData: object) {
         const endpoint = "/api/subscribers";
@@ -232,7 +232,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 <Toolbar
                     calendarRef={calendarRef}
                     session={session}
-                    ftsValue={ftsValue}
                     showForm={showForm}
                     status={status}
                     setEvents={setEvents}
