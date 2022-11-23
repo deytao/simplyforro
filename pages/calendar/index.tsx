@@ -17,14 +17,9 @@ import { FiZoomIn } from "react-icons/fi";
 import {
     HiArrowTopRightOnSquare,
     HiCalendar,
-    HiChevronLeft,
-    HiChevronRight,
-    HiOutlineEllipsisHorizontal,
-    HiPlus,
-    HiRss,
 } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
-
+import { loadEvents, Toolbar } from "components/CalendarToolbar";
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
 import { IPopup, Popup } from "components/Popup";
@@ -47,11 +42,6 @@ interface Props {
     subscriptions: Subscription[];
 }
 
-interface CategoryOption {
-    label: string;
-    value: string;
-}
-
 interface IMessageDialog {
     isOpen: boolean;
     status?: string;
@@ -59,14 +49,6 @@ interface IMessageDialog {
     message?: any;
     content?: any;
     customButtons?: object[];
-}
-
-interface ToolbarProps {
-    calendarRef: any;
-    ftsValue: string;
-    showForm: any;
-    status: string;
-    setEvents: Function;
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -84,228 +66,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-const loadEvents = (date: Date, selectedCategories: string[], q: string, setEvents: Function) => {
-    let lbound = moment(date).startOf("month").startOf("week");
-    let ubound = moment(date).endOf("month").endOf("week");
-    let dates = [
-        `lbound=${encodeURIComponent(lbound.format("YYYY-MM-DD"))}`,
-        `ubound=${encodeURIComponent(ubound.format("YYYY-MM-DD"))}`,
-    ];
-    let params = [
-        ...dates,
-        ...([...selectedCategories].map((category) => `categories=${encodeURIComponent(category)}`)),
-        `q=${encodeURIComponent(q)}`,
-    ];
-    fetch(`/api/events?${params.join("&")}`)
-        .then((res) => res.json())
-        .then((data) => {
-            let events = data
-                .map((event: Event) => {
-                    if (!event.frequency) {
-                        return event;
-                    }
-                    let eventDate = moment(event.start_at);
-                    let lastDate =
-                        event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
-                    let events: Event[] = [];
-                    while (eventDate.isSameOrBefore(lastDate)) {
-                        let isExcluded = event.excluded_on?.filter((excluded_date) => {
-                            return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
-                        });
-                        if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
-                            events.push({
-                                ...event,
-                                start_at: eventDate.toDate(),
-                                end_at: eventDate.toDate(),
-                            });
-                        }
-                        eventDate.add(frequencyIntervals[event.frequency]);
-                    }
-                    return events;
-                })
-                .flat(1);
-            setEvents(events);
-        });
-};
-
-const Toolbar = ({ calendarRef, session, ftsValue, showForm, status, setEvents }: ToolbarProps) => {
-    if (!calendarRef.current) {
-        return <></>
-    }
-    const calendar = calendarRef.current
-    const prevMonth = () => calendar.handleNavigate("PREV");
-    const currentMonth = () => calendar.handleNavigate("TODAY");
-    const nextMonth = () => calendar.handleNavigate("NEXT");
-    const changeCategories = () => calendar.handleNavigate();
-    let taskId: ReturnType<typeof setTimeout>;
-    const changeFTS = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (taskId) {
-            clearTimeout(taskId);
-        }
-        taskId = setTimeout(() => calendar.handleNavigate(), 800);
-    };
-
-    const [selectedCategories, setSelectedCategories] = useState(categories);
-
-    const categoriesStyles: {[key: string]: {color: string, backgroundColor: string}} = {
-        "party": {
-            color: "#7F1D1D",
-            backgroundColor: "#FEE2E2",
-        },
-        "pratica": {
-            color: "#1E3A8A",
-            backgroundColor: "#DBEAFE",
-        },
-        "class": {
-            color: "#581C87",
-            backgroundColor: "#F3E8FF",
-        },
-        "workshop": {
-            color: "#7C2D12",
-            backgroundColor: "#FFEDD5",
-        },
-        "festival": {
-            color: "#14532D",
-            backgroundColor: "#DCFCE7",
-        },
-    }
-
-    useEffect(
-        () => loadEvents(calendar.props.date, selectedCategories, ftsValue, setEvents),
-        []
-    );
-
-    return (
-        <>
-            <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
-                <div className="flex items-center">
-                    <Button
-                        color=""
-                        size="sm"
-                        className="lg:hidden basis-1/4"
-                        onClick={prevMonth}
-                        onKeyPress={prevMonth}
-                        data-previous-month={true}
-                    >
-                        <HiChevronLeft className="h-8 w-8" />
-                    </Button>
-                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{moment(calendar.props.date).format("MMMM YYYY")}</h1>
-                    <Button
-                        color=""
-                        size="sm"
-                        className="lg:hidden basis-1/4"
-                        onClick={nextMonth}
-                        onKeyPress={nextMonth}
-                        data-next-month={true}
-                    >
-                        <HiChevronRight className="h-8 w-8" />
-                    </Button>
-                </div>
-                <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
-                    <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <Button
-                            color=""
-                            size="sm"
-                            onClick={prevMonth}
-                            onKeyPress={prevMonth}
-                            className="hidden lg:block"
-                            data-previous-month={true}
-                        >
-                            <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
-                        </Button>
-                        <Button color="purple" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
-                            Today
-                        </Button>
-                        <Button
-                            color=""
-                            size="sm"
-                            onClick={nextMonth}
-                            onKeyPress={nextMonth}
-                            className="hidden lg:block"
-                            data-next-month={true}
-                        >
-                            <HiChevronRight className="h-3 md:h-6 w-6 md:w-12" />
-                        </Button>
-                    </div>
-                    <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-                        <TextInput
-                            key="fts-field"
-                            onChange={changeFTS}
-                            placeholder="Search..."
-                            defaultValue={ftsValue}
-                            data-filters-fts={true}
-                        />
-                    </div>
-                    <div className="col-span-5 lg:col-span-3 order-3">
-                        <Select
-                            styles={{
-                                container: (baseStyles) => ({
-                                    ...baseStyles,
-                                    zIndex: "30",
-                                }),
-                                multiValue: (baseStyles, { data }) => ({
-                                    ...baseStyles,
-                                    ...categoriesStyles[data.value],
-                                }),
-                                option: (baseStyles, { data, isFocused }) => ({
-                                    ...baseStyles,
-                                    color: categoriesStyles[data.value].color,
-                                    backgroundColor: undefined,
-                                }),
-                                valueContainer: (baseStyles) => ({
-                                    ...baseStyles,
-                                    flexWrap: "nowrap",
-                                }),
-                            }}
-                            closeMenuOnSelect={false}
-                            data-filters-categories={true}
-                            defaultValue={selectedCategories.map((category: any, idx: number) => ({
-                                value: category,
-                                label: category,
-                            }))}
-                            hideSelectedOptions={false}
-                            isClearable={false}
-                            isMulti={true}
-                            isSearchable={false}
-                            name="categories"
-                            onChange={changeCategories}
-                            options={categories.map((category: any, idx: number) => ({
-                                value: category,
-                                label: category,
-                            }))}
-                            placeholder="Categories"
-                        />
-                    </div>
-                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
-                        <Dropdown
-                            label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
-                            arrowIcon={false}
-                            color="purple"
-                            size="xs"
-                        >
-                            <Dropdown.Item onClick={showForm} onKeyPress={showForm}>
-                                Subscriptions
-                            </Dropdown.Item>
-                            {session?.user.roles.includes(Role.contributor) && (
-                                <Dropdown.Item>
-                                    <Link href="/calendar/pendings">View pendings</Link>
-                                </Dropdown.Item>
-                            )}
-                            <Dropdown.Item>
-                                <Link href="/calendar/form">Add event</Link>
-                            </Dropdown.Item>
-                        </Dropdown>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
-};
-
 const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { data: session, status } = useSession();
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [ftsValue, setFTSValue] = useState("");
     const [events, setEvents] = useState([]);
     const [modal, setModal] = useState<IModal>({
         isOpen: false,
@@ -481,7 +243,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         event: EventDetailsSimple,
                     }}
                     toolbar={false}
-                    defaultDate={currentDate}
+                    defaultDate={new Date()}
                     defaultView="month"
                     events={events.map((event: any, idx: number) => {
                         return {
@@ -492,16 +254,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         };
                     })}
                     localizer={localizer}
-                    onNavigate={(newDate) => {
-                        const elements = document.querySelectorAll(
-                            "[data-filters-categories]:checked",
-                        ) as NodeListOf<HTMLInputElement>;
-                        const newCategories = [...elements].map((el) => el.value);
-                        const ftsInput = document.querySelector("[data-filters-fts]") as HTMLInputElement;
-
-                        setFTSValue(ftsInput ? ftsInput.value : "");
-                        setCurrentDate(newDate);
-                    }}
                     onSelectEvent={(event: Event) => {
                         const defaultImgClasses = ["h-48", "justify-self-center"];
                         let state: IModal = {
