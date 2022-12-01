@@ -37,10 +37,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 categories: event.categories,
             })),
         },
-        // Next.js will attempt to re-generate the page:
-        // - When a request comes in
-        // - At most once every second
-        revalidate: 60, // In seconds
     };
 };
 
