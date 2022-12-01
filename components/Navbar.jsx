@@ -1,7 +1,10 @@
+import { Dropdown } from "flowbite-react";
 import Link from "next/link";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { CalendarIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 export function Navbar() {
+    const { data: session } = useSession();
     return (
         <nav className="bg-menu flex items-center justify-between flex-wrap p-4 md:p-6 z-50 sticky top-0 right-0 left-0">
             <div className="flex items-center flex-shrink-0 text-white md:mr-6">
@@ -19,9 +22,28 @@ export function Navbar() {
                 <Link className="px-3 py-2 text-violet-200 hover:text-white" href="/calendar">
                     <CalendarIcon className="h-5 w-5" />
                 </Link>
-                <Link className="px-3 py-2 text-violet-200 hover:text-white" href="/my">
-                    <UserCircleIcon className="h-5 w-5" />
-                </Link>
+                <div className="px-3 py-2">
+                    <Dropdown label={<UserCircleIcon className="h-5 w-5 text-violet-200 hover:text-white" />} inline={true} arrowIcon={false}>
+                        {session && <>
+                            <Dropdown.Header>
+                                <span className="block text-sm">Signed in as</span>
+                                <span className="block truncate text-sm font-medium">{session.user.name}</span>
+                            </Dropdown.Header>
+                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                My Profile
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>
+                                Signout
+                            </Dropdown.Item>
+                        </>}
+                        {!session && <>
+                            <Dropdown.Item onClick={() => signIn()} onKeyPress={() => signIn()}>
+                                Signin
+                            </Dropdown.Item>
+                        </>}
+                    </Dropdown>
+                </div>
             </div>
         </nav>
     );
