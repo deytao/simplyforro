@@ -1,3 +1,4 @@
+import { Dropdown } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
@@ -475,6 +476,19 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                     title: "Edit",
                                 },
                                 {
+                                    custom: <div className="inline-block ml-1">
+                                        <Dropdown label="Delete" color="failure" size="xs">
+                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                                All events
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                                Ony this one
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                                This one and the followings
+                                            </Dropdown.Item>
+                                        </Dropdown>
+                                    </div>,
                                     callback: () => {
                                         if (confirm("Sure?")) {
                                             const endpoint = `/api/events/${event.id}`;

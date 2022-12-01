@@ -39,6 +39,11 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
                         Close
                     </button>
                     {messageDialog.customButtons?.map((button, idx) => {
+                        if (button.custom) {
+                            return <>
+                                {button.custom}
+                            </>
+                        }
                         return (
                             <button
                                 key={idx}
