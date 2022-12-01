@@ -148,12 +148,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     }
                 },
             );
-            let lastRun = moment();
             let shiftSubscription = await prisma.subscription.update({
                 where: { id: subscription.id },
                 data: {
-                    lastRun: lastRun.toDate(),
-                    nextRun: moment(lastRun)
+                    lastRun: moment().toDate(),
+                    nextRun: moment(subscription.nextRun)
                         .add(frequencyIntervals[subscription.frequency])
                         .toDate(),
                 },
