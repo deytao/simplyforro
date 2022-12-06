@@ -85,22 +85,22 @@ const Toolbar = ({
     return (
         <>
             <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
-                <div className="grid grid-cols-4">
+                <div className="flex items-center">
                     <Button
                         color=""
                         size="sm"
-                        className="lg:hidden"
+                        className="lg:hidden basis-1/4"
                         onClick={prevMonth}
                         onKeyPress={prevMonth}
                         data-previous-month={true}
                     >
                         <ChevronLeftIcon className="h-8 w-8" />
                     </Button>
-                    <h1 className="col-span-2 lg:col-span-4 text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
+                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
                     <Button
                         color=""
                         size="sm"
-                        className="lg:hidden"
+                        className="lg:hidden basis-1/4"
                         onClick={nextMonth}
                         onKeyPress={nextMonth}
                         data-next-month={true}
@@ -171,7 +171,7 @@ const Toolbar = ({
                             ))}
                         </div>
                     </div>
-                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
+                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
                         <Button color="dark" size="xs" onClick={showForm} onKeyPress={showForm}>
                             <RssIcon className="h-4 w-6" />
                         </Button>
