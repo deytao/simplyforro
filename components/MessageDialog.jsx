@@ -1,5 +1,5 @@
+import { Button, Modal } from "flowbite-react";
 import { useState } from "react";
-import { Dialog } from "@headlessui/react";
 
 const statusClasses = {
     success: ["bg-green-100 border-green-700 text-green-700", "btn-emerald"],
@@ -15,46 +15,37 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
     }
     const [panelClasses, buttonClasses] = statusClasses[messageDialog.status];
     return (
-        <Dialog
-            open={messageDialog.isOpen}
-            onClose={() => setMessageDialog({ isOpen: false })}
-            className="relative z-50"
-        >
-            <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-                <Dialog.Panel className={`border-t-4 rounded-b px-4 py-3 shadow-md w-full max-w-sm ${panelClasses}`}>
-                    <Dialog.Title className="font-bold">{messageDialog.title}</Dialog.Title>
+        <Modal show={messageDialog.isOpen} onClose={() => setMessageDialog({ isOpen: false })}>
+            <Modal.Header>{messageDialog.title}</Modal.Header>
+            <Modal.Body>
+                {messageDialog.message && <div className="text-sm my-5">{messageDialog.message}</div>}
 
-                    {messageDialog.message && (
-                        <Dialog.Description className="text-sm my-5">{messageDialog.message}</Dialog.Description>
-                    )}
-
-                    {messageDialog.content && <div className="my-5">{messageDialog.content}</div>}
-
-                    <button
-                        onClick={() => setMessageDialog({ isOpen: false })}
-                        onKeyPress={() => setMessageDialog({ isOpen: false })}
-                        className={`${buttonClasses} btn`}
-                    >
-                        Close
-                    </button>
-                    {messageDialog.customButtons?.map((button, idx) => {
-                        if (button.custom) {
-                            return button.custom;
-                        }
-                        return (
-                            <button
-                                key={idx}
-                                onClick={button.callback}
-                                onKeyPress={button.callback}
-                                className={`${button.classes} ml-1`}
-                            >
-                                {button.title}
-                            </button>
-                        );
-                    })}
-                </Dialog.Panel>
-            </div>
-        </Dialog>
+                {messageDialog.content && <div className="my-5">{messageDialog.content}</div>}
+            </Modal.Body>
+            <Modal.Footer>
+                <button
+                    onClick={() => setMessageDialog({ isOpen: false })}
+                    onKeyPress={() => setMessageDialog({ isOpen: false })}
+                    className={`${buttonClasses} btn`}
+                >
+                    Close
+                </button>
+                {messageDialog.customButtons?.map((button, idx) => {
+                    if (button.custom) {
+                        return button.custom;
+                    }
+                    return (
+                        <button
+                            key={idx}
+                            onClick={button.callback}
+                            onKeyPress={button.callback}
+                            className={`${button.classes} ml-1`}
+                        >
+                            {button.title}
+                        </button>
+                    );
+                })}
+            </Modal.Footer>
+        </Modal>
     );
 };
