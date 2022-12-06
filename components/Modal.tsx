@@ -19,7 +19,7 @@ export interface IModal {
         title?: string;
         callback?: any;
         classes?: string;
-        custom?: Element;
+        custom?: React.ReactElement;
     }[];
 }
 

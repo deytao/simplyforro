@@ -22,6 +22,7 @@ import {
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
+import { IPopup, Popup } from "components/Popup";
 import { frequencyIntervals } from "lib/calendar";
 import { Subscription } from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -192,6 +193,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [events, setEvents] = useState([]);
     const [modal, setModal] = useState<IModal>({
         isOpen: false,
+    });
+    const [popup, setPopup] = useState<IPopup>({
+        isOpen: false,
+        message: "",
+        buttons: [],
     });
     const formOptions = {
         resolver: yupResolver(subscriberSchema),
@@ -400,6 +406,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     return (
         <>
             <Modal modal={modal} setModal={setModal} />
+            <Popup popup={popup} setPopup={setPopup} />
             <div {...swipeHandlers} style={{ width: "100%" }}>
                 <BigCalendar
                     components={{
@@ -492,6 +499,22 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         });
                                     });
                             };
+                            const eventHandler = (callback: Function) => {
+                                return () =>
+                                    setPopup({
+                                        isOpen: true,
+                                        message: "Are you sure?",
+                                        buttons: [
+                                            {
+                                                title: "Yes",
+                                                callback: callback,
+                                            },
+                                            {
+                                                title: "No",
+                                            },
+                                        ],
+                                    });
+                            };
                             state["customButtons"] = [
                                 {
                                     callback: () => router.push(`/calendar/form?eventId=${event.id}`),
@@ -503,39 +526,31 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         <div className="inline-block ml-1">
                                             <Dropdown label="Delete" color="failure" size="xs">
                                                 <Dropdown.Item
-                                                    onClick={() => {
-                                                        if (confirm("Sure?")) {
-                                                            const result = _fetch("DELETE", endpoint, null);
-                                                        }
-                                                    }}
+                                                    onClick={eventHandler(() => _fetch("DELETE", endpoint, null))}
                                                 >
                                                     All events
                                                 </Dropdown.Item>
                                                 <Dropdown.Item
-                                                    onClick={() => {
-                                                        if (confirm("Sure?")) {
-                                                            const data = {
-                                                                excluded_on: (event.excluded_on || []).concat([
-                                                                    moment(event.start_at).toDate(),
-                                                                ]),
-                                                            };
-                                                            const result = _fetch("PATCH", endpoint, data);
-                                                        }
-                                                    }}
+                                                    onClick={eventHandler(() => {
+                                                        const data = {
+                                                            excluded_on: (event.excluded_on || []).concat([
+                                                                moment(event.start_at).toDate(),
+                                                            ]),
+                                                        };
+                                                        const result = _fetch("PATCH", endpoint, data);
+                                                    })}
                                                 >
                                                     Ony this one
                                                 </Dropdown.Item>
                                                 <Dropdown.Item
-                                                    onClick={() => {
-                                                        if (confirm("Sure?")) {
-                                                            const endAt = moment(event.end_at);
-                                                            endAt.subtract(frequencyIntervals[event.frequency!]);
-                                                            const data = {
-                                                                end_at: endAt.toDate(),
-                                                            };
-                                                            const result = _fetch("PATCH", endpoint, data);
-                                                        }
-                                                    }}
+                                                    onClick={eventHandler(() => {
+                                                        const endAt = moment(event.end_at);
+                                                        endAt.subtract(frequencyIntervals[event.frequency!]);
+                                                        const data = {
+                                                            end_at: endAt.toDate(),
+                                                        };
+                                                        const result = _fetch("PATCH", endpoint, data);
+                                                    })}
                                                 >
                                                     This one and the followings
                                                 </Dropdown.Item>
