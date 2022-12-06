@@ -9,7 +9,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Event, Role } from "@prisma/client";
 
 import { EventPreview } from "components/EventPreview";
-import { MessageDialog } from "components/MessageDialog";
+import { Modal } from "components/Modal";
 import prisma from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import { eventSchema } from "schemas/event";
@@ -59,7 +59,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
     const { register, handleSubmit, formState, watch } = useForm(formOptions);
     const { errors } = formState;
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [messageDialogState, setMessageDialogState] = useState({
+    const [modal, setModal] = useState({
         isOpen: false,
         status: "",
         title: "",
@@ -122,7 +122,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
             })
             .then((data) => {
                 setIsSubmitting(false);
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "success",
                     title: "Thank you!",
@@ -131,7 +131,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                 refreshData();
             })
             .catch((error) => {
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "error",
                     title: "Error",
@@ -156,7 +156,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Event</h1>
 
-            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <Modal modal={modal} setModal={setModal} />
 
             <div className="relative md:grid md:grid-cols-4 md:gap-4">
                 <div className="md:col-span-2">

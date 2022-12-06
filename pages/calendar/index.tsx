@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { EventDetailsSimple } from "components/EventPreview";
-import { MessageDialog } from "components/MessageDialog";
+import { IModal, Modal } from "components/Modal";
 import { frequencyIntervals } from "lib/calendar";
 import { Subscription } from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -39,15 +39,6 @@ const localizer = momentLocalizer(moment);
 
 interface Props {
     subscriptions: Subscription[];
-}
-
-interface IMessageDialog {
-    isOpen: boolean;
-    status?: string;
-    title?: string;
-    message?: any;
-    content?: any;
-    customButtons?: object[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -199,7 +190,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [selectedCategories, setSelectedCategories] = useState(categories);
     const [ftsValue, setFTSValue] = useState("");
     const [events, setEvents] = useState([]);
-    const [messageDialogState, setMessageDialogState] = useState<IMessageDialog>({
+    const [modal, setModal] = useState<IModal>({
         isOpen: false,
     });
     const formOptions = {
@@ -234,7 +225,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 return response.json();
             })
             .then((data) => {
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "success",
                     title: "Subscriptions updated!",
@@ -242,7 +233,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 });
             })
             .catch((error) => {
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "error",
                     title: "Error",
@@ -253,12 +244,12 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     }
 
     const reloadFailSubmit = (errors: Object) => {
-        setMessageDialogState({ isOpen: false });
+        setModal({ isOpen: false });
         showForm(errors);
     };
 
     const showForm = (errors: any = {}) => {
-        setMessageDialogState({
+        setModal({
             isOpen: true,
             status: "neutral",
             title: "Configuration",
@@ -408,7 +399,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
 
     return (
         <>
-            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <Modal modal={modal} setModal={setModal} />
             <div {...swipeHandlers} style={{ width: "100%" }}>
                 <BigCalendar
                     components={{
@@ -442,7 +433,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         setCurrentDate(newDate);
                     }}
                     onSelectEvent={(event: Event) => {
-                        let state: IMessageDialog = {
+                        let state: IModal = {
                             isOpen: true,
                             status: "neutral",
                             title: event.title,
@@ -490,10 +481,10 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                     })
                                     .then((data) => {
                                         loadEvents();
-                                        setMessageDialogState({ isOpen: false });
+                                        setModal({ isOpen: false });
                                     })
                                     .catch((error) => {
-                                        setMessageDialogState({
+                                        setModal({
                                             isOpen: true,
                                             status: "error",
                                             title: "Error",
@@ -554,7 +545,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 },
                             ];
                         }
-                        setMessageDialogState(state);
+                        setModal(state);
                     }}
                     startAccessor="start_at"
                     endAccessor="end_at"

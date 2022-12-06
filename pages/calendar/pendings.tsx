@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ArrowSmallRightIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Event, Role } from "@prisma/client";
 
-import { MessageDialog } from "components/MessageDialog";
+import { Modal } from "components/Modal";
 import { GetPendingEvents } from "lib/calendar";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Pendings: NextPage<Props> = ({ events }) => {
-    const [messageDialogState, setMessageDialogState] = useState({
+    const [modal, setModal] = useState({
         isOpen: false,
         status: "",
         title: "",
@@ -89,7 +89,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                         element.remove();
                     }
                 });
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "success",
                     title: "Success!",
@@ -100,7 +100,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                 if (!errors) {
                     return;
                 }
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "error",
                     title: "Fail!",
@@ -113,7 +113,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Pendings</h1>
 
-            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <Modal modal={modal} setModal={setModal} />
 
             <table className="w-full table-fixed text-sm md:text-base">
                 <thead>

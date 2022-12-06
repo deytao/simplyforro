@@ -1,7 +1,7 @@
-import { Button, Modal } from "flowbite-react";
+import { Button, Modal as _Modal } from "flowbite-react";
 import { useState } from "react";
 
-const statusClasses = {
+const statusClasses: { [key: string]: string[] } = {
     success: ["bg-green-100 border-green-700 text-green-700", "btn-emerald"],
     error: ["bg-red-100 border-red-700 text-red-700", "btn-red"],
     info: ["bg-teal-100 border-teal-700 text-teal-700", "bg-teal-700 hover:bg-teal-900"],
@@ -9,28 +9,41 @@ const statusClasses = {
     neutral: ["bg-neutral-100 border-neutral-700 text-neutral-700", "btn-neutral"],
 };
 
-export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
-    if (!(messageDialog.status in statusClasses)) {
+export interface IModal {
+    isOpen: boolean;
+    status?: string;
+    title?: string;
+    message?: any;
+    content?: any;
+    customButtons?: {
+        title?: string;
+        callback?: any;
+        classes?: string;
+        custom?: Element;
+    }[];
+}
+
+export const Modal = ({ modal, setModal }: { modal: IModal; setModal: Function }) => {
+    if (!(modal.status && Object.keys(statusClasses).includes(modal.status))) {
         return <></>;
     }
-    const [panelClasses, buttonClasses] = statusClasses[messageDialog.status];
+    const [panelClasses, buttonClasses] = statusClasses[modal.status];
     return (
-        <Modal show={messageDialog.isOpen} onClose={() => setMessageDialog({ isOpen: false })}>
-            <Modal.Header>{messageDialog.title}</Modal.Header>
-            <Modal.Body>
-                {messageDialog.message && <div className="text-sm my-5">{messageDialog.message}</div>}
-
-                {messageDialog.content && <div className="my-5">{messageDialog.content}</div>}
-            </Modal.Body>
-            <Modal.Footer>
+        <_Modal show={modal.isOpen} onClose={() => setModal({ isOpen: false })}>
+            <_Modal.Header>{modal.title}</_Modal.Header>
+            <_Modal.Body>
+                {modal.message}
+                {modal.content}
+            </_Modal.Body>
+            <_Modal.Footer>
                 <button
-                    onClick={() => setMessageDialog({ isOpen: false })}
-                    onKeyPress={() => setMessageDialog({ isOpen: false })}
+                    onClick={() => setModal({ isOpen: false })}
+                    onKeyPress={() => setModal({ isOpen: false })}
                     className={`${buttonClasses} btn`}
                 >
                     Close
                 </button>
-                {messageDialog.customButtons?.map((button, idx) => {
+                {modal.customButtons?.map((button, idx) => {
                     if (button.custom) {
                         return button.custom;
                     }
@@ -45,7 +58,7 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
                         </button>
                     );
                 })}
-            </Modal.Footer>
-        </Modal>
+            </_Modal.Footer>
+        </_Modal>
     );
 };
