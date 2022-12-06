@@ -10,7 +10,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Event, Role } from "@prisma/client";
 
 import { EventPreview } from "components/EventPreview";
-import { Modal } from "components/Modal";
+import { IPopup, Popup } from "components/Popup";
 import prisma from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import { eventSchema } from "schemas/event";
@@ -60,12 +60,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
     const { register, handleSubmit, formState, watch } = useForm(formOptions);
     const { errors } = formState;
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [modal, setModal] = useState({
-        isOpen: false,
-        status: "",
-        title: "",
-        message: "",
-    });
+    const [popup, setPopup] = useState<IPopup>({ isOpen: false });
     const placeholderEvent = {
         title: "FENFIT",
         url: "https://www.example.com",
@@ -123,20 +118,24 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
             })
             .then((data) => {
                 setIsSubmitting(false);
-                setModal({
+                setPopup({
                     isOpen: true,
-                    status: "success",
-                    title: "Thank you!",
                     message: "Your event has been created. It will be validated and added to the calendar soon.",
+                    buttons: [{
+                        title: "Close",
+                        color: "success",
+                    }],
                 });
                 refreshData();
             })
             .catch((error) => {
-                setModal({
+                setPopup({
                     isOpen: true,
-                    status: "error",
-                    title: "Error",
                     message: error.message,
+                    buttons: [{
+                        title: "Close",
+                        color: "failure",
+                    }],
                 });
             });
         return false;
@@ -157,7 +156,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Event</h1>
 
-            <Modal modal={modal} setModal={setModal} />
+            <Popup popup={popup} setPopup={setPopup} />
 
             <div className="relative md:grid md:grid-cols-4 md:gap-4">
                 <div className="md:col-span-2">
