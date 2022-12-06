@@ -40,9 +40,7 @@ export const MessageDialog = ({ messageDialog, setMessageDialog }) => {
                     </button>
                     {messageDialog.customButtons?.map((button, idx) => {
                         if (button.custom) {
-                            return <>
-                                {button.custom}
-                            </>
+                            return button.custom
                         }
                         return (
                             <button

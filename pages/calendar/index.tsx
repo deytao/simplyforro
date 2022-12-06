@@ -384,8 +384,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         let lastDate =
                             event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
                         let events: Event[] = [];
-                        while (eventDate <= lastDate) {
-                            if (eventDate >= lbound) {
+                        while (eventDate.isSameOrBefore(lastDate)) {
+                            let isExcluded = event.excluded_on?.filter(excluded_date => {
+                                return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD")
+                            });
+                            if (eventDate.isSameOrAfter(lbound) && !(isExcluded?.length)) {
                                 events.push({
                                     ...event,
                                     start_at: eventDate.toDate(),
@@ -469,6 +472,35 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             ),
                         };
                         if (session?.user.roles.includes(Role.contributor)) {
+                            const endpoint = `/api/events/${event.id}`;
+                            const _fetch = (method: string, endpoint: string, data: any) => {
+                                const options = {
+                                    method: method,
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: data ? JSON.stringify(data) : null,
+                                };
+                                return fetch(endpoint, options)
+                                    .then((response) => {
+                                        if (!response.ok) {
+                                            throw new Error("An error occured, please try again later.");
+                                        }
+                                        return response.json();
+                                    })
+                                    .then((data) => {
+                                        loadEvents();
+                                        setMessageDialogState({ isOpen: false });
+                                    })
+                                    .catch((error) => {
+                                        setMessageDialogState({
+                                            isOpen: true,
+                                            status: "error",
+                                            title: "Error",
+                                            message: error.message,
+                                        });
+                                    });
+                            };
                             state["customButtons"] = [
                                 {
                                     callback: () => router.push(`/calendar/form?eventId=${event.id}`),
@@ -478,47 +510,37 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 {
                                     custom: <div className="inline-block ml-1">
                                         <Dropdown label="Delete" color="failure" size="xs">
-                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                            <Dropdown.Item onClick={() => {
+                                                if (confirm("Sure?")) {
+                                                    const result = _fetch("DELETE", endpoint, null)
+                                                }
+                                            }}>
                                                 All events
                                             </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                            <Dropdown.Item onClick={() => {
+                                                if (confirm("Sure?")) {
+                                                    const data = {
+                                                        excluded_on: (event.excluded_on || []).concat([moment(event.start_at).toDate()]),
+                                                    };
+                                                    const result = _fetch("PATCH", endpoint, data)
+                                                }
+                                            }}>
                                                 Ony this one
                                             </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                            <Dropdown.Item onClick={() => {
+                                                if (confirm("Sure?")) {
+                                                    const endAt = moment(event.end_at)
+                                                    endAt.subtract(frequencyIntervals[event.frequency!]);
+                                                    const data = {
+                                                        end_at: endAt.toDate(),
+                                                    };
+                                                    const result = _fetch("PATCH", endpoint, data)
+                                                }
+                                            }}>
                                                 This one and the followings
                                             </Dropdown.Item>
                                         </Dropdown>
                                     </div>,
-                                    callback: () => {
-                                        if (confirm("Sure?")) {
-                                            const endpoint = `/api/events/${event.id}`;
-
-                                            const options = {
-                                                method: "DELETE",
-                                            };
-                                            const result = fetch(endpoint, options)
-                                                .then((response) => {
-                                                    if (!response.ok) {
-                                                        throw new Error("An error occured, please try again later.");
-                                                    }
-                                                    return response.json();
-                                                })
-                                                .then((data) => {
-                                                    loadEvents();
-                                                    setMessageDialogState({ isOpen: false });
-                                                })
-                                                .catch((error) => {
-                                                    setMessageDialogState({
-                                                        isOpen: true,
-                                                        status: "error",
-                                                        title: "Error",
-                                                        message: error.message,
-                                                    });
-                                                });
-                                        }
-                                    },
-                                    classes: "btn btn-red",
-                                    title: "Delete",
                                 },
                             ];
                         }

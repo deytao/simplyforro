@@ -27,8 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (method === "DELETE") {
         const result = DeleteEvent(+eventId);
     } else {
-        const event: Event = req.body;
-        const result = UpdateEvent(+eventId, event);
+        const existingEvent = await prisma.event.findUnique({
+            where: {
+                id: +eventId,
+            },
+        });
+        const sentEvent: Event = req.body;
+        const result = UpdateEvent(+eventId, {...existingEvent, ...sentEvent});
     }
     res.status(200).json({ eventId: eventId });
 }
