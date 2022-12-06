@@ -194,11 +194,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [modal, setModal] = useState<IModal>({
         isOpen: false,
     });
-    const [popup, setPopup] = useState<IPopup>({
-        isOpen: false,
-        message: "",
-        buttons: [],
-    });
+    const [popup, setPopup] = useState<IPopup>({ isOpen: false });
     const formOptions = {
         resolver: yupResolver(subscriberSchema),
         defaultValues: {
@@ -332,7 +328,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
             customButtons: [
                 {
                     callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
-                    classes: "btn btn-emerald",
+                    color: "green",
                     title: "Submit",
                 },
             ],
@@ -508,9 +504,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             {
                                                 title: "Yes",
                                                 callback: callback,
+                                                color: "purple",
                                             },
                                             {
                                                 title: "No",
+                                                color: "gray",
                                             },
                                         ],
                                     });
@@ -518,13 +516,13 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             state["customButtons"] = [
                                 {
                                     callback: () => router.push(`/calendar/form?eventId=${event.id}`),
-                                    classes: "btn btn-violet",
+                                    color: "purple",
                                     title: "Edit",
                                 },
                                 {
                                     custom: (
                                         <div className="inline-block ml-1">
-                                            <Dropdown label="Delete" color="failure" size="xs">
+                                            <Dropdown label="Delete" color="failure" size="sm">
                                                 <Dropdown.Item
                                                     onClick={eventHandler(() => _fetch("DELETE", endpoint, null))}
                                                 >

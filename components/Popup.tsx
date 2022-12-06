@@ -8,6 +8,7 @@ export interface IPopup {
     buttons?: {
         title: string;
         callback?: any;
+        color?: string;
     }[];
 }
 
@@ -27,7 +28,7 @@ export const Popup = ({ popup, setPopup }: { popup: IPopup; setPopup: Function }
                             setPopup({ isOpen: false });
                         };
                         return (
-                            <Button key={idx} onClick={callback} onKeyPress={callback}>
+                            <Button key={idx} onClick={callback} onKeyPress={callback} color={button.color}>
                                 {button.title}
                             </Button>
                         );
