@@ -1,3 +1,4 @@
+import { Button, Spinner } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -427,47 +428,31 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                 </fieldset>
                             </div>
 
-                            <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                                <button
-                                    type="button"
+                            <div className="px-4 py-3 bg-gray-50 text-right sm:px-6 flex gap-2">
+                                <Button
+                                    color="light"
+                                    size="sm"
                                     onClick={togglePreview}
                                     onKeyPress={togglePreview}
-                                    className=" btn btn-neutral inline-flex justify-center mr-2 md:hidden"
+                                    className="md:hidden"
                                     data-preview-panel="event-preview"
                                 >
-                                    Preview{" "}
-                                </button>
-                                <button
+                                    Preview
+                                </Button>
+                                <Button
                                     type="submit"
-                                    className={`btn btn-violet inline-flex justify-center ${
-                                        isSubmitting && "cursor-not-allowed"
-                                    }`}
+                                    color="purple"
+                                    size="sm"
+                                    className={`${isSubmitting && "cursor-not-allowed"}`}
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting && (
-                                        <svg
-                                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            />
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                            />
-                                        </svg>
+                                        <div className="mr-3">
+                                            <Spinner size="sm" light={true} />
+                                        </div>
                                     )}
                                     {isSubmitting ? "Processing" : "Send"}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </form>
@@ -485,7 +470,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                 />
                 <div
                     data-event-preview={true}
-                    className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl"
+                    className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl z-20"
                 >
                     <XMarkIcon
                         className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer"
