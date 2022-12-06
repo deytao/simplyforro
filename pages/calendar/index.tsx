@@ -120,12 +120,7 @@ const Toolbar = ({
                         >
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12" />
                         </Button>
-                        <Button
-                            color="dark"
-                            size="sm"
-                            onClick={currentMonth}
-                            onKeyPress={currentMonth}
-                        >
+                        <Button color="dark" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
                             Today
                         </Button>
                         <Button
@@ -495,11 +490,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         });
                                     });
                             };
-                            const eventHandler = (callback: Function) => {
+                            const eventHandler = (message: string, callback: Function) => {
                                 return () =>
                                     setPopup({
                                         isOpen: true,
-                                        message: "Are you sure?",
+                                        message: message,
                                         buttons: [
                                             {
                                                 title: "Yes",
@@ -519,44 +514,62 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                     color: "purple",
                                     title: "Edit",
                                 },
-                                {
+                            ];
+                            if (event.frequency) {
+                                state["customButtons"].push({
                                     custom: (
-                                        <div className="inline-block ml-1">
-                                            <Dropdown label="Delete" color="failure" size="sm">
-                                                <Dropdown.Item
-                                                    onClick={eventHandler(() => _fetch("DELETE", endpoint, null))}
-                                                >
-                                                    All events
-                                                </Dropdown.Item>
-                                                <Dropdown.Item
-                                                    onClick={eventHandler(() => {
+                                        <Dropdown label="Delete" color="failure" size="sm">
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will delete ALL occurences to the event, it CAN'T be reverted. Are you sure?",
+                                                    () => _fetch("DELETE", endpoint, null),
+                                                )}
+                                            >
+                                                All events
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will remove the selected event. Are you sure?",
+                                                    () => {
                                                         const data = {
                                                             excluded_on: (event.excluded_on || []).concat([
                                                                 moment(event.start_at).toDate(),
                                                             ]),
                                                         };
                                                         const result = _fetch("PATCH", endpoint, data);
-                                                    })}
-                                                >
-                                                    Ony this one
-                                                </Dropdown.Item>
-                                                <Dropdown.Item
-                                                    onClick={eventHandler(() => {
+                                                    },
+                                                )}
+                                            >
+                                                Ony this one
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will remove the selected and ALL of the following events. Are you sure?",
+                                                    () => {
                                                         const endAt = moment(event.end_at);
                                                         endAt.subtract(frequencyIntervals[event.frequency!]);
                                                         const data = {
                                                             end_at: endAt.toDate(),
                                                         };
                                                         const result = _fetch("PATCH", endpoint, data);
-                                                    })}
-                                                >
-                                                    This one and the followings
-                                                </Dropdown.Item>
-                                            </Dropdown>
-                                        </div>
+                                                    },
+                                                )}
+                                            >
+                                                This one and the followings
+                                            </Dropdown.Item>
+                                        </Dropdown>
                                     ),
-                                },
-                            ];
+                                });
+                            } else {
+                                state["customButtons"].push({
+                                    callback: eventHandler(
+                                        "Doing this will delete the event, it CAN'T be reverted. Are you sure?",
+                                        () => _fetch("DELETE", endpoint, null),
+                                    ),
+                                    color: "failure",
+                                    title: "Delete",
+                                });
+                            }
                         }
                         setModal(state);
                     }}

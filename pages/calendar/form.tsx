@@ -121,10 +121,12 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                 setPopup({
                     isOpen: true,
                     message: "Your event has been created. It will be validated and added to the calendar soon.",
-                    buttons: [{
-                        title: "Close",
-                        color: "success",
-                    }],
+                    buttons: [
+                        {
+                            title: "Close",
+                            color: "success",
+                        },
+                    ],
                 });
                 refreshData();
             })
@@ -132,10 +134,12 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                 setPopup({
                     isOpen: true,
                     message: error.message,
-                    buttons: [{
-                        title: "Close",
-                        color: "failure",
-                    }],
+                    buttons: [
+                        {
+                            title: "Close",
+                            color: "failure",
+                        },
+                    ],
                 });
             });
         return false;

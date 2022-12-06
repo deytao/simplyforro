@@ -1,4 +1,4 @@
-import { Button, Modal as _Modal } from "flowbite-react";
+import { Button, Modal as Modal_ } from "flowbite-react";
 import { useState } from "react";
 
 const statusClasses: { [key: string]: string[] } = {
@@ -29,13 +29,13 @@ export const Modal = ({ modal, setModal }: { modal: IModal; setModal: Function }
     }
     const [panelClasses, buttonColor] = statusClasses[modal.status];
     return (
-        <_Modal show={modal.isOpen} onClose={() => setModal({ isOpen: false })}>
-            <_Modal.Header>{modal.title}</_Modal.Header>
-            <_Modal.Body>
+        <Modal_ show={modal.isOpen} onClose={() => setModal({ isOpen: false })}>
+            <Modal_.Header>{modal.title}</Modal_.Header>
+            <Modal_.Body>
                 {modal.message}
                 {modal.content}
-            </_Modal.Body>
-            <_Modal.Footer>
+            </Modal_.Body>
+            <Modal_.Footer className="flex">
                 <Button
                     onClick={() => setModal({ isOpen: false })}
                     onKeyPress={() => setModal({ isOpen: false })}
@@ -60,7 +60,7 @@ export const Modal = ({ modal, setModal }: { modal: IModal; setModal: Function }
                         </Button>
                     );
                 })}
-            </_Modal.Footer>
-        </_Modal>
+            </Modal_.Footer>
+        </Modal_>
     );
 };
