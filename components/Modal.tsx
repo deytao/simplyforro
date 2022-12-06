@@ -2,11 +2,11 @@ import { Button, Modal as _Modal } from "flowbite-react";
 import { useState } from "react";
 
 const statusClasses: { [key: string]: string[] } = {
-    success: ["bg-green-100 border-green-700 text-green-700", "green"],
-    error: ["bg-red-100 border-red-700 text-red-700", "red"],
+    success: ["bg-green-100 border-green-700 text-green-700", "success"],
+    error: ["bg-red-100 border-red-700 text-red-700", "failure"],
     info: ["bg-teal-100 border-teal-700 text-teal-700", "purple"],
-    warning: ["bg-orange-100 border-orange-700 text-orange-700", "yellow"],
-    neutral: ["bg-neutral-100 border-neutral-700 text-neutral-700", "gray"],
+    warning: ["bg-orange-100 border-orange-700 text-orange-700", "warning"],
+    neutral: ["bg-neutral-100 border-neutral-700 text-neutral-700", "light"],
 };
 
 export interface IModal {

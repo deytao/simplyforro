@@ -1,7 +1,6 @@
-import { Dropdown } from "flowbite-react";
+import { Button, Dropdown } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
@@ -87,54 +86,58 @@ const Toolbar = ({
         <>
             <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
                 <div className="grid grid-cols-4">
-                    <button
-                        type="button"
+                    <Button
+                        color=""
+                        size="sm"
+                        className="lg:hidden"
                         onClick={prevMonth}
                         onKeyPress={prevMonth}
-                        className="col-span-1 grid place-items-center lg:hidden"
                         data-previous-month={true}
                     >
                         <ChevronLeftIcon className="h-8 w-8" />
-                    </button>
+                    </Button>
                     <h1 className="col-span-2 lg:col-span-4 text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
-                    <button
-                        type="button"
+                    <Button
+                        color=""
+                        size="sm"
+                        className="lg:hidden"
                         onClick={nextMonth}
                         onKeyPress={nextMonth}
-                        className="col-span-1 grid place-items-center lg:hidden"
                         data-next-month={true}
                     >
                         <ChevronRightIcon className="h-8 w-8" />
-                    </button>
+                    </Button>
                 </div>
                 <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
                     <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <button
-                            type="button"
+                        <Button
+                            color=""
+                            size="sm"
                             onClick={prevMonth}
                             onKeyPress={prevMonth}
                             className="hidden lg:block"
                             data-previous-month={true}
                         >
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12" />
-                        </button>
-                        <button
-                            type="button"
+                        </Button>
+                        <Button
+                            color="dark"
+                            size="sm"
                             onClick={currentMonth}
                             onKeyPress={currentMonth}
-                            className="btn btn-neutral ml-2 lg:ml-0"
                         >
                             Today
-                        </button>
-                        <button
-                            type="button"
+                        </Button>
+                        <Button
+                            color=""
+                            size="sm"
                             onClick={nextMonth}
                             onKeyPress={nextMonth}
                             className="hidden lg:block"
                             data-next-month={true}
                         >
                             <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12" />
-                        </button>
+                        </Button>
                     </div>
                     <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
                         <input
@@ -169,15 +172,12 @@ const Toolbar = ({
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
-                        <button className="btn btn-neutral" onClick={showForm} onKeyPress={showForm}>
-                            {status !== "authenticated" && <span className="hidden lg:inline">Subscribe</span>}
-                            {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
-                            <RssIcon className="h-4 w-6 lg:hidden" />
-                        </button>
-                        <Link href="/calendar/form" className="btn btn-violet">
-                            <span className="hidden lg:inline">Add</span>
-                            <PlusIcon className="h-4 w-6 lg:hidden" />
-                        </Link>
+                        <Button color="dark" size="xs" onClick={showForm} onKeyPress={showForm}>
+                            <RssIcon className="h-4 w-6" />
+                        </Button>
+                        <Button color="purple" size="xs" href="/calendar/form">
+                            <PlusIcon className="h-4 w-6" />
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -328,7 +328,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
             customButtons: [
                 {
                     callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
-                    color: "green",
+                    color: "success",
                     title: "Submit",
                 },
             ],
@@ -508,7 +508,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             },
                                             {
                                                 title: "No",
-                                                color: "gray",
+                                                color: "light",
                                             },
                                         ],
                                     });
