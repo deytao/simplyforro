@@ -385,10 +385,10 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
                         let events: Event[] = [];
                         while (eventDate.isSameOrBefore(lastDate)) {
-                            let isExcluded = event.excluded_on?.filter(excluded_date => {
-                                return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD")
+                            let isExcluded = event.excluded_on?.filter((excluded_date) => {
+                                return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
                             });
-                            if (eventDate.isSameOrAfter(lbound) && !(isExcluded?.length)) {
+                            if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
                                 events.push({
                                     ...event,
                                     start_at: eventDate.toDate(),
@@ -508,39 +508,49 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                     title: "Edit",
                                 },
                                 {
-                                    custom: <div className="inline-block ml-1">
-                                        <Dropdown label="Delete" color="failure" size="xs">
-                                            <Dropdown.Item onClick={() => {
-                                                if (confirm("Sure?")) {
-                                                    const result = _fetch("DELETE", endpoint, null)
-                                                }
-                                            }}>
-                                                All events
-                                            </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => {
-                                                if (confirm("Sure?")) {
-                                                    const data = {
-                                                        excluded_on: (event.excluded_on || []).concat([moment(event.start_at).toDate()]),
-                                                    };
-                                                    const result = _fetch("PATCH", endpoint, data)
-                                                }
-                                            }}>
-                                                Ony this one
-                                            </Dropdown.Item>
-                                            <Dropdown.Item onClick={() => {
-                                                if (confirm("Sure?")) {
-                                                    const endAt = moment(event.end_at)
-                                                    endAt.subtract(frequencyIntervals[event.frequency!]);
-                                                    const data = {
-                                                        end_at: endAt.toDate(),
-                                                    };
-                                                    const result = _fetch("PATCH", endpoint, data)
-                                                }
-                                            }}>
-                                                This one and the followings
-                                            </Dropdown.Item>
-                                        </Dropdown>
-                                    </div>,
+                                    custom: (
+                                        <div className="inline-block ml-1">
+                                            <Dropdown label="Delete" color="failure" size="xs">
+                                                <Dropdown.Item
+                                                    onClick={() => {
+                                                        if (confirm("Sure?")) {
+                                                            const result = _fetch("DELETE", endpoint, null);
+                                                        }
+                                                    }}
+                                                >
+                                                    All events
+                                                </Dropdown.Item>
+                                                <Dropdown.Item
+                                                    onClick={() => {
+                                                        if (confirm("Sure?")) {
+                                                            const data = {
+                                                                excluded_on: (event.excluded_on || []).concat([
+                                                                    moment(event.start_at).toDate(),
+                                                                ]),
+                                                            };
+                                                            const result = _fetch("PATCH", endpoint, data);
+                                                        }
+                                                    }}
+                                                >
+                                                    Ony this one
+                                                </Dropdown.Item>
+                                                <Dropdown.Item
+                                                    onClick={() => {
+                                                        if (confirm("Sure?")) {
+                                                            const endAt = moment(event.end_at);
+                                                            endAt.subtract(frequencyIntervals[event.frequency!]);
+                                                            const data = {
+                                                                end_at: endAt.toDate(),
+                                                            };
+                                                            const result = _fetch("PATCH", endpoint, data);
+                                                        }
+                                                    }}
+                                                >
+                                                    This one and the followings
+                                                </Dropdown.Item>
+                                            </Dropdown>
+                                        </div>
+                                    ),
                                 },
                             ];
                         }

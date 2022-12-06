@@ -23,25 +23,33 @@ export function Navbar() {
                     <CalendarIcon className="h-5 w-5" />
                 </Link>
                 <div className="px-3 py-2">
-                    <Dropdown label={<UserCircleIcon className="h-5 w-5 text-violet-200 hover:text-white" />} inline={true} arrowIcon={false}>
-                        {session && <>
-                            <Dropdown.Header>
-                                <span className="block text-sm">Signed in as</span>
-                                <span className="block truncate text-sm font-medium">{session.user.name}</span>
-                            </Dropdown.Header>
-                            <Dropdown.Item onClick={() => document.location.assign("/my")}>
-                                My Profile
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>
-                                Signout
-                            </Dropdown.Item>
-                        </>}
-                        {!session && <>
-                            <Dropdown.Item onClick={() => signIn()} onKeyPress={() => signIn()}>
-                                Signin
-                            </Dropdown.Item>
-                        </>}
+                    <Dropdown
+                        label={<UserCircleIcon className="h-5 w-5 text-violet-200 hover:text-white" />}
+                        inline={true}
+                        arrowIcon={false}
+                    >
+                        {session && (
+                            <>
+                                <Dropdown.Header>
+                                    <span className="block text-sm">Signed in as</span>
+                                    <span className="block truncate text-sm font-medium">{session.user.name}</span>
+                                </Dropdown.Header>
+                                <Dropdown.Item onClick={() => document.location.assign("/my")}>
+                                    My Profile
+                                </Dropdown.Item>
+                                <Dropdown.Divider />
+                                <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>
+                                    Signout
+                                </Dropdown.Item>
+                            </>
+                        )}
+                        {!session && (
+                            <>
+                                <Dropdown.Item onClick={() => signIn()} onKeyPress={() => signIn()}>
+                                    Signin
+                                </Dropdown.Item>
+                            </>
+                        )}
                     </Dropdown>
                 </div>
             </div>

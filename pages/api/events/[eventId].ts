@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
         });
         const sentEvent: Event = req.body;
-        const result = UpdateEvent(+eventId, {...existingEvent, ...sentEvent});
+        const result = UpdateEvent(+eventId, { ...existingEvent, ...sentEvent });
     }
     res.status(200).json({ eventId: eventId });
 }

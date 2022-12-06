@@ -40,7 +40,7 @@ export async function UpdateEvent(eventId: number, event: Event) {
             url: event.url ? event.url : null,
             start_at: start_at.toDate(),
             end_at: end_at.isValid() ? end_at.toDate() : null,
-            frequency: event.frequency ? (event.frequency) : null,
+            frequency: event.frequency ? event.frequency : null,
             categories: event.categories,
         },
     });
