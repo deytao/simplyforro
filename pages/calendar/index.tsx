@@ -120,7 +120,7 @@ const Toolbar = ({
                         >
                             <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12" />
                         </Button>
-                        <Button color="dark" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
+                        <Button color="purple" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
                             Today
                         </Button>
                         <Button
@@ -167,7 +167,7 @@ const Toolbar = ({
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
-                        <Button color="dark" size="xs" onClick={showForm} onKeyPress={showForm}>
+                        <Button color="purple" size="xs" onClick={showForm} onKeyPress={showForm}>
                             <RssIcon className="h-4 w-6" />
                         </Button>
                         <Button color="purple" size="xs" href="/calendar/form">
