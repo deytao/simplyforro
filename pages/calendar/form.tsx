@@ -6,7 +6,7 @@ import { unstable_getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { HiOutlineXMark } from "react-icons/hi2";
 import { Event, Role } from "@prisma/client";
 
 import { EventPreview } from "components/EventPreview";
@@ -475,7 +475,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                     data-event-preview={true}
                     className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl z-20"
                 >
-                    <XMarkIcon
+                    <HiOutlineXMark
                         className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer"
                         onClick={togglePreview}
                         onKeyPress={togglePreview}

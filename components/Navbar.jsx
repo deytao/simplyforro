@@ -1,7 +1,7 @@
 import { Dropdown } from "flowbite-react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { CalendarIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { HiCalendar, HiOutlineUserCircle } from "react-icons/hi2";
 
 export function Navbar() {
     const { data: session } = useSession();
@@ -20,11 +20,11 @@ export function Navbar() {
             </div>
             <div className="flex">
                 <Link className="px-3 py-2 text-violet-200 hover:text-white" href="/calendar">
-                    <CalendarIcon className="h-5 w-5" />
+                    <HiCalendar className="h-5 w-5" />
                 </Link>
                 <div className="px-3 py-2">
                     <Dropdown
-                        label={<UserCircleIcon className="h-5 w-5 text-violet-200 hover:text-white" />}
+                        label={<HiOutlineUserCircle className="h-5 w-5 text-violet-200 hover:text-white" />}
                         inline={true}
                         arrowIcon={false}
                     >

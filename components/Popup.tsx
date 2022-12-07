@@ -1,6 +1,6 @@
 import { Button, Modal } from "flowbite-react";
 import { useState } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { HiExclamationCircle } from "react-icons/hi2";
 
 export interface IPopup {
     isOpen: boolean;
@@ -17,7 +17,7 @@ export const Popup = ({ popup, setPopup }: { popup: IPopup; setPopup: Function }
         <Modal show={popup.isOpen} onClose={() => setPopup({ isOpen: false })}>
             <Modal.Header />
             <Modal.Body>
-                <ExclamationCircleIcon className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                <HiExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">{popup.message}</h3>
                 <div className="flex justify-center gap-4">
                     {popup.buttons?.map((button, idx) => {

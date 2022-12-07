@@ -11,13 +11,7 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
-import {
-    ArrowTopRightOnSquareIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    PlusIcon,
-    RssIcon,
-} from "@heroicons/react/24/outline";
+import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiPlus, HiRss } from "react-icons/hi2";
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
@@ -94,7 +88,7 @@ const Toolbar = ({
                         onKeyPress={prevMonth}
                         data-previous-month={true}
                     >
-                        <ChevronLeftIcon className="h-8 w-8" />
+                        <HiChevronLeft className="h-8 w-8" />
                     </Button>
                     <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
                     <Button
@@ -105,7 +99,7 @@ const Toolbar = ({
                         onKeyPress={nextMonth}
                         data-next-month={true}
                     >
-                        <ChevronRightIcon className="h-8 w-8" />
+                        <HiChevronRight className="h-8 w-8" />
                     </Button>
                 </div>
                 <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
@@ -118,7 +112,7 @@ const Toolbar = ({
                             className="hidden lg:block"
                             data-previous-month={true}
                         >
-                            <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12" />
+                            <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
                         </Button>
                         <Button color="purple" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
                             Today
@@ -131,7 +125,7 @@ const Toolbar = ({
                             className="hidden lg:block"
                             data-next-month={true}
                         >
-                            <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12" />
+                            <HiChevronRight className="h-3 md:h-6 w-6 md:w-12" />
                         </Button>
                     </div>
                     <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
@@ -166,10 +160,10 @@ const Toolbar = ({
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
                         <Button color="purple" size="xs" onClick={showForm} onKeyPress={showForm}>
-                            <RssIcon className="h-4 w-6" />
+                            <HiRss className="h-4 w-6" />
                         </Button>
                         <Button color="purple" size="xs" href="/calendar/form">
-                            <PlusIcon className="h-4 w-6" />
+                            <HiPlus className="h-4 w-6" />
                         </Button>
                     </div>
                 </div>
@@ -236,7 +230,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
 
     const showForm = (errors: any = {}) => {
-        const userSubscriptionSlugs = session?.user.subscriptions?.map((subscription) => subscription.slug)
+        const userSubscriptionSlugs = session?.user.subscriptions?.map((subscription) => subscription.slug);
         setModal({
             isOpen: true,
             status: "neutral",
@@ -438,7 +432,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             target="_blank"
                                             rel="noreferrer"
                                         >
-                                            More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline" />
+                                            More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
                                         </a>
                                     )}
                                 </>

@@ -6,10 +6,10 @@ import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { HiOutlineCheckCircle } from "react-icons/hi2";
 import { SchemaOf } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Role, Subscription, User } from "@prisma/client";
-import { CheckIcon } from "@heroicons/react/24/outline";
 
 import { GetSubscriptions } from "lib/subscription";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -126,7 +126,7 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
         <>
             <Toast duration={100} className={`absolute z-50 top-10 ${formIsSuccess ? "" : "hidden"}`}>
                 <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
-                    <CheckIcon className="h-5 w-5 -mt-1 inline" />
+                    <HiOutlineCheckCircle className="h-5 w-5 -mt-1 inline" />
                 </div>
                 <div className="ml-3 text-sm font-normal">Informations updated</div>
                 <Toast.Toggle />
