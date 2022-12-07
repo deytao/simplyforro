@@ -2,10 +2,10 @@ import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { unstable_getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
-import { ArrowSmallRightIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { HiArrowRight, HiOutlineCheckCircle, HiOutlineXMark } from "react-icons/hi2";
 import { Event, Role } from "@prisma/client";
 
-import { MessageDialog } from "components/MessageDialog";
+import { Modal } from "components/Modal";
 import { GetPendingEvents } from "lib/calendar";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Pendings: NextPage<Props> = ({ events }) => {
-    const [messageDialogState, setMessageDialogState] = useState({
+    const [modal, setModal] = useState({
         isOpen: false,
         status: "",
         title: "",
@@ -89,7 +89,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                         element.remove();
                     }
                 });
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "success",
                     title: "Success!",
@@ -100,7 +100,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                 if (!errors) {
                     return;
                 }
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "error",
                     title: "Fail!",
@@ -113,7 +113,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
         <>
             <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Pendings</h1>
 
-            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <Modal modal={modal} setModal={setModal} />
 
             <table className="w-full table-fixed text-sm md:text-base">
                 <thead>
@@ -132,7 +132,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                                 data-event-action="validate"
                                 data-event-all={true}
                             >
-                                <CheckIcon className="h-3 w-3 lg:hidden" />
+                                <HiOutlineCheckCircle className="h-3 w-3 lg:hidden" />
                             </button>
                             <button
                                 type="button"
@@ -142,7 +142,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                                 data-event-action="reject"
                                 data-event-all={true}
                             >
-                                <XMarkIcon className="h-3 w-3 lg:hidden" />
+                                <HiOutlineXMark className="h-3 w-3 lg:hidden" />
                             </button>
                         </th>
                     </tr>
@@ -153,7 +153,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                             <td className="border-b border-slate-100 p-1 md:p-2">{event.title}</td>
                             <td className="border-b border-slate-100 p-1 md:p-2">
                                 {event.start_at}
-                                {event.end_at && <ArrowSmallRightIcon className="h-5 w-5 -mt-1 inline" />}
+                                {event.end_at && <HiArrowRight className="h-5 w-5 -mt-1 inline" />}
                                 {event.end_at}
                             </td>
                             <td className="border-b border-slate-100 p-1 md:p-2">
@@ -179,7 +179,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                                     data-event-action="validate"
                                     data-event-id={event.id}
                                 >
-                                    <CheckIcon className="h-3 w-3 lg:hidden" />
+                                    <HiOutlineCheckCircle className="h-3 w-3 lg:hidden" />
                                 </button>
                                 <button
                                     type="button"
@@ -189,7 +189,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
                                     data-event-action="reject"
                                     data-event-id={event.id}
                                 >
-                                    <XMarkIcon className="h-3 w-3 lg:hidden" />
+                                    <HiOutlineXMark className="h-3 w-3 lg:hidden" />
                                 </button>
                             </td>
                         </tr>

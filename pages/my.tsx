@@ -1,3 +1,4 @@
+import { Button, Toast } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
@@ -5,10 +6,10 @@ import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { HiOutlineCheckCircle } from "react-icons/hi2";
 import { SchemaOf } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Role, Subscription, User } from "@prisma/client";
-import { CheckIcon } from "@heroicons/react/24/outline";
 
 import { GetSubscriptions } from "lib/subscription";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -123,6 +124,14 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
 
     return (
         <>
+            <Toast duration={100} className={`absolute z-50 top-10 ${formIsSuccess ? "" : "hidden"}`}>
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
+                    <HiOutlineCheckCircle className="h-5 w-5 -mt-1 inline" />
+                </div>
+                <div className="ml-3 text-sm font-normal">Informations updated</div>
+                <Toast.Toggle />
+            </Toast>
+
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <div className="w-full pr-2 pl-2">
@@ -192,13 +201,9 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                         )}
                     </div>
                     <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
-                        <div className={`text-xs font-bold text-green-600 ${formIsSuccess ? "" : "hidden"}`}>
-                            <CheckIcon className="h-5 w-5 -mt-1 inline" />
-                            Success
-                        </div>
-                        <button type="submit" className="btn btn-violet">
+                        <Button type="submit" color="purple">
                             Save
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>
@@ -243,13 +248,9 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                         </fieldset>
                     </div>
                     <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
-                        <div className={`text-xs font-bold text-green-600 ${formIsSuccess ? "" : "hidden"}`}>
-                            <CheckIcon className="h-5 w-5 -mt-1 inline" />
-                            Success
-                        </div>
-                        <button type="submit" className="btn btn-violet">
+                        <Button type="submit" color="purple">
                             Save
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

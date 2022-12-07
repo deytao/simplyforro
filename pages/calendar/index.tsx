@@ -1,6 +1,6 @@
+import { Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
@@ -11,16 +11,11 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
-import {
-    ArrowTopRightOnSquareIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    PlusIcon,
-    RssIcon,
-} from "@heroicons/react/24/outline";
+import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiPlus, HiRss } from "react-icons/hi2";
 
 import { EventDetailsSimple } from "components/EventPreview";
-import { MessageDialog } from "components/MessageDialog";
+import { IModal, Modal } from "components/Modal";
+import { IPopup, Popup } from "components/Popup";
 import { frequencyIntervals } from "lib/calendar";
 import { Subscription } from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
@@ -38,15 +33,6 @@ const localizer = momentLocalizer(moment);
 
 interface Props {
     subscriptions: Subscription[];
-}
-
-interface IMessageDialog {
-    isOpen: boolean;
-    status?: string;
-    title?: string;
-    message?: any;
-    content?: any;
-    customButtons?: object[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -93,59 +79,57 @@ const Toolbar = ({
     return (
         <>
             <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
-                <div className="grid grid-cols-4">
-                    <button
-                        type="button"
+                <div className="flex items-center">
+                    <Button
+                        color=""
+                        size="sm"
+                        className="lg:hidden basis-1/4"
                         onClick={prevMonth}
                         onKeyPress={prevMonth}
-                        className="col-span-1 grid place-items-center lg:hidden"
                         data-previous-month={true}
                     >
-                        <ChevronLeftIcon className="h-8 w-8" />
-                    </button>
-                    <h1 className="col-span-2 lg:col-span-4 text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
-                    <button
-                        type="button"
+                        <HiChevronLeft className="h-8 w-8" />
+                    </Button>
+                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{label}</h1>
+                    <Button
+                        color=""
+                        size="sm"
+                        className="lg:hidden basis-1/4"
                         onClick={nextMonth}
                         onKeyPress={nextMonth}
-                        className="col-span-1 grid place-items-center lg:hidden"
                         data-next-month={true}
                     >
-                        <ChevronRightIcon className="h-8 w-8" />
-                    </button>
+                        <HiChevronRight className="h-8 w-8" />
+                    </Button>
                 </div>
                 <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
                     <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <button
-                            type="button"
+                        <Button
+                            color=""
+                            size="sm"
                             onClick={prevMonth}
                             onKeyPress={prevMonth}
                             className="hidden lg:block"
                             data-previous-month={true}
                         >
-                            <ChevronLeftIcon className="h-3 md:h-6 w-6 md:w-12" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={currentMonth}
-                            onKeyPress={currentMonth}
-                            className="btn btn-neutral ml-2 lg:ml-0"
-                        >
+                            <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
+                        </Button>
+                        <Button color="purple" size="sm" onClick={currentMonth} onKeyPress={currentMonth}>
                             Today
-                        </button>
-                        <button
-                            type="button"
+                        </Button>
+                        <Button
+                            color=""
+                            size="sm"
                             onClick={nextMonth}
                             onKeyPress={nextMonth}
                             className="hidden lg:block"
                             data-next-month={true}
                         >
-                            <ChevronRightIcon className="h-3 md:h-6 w-6 md:w-12" />
-                        </button>
+                            <HiChevronRight className="h-3 md:h-6 w-6 md:w-12" />
+                        </Button>
                     </div>
                     <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-                        <input
-                            type="text"
+                        <TextInput
                             key="fts-field"
                             onChange={changeFTS}
                             placeholder="Search..."
@@ -157,34 +141,30 @@ const Toolbar = ({
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                             {categories.map((category: any, idx: number) => (
                                 <div key={idx} className="flex items-center basis-1/6">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         id={`categories-${category}`}
                                         value={category}
                                         onChange={changeCategories}
-                                        data-filters-categories={true}
                                         checked={selectedCategories.includes(category)}
+                                        data-filters-categories={true}
                                     />
-                                    <label
+                                    <Label
                                         htmlFor={`categories-${category}`}
                                         className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}
                                     >
                                         {category}
-                                    </label>
+                                    </Label>
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 pr-2 flex items-center justify-end gap-1">
-                        <button className="btn btn-neutral" onClick={showForm} onKeyPress={showForm}>
-                            {status !== "authenticated" && <span className="hidden lg:inline">Subscribe</span>}
-                            {status === "authenticated" && <span className="hidden lg:inline">My Subscriptions</span>}
-                            <RssIcon className="h-4 w-6 lg:hidden" />
-                        </button>
-                        <Link href="/calendar/form" className="btn btn-violet">
-                            <span className="hidden lg:inline">Add</span>
-                            <PlusIcon className="h-4 w-6 lg:hidden" />
-                        </Link>
+                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
+                        <Button color="purple" size="xs" onClick={showForm} onKeyPress={showForm}>
+                            <HiRss className="h-4 w-6" />
+                        </Button>
+                        <Button color="purple" size="xs" href="/calendar/form">
+                            <HiPlus className="h-4 w-6" />
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -198,18 +178,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const [selectedCategories, setSelectedCategories] = useState(categories);
     const [ftsValue, setFTSValue] = useState("");
     const [events, setEvents] = useState([]);
-    const [messageDialogState, setMessageDialogState] = useState<IMessageDialog>({
+    const [modal, setModal] = useState<IModal>({
         isOpen: false,
     });
-    const formOptions = {
-        resolver: yupResolver(subscriberSchema),
-        defaultValues: {
-            name: session?.user.name,
-            email: session?.user.email,
-            subscriptions: session?.user.subscriptions?.map((subscription) => subscription.slug),
-        },
-    };
-    const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
+    const [popup, setPopup] = useState<IPopup>({ isOpen: false });
+    const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(subscriberSchema) });
     const { errors } = formState;
     const router = useRouter();
 
@@ -233,7 +206,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 return response.json();
             })
             .then((data) => {
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "success",
                     title: "Subscriptions updated!",
@@ -241,7 +214,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 });
             })
             .catch((error) => {
-                setMessageDialogState({
+                setModal({
                     isOpen: true,
                     status: "error",
                     title: "Error",
@@ -252,12 +225,13 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     }
 
     const reloadFailSubmit = (errors: Object) => {
-        setMessageDialogState({ isOpen: false });
+        setModal({ isOpen: false });
         showForm(errors);
     };
 
     const showForm = (errors: any = {}) => {
-        setMessageDialogState({
+        const userSubscriptionSlugs = session?.user.subscriptions?.map((subscription) => subscription.slug);
+        setModal({
             isOpen: true,
             status: "neutral",
             title: "Configuration",
@@ -268,8 +242,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             <>
                                 <div className="col-span-1">
                                     <div className="mt-1 flex rounded-md shadow-sm">
-                                        <input
-                                            type="text"
+                                        <TextInput
                                             {...register("name")}
                                             placeholder="John Doe"
                                             className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
@@ -280,8 +253,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
 
                                 <div className="col-span-1">
                                     <div className="mt-1 flex rounded-md shadow-sm">
-                                        <input
-                                            type="text"
+                                        <TextInput
                                             {...register("email")}
                                             placeholder="john.doe@email.com"
                                             className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
@@ -293,8 +265,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         {session && (
                             <>
-                                <input type="hidden" {...register("name")} />
-                                <input type="hidden" {...register("email")} />
+                                <input type="hidden" {...register("name", { value: session?.user.name })} />
+                                <input type="hidden" {...register("email", { value: session?.user.email })} />
                             </>
                         )}
                         <div className="col-span-2">
@@ -303,26 +275,21 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
                                 <div className="mt-2 space-y-4">
                                     {subscriptions.map((subscription: Subscription) => (
-                                        <div key={subscription.slug} className="flex items-start">
+                                        <div key={subscription.slug} className="flex items-start gap-2">
                                             <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
+                                                <Checkbox
                                                     id={`subscriptions-${subscription.slug}`}
                                                     {...register("subscriptions")}
                                                     value={subscription.slug}
+                                                    defaultChecked={userSubscriptionSlugs?.includes(subscription.slug)}
                                                 />
                                             </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor={`subscriptions-${subscription.slug}`}
-                                                    className="font-medium text-gray-700"
-                                                >
-                                                    {subscription.title}
-                                                    <p className="text-gray-500 font-normal">
-                                                        {subscription.description}
-                                                    </p>
-                                                </label>
-                                            </div>
+                                            <Label htmlFor={`subscriptions-${subscription.slug}`}>
+                                                {subscription.title}
+                                                <p className="text-gray-500 dark:text-gray-300">
+                                                    {subscription.description}
+                                                </p>
+                                            </Label>
                                         </div>
                                     ))}
                                 </div>
@@ -334,7 +301,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
             customButtons: [
                 {
                     callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
-                    classes: "btn btn-emerald",
+                    color: "success",
                     title: "Submit",
                 },
             ],
@@ -383,8 +350,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         let lastDate =
                             event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
                         let events: Event[] = [];
-                        while (eventDate <= lastDate) {
-                            if (eventDate >= lbound) {
+                        while (eventDate.isSameOrBefore(lastDate)) {
+                            let isExcluded = event.excluded_on?.filter((excluded_date) => {
+                                return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
+                            });
+                            if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
                                 events.push({
                                     ...event,
                                     start_at: eventDate.toDate(),
@@ -404,7 +374,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
 
     return (
         <>
-            <MessageDialog messageDialog={messageDialogState} setMessageDialog={setMessageDialogState} />
+            <Modal modal={modal} setModal={setModal} />
+            <Popup popup={popup} setPopup={setPopup} />
             <div {...swipeHandlers} style={{ width: "100%" }}>
                 <BigCalendar
                     components={{
@@ -438,7 +409,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         setCurrentDate(newDate);
                     }}
                     onSelectEvent={(event: Event) => {
-                        let state: IMessageDialog = {
+                        let state: IModal = {
                             isOpen: true,
                             status: "neutral",
                             title: event.title,
@@ -461,54 +432,124 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             target="_blank"
                                             rel="noreferrer"
                                         >
-                                            More <ArrowTopRightOnSquareIcon className="h-3 w-3 inline" />
+                                            More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
                                         </a>
                                     )}
                                 </>
                             ),
                         };
                         if (session?.user.roles.includes(Role.contributor)) {
+                            const endpoint = `/api/events/${event.id}`;
+                            const _fetch = (method: string, endpoint: string, data: any) => {
+                                const options = {
+                                    method: method,
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: data ? JSON.stringify(data) : null,
+                                };
+                                return fetch(endpoint, options)
+                                    .then((response) => {
+                                        if (!response.ok) {
+                                            throw new Error("An error occured, please try again later.");
+                                        }
+                                        return response.json();
+                                    })
+                                    .then((data) => {
+                                        loadEvents();
+                                        setModal({ isOpen: false });
+                                    })
+                                    .catch((error) => {
+                                        setModal({
+                                            isOpen: true,
+                                            status: "error",
+                                            title: "Error",
+                                            message: error.message,
+                                        });
+                                    });
+                            };
+                            const eventHandler = (message: string, callback: Function) => {
+                                return () =>
+                                    setPopup({
+                                        isOpen: true,
+                                        message: message,
+                                        buttons: [
+                                            {
+                                                title: "Yes",
+                                                callback: callback,
+                                                color: "purple",
+                                            },
+                                            {
+                                                title: "No",
+                                                color: "light",
+                                            },
+                                        ],
+                                    });
+                            };
                             state["customButtons"] = [
                                 {
                                     callback: () => router.push(`/calendar/form?eventId=${event.id}`),
-                                    classes: "btn btn-violet",
+                                    color: "purple",
                                     title: "Edit",
                                 },
-                                {
-                                    callback: () => {
-                                        if (confirm("Sure?")) {
-                                            const endpoint = `/api/events/${event.id}`;
-
-                                            const options = {
-                                                method: "DELETE",
-                                            };
-                                            const result = fetch(endpoint, options)
-                                                .then((response) => {
-                                                    if (!response.ok) {
-                                                        throw new Error("An error occured, please try again later.");
-                                                    }
-                                                    return response.json();
-                                                })
-                                                .then((data) => {
-                                                    loadEvents();
-                                                    setMessageDialogState({ isOpen: false });
-                                                })
-                                                .catch((error) => {
-                                                    setMessageDialogState({
-                                                        isOpen: true,
-                                                        status: "error",
-                                                        title: "Error",
-                                                        message: error.message,
-                                                    });
-                                                });
-                                        }
-                                    },
-                                    classes: "btn btn-red",
-                                    title: "Delete",
-                                },
                             ];
+                            if (event.frequency) {
+                                state["customButtons"].push({
+                                    custom: (
+                                        <Dropdown label="Delete" color="failure" size="sm">
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will delete ALL occurences to the event, it CAN'T be reverted. Are you sure?",
+                                                    () => _fetch("DELETE", endpoint, null),
+                                                )}
+                                            >
+                                                All events
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will remove the selected event. Are you sure?",
+                                                    () => {
+                                                        const data = {
+                                                            excluded_on: (event.excluded_on || []).concat([
+                                                                moment(event.start_at).toDate(),
+                                                            ]),
+                                                        };
+                                                        const result = _fetch("PATCH", endpoint, data);
+                                                    },
+                                                )}
+                                            >
+                                                Ony this one
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={eventHandler(
+                                                    "Doing this will remove the selected and ALL of the following events. Are you sure?",
+                                                    () => {
+                                                        const endAt = moment(event.end_at);
+                                                        endAt.subtract(frequencyIntervals[event.frequency!]);
+                                                        const data = {
+                                                            end_at: endAt.toDate(),
+                                                        };
+                                                        const result = _fetch("PATCH", endpoint, data);
+                                                    },
+                                                )}
+                                            >
+                                                This one and the followings
+                                            </Dropdown.Item>
+                                        </Dropdown>
+                                    ),
+                                });
+                            } else {
+                                state["customButtons"].push({
+                                    callback: eventHandler(
+                                        "Doing this will delete the event, it CAN'T be reverted. Are you sure?",
+                                        () => _fetch("DELETE", endpoint, null),
+                                    ),
+                                    color: "failure",
+                                    title: "Delete",
+                                });
+                            }
                         }
-                        setMessageDialogState(state);
+                        setModal(state);
                     }}
                     startAccessor="start_at"
                     endAccessor="end_at"
