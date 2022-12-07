@@ -1,4 +1,4 @@
-import { Button, Dropdown } from "flowbite-react";
+import { Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -135,8 +135,7 @@ const Toolbar = ({
                         </Button>
                     </div>
                     <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-                        <input
-                            type="text"
+                        <TextInput
                             key="fts-field"
                             onChange={changeFTS}
                             placeholder="Search..."
@@ -148,20 +147,19 @@ const Toolbar = ({
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                             {categories.map((category: any, idx: number) => (
                                 <div key={idx} className="flex items-center basis-1/6">
-                                    <input
-                                        type="checkbox"
+                                    <Checkbox
                                         id={`categories-${category}`}
                                         value={category}
                                         onChange={changeCategories}
-                                        data-filters-categories={true}
                                         checked={selectedCategories.includes(category)}
+                                        data-filters-categories={true}
                                     />
-                                    <label
+                                    <Label
                                         htmlFor={`categories-${category}`}
                                         className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}
                                     >
                                         {category}
-                                    </label>
+                                    </Label>
                                 </div>
                             ))}
                         </div>
@@ -190,15 +188,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
         isOpen: false,
     });
     const [popup, setPopup] = useState<IPopup>({ isOpen: false });
-    const formOptions = {
-        resolver: yupResolver(subscriberSchema),
-        defaultValues: {
-            name: session?.user.name,
-            email: session?.user.email,
-            subscriptions: session?.user.subscriptions?.map((subscription) => subscription.slug),
-        },
-    };
-    const { register, handleSubmit, reset, formState, watch } = useForm(formOptions);
+    const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(subscriberSchema) });
     const { errors } = formState;
     const router = useRouter();
 
@@ -246,6 +236,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     };
 
     const showForm = (errors: any = {}) => {
+        const userSubscriptionSlugs = session?.user.subscriptions?.map((subscription) => subscription.slug)
         setModal({
             isOpen: true,
             status: "neutral",
@@ -257,8 +248,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             <>
                                 <div className="col-span-1">
                                     <div className="mt-1 flex rounded-md shadow-sm">
-                                        <input
-                                            type="text"
+                                        <TextInput
                                             {...register("name")}
                                             placeholder="John Doe"
                                             className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
@@ -269,8 +259,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
 
                                 <div className="col-span-1">
                                     <div className="mt-1 flex rounded-md shadow-sm">
-                                        <input
-                                            type="text"
+                                        <TextInput
                                             {...register("email")}
                                             placeholder="john.doe@email.com"
                                             className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
@@ -282,8 +271,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         {session && (
                             <>
-                                <input type="hidden" {...register("name")} />
-                                <input type="hidden" {...register("email")} />
+                                <input type="hidden" {...register("name", { value: session?.user.name })} />
+                                <input type="hidden" {...register("email", { value: session?.user.email })} />
                             </>
                         )}
                         <div className="col-span-2">
@@ -292,26 +281,21 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                 <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
                                 <div className="mt-2 space-y-4">
                                     {subscriptions.map((subscription: Subscription) => (
-                                        <div key={subscription.slug} className="flex items-start">
+                                        <div key={subscription.slug} className="flex items-start gap-2">
                                             <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
+                                                <Checkbox
                                                     id={`subscriptions-${subscription.slug}`}
                                                     {...register("subscriptions")}
                                                     value={subscription.slug}
+                                                    defaultChecked={userSubscriptionSlugs?.includes(subscription.slug)}
                                                 />
                                             </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor={`subscriptions-${subscription.slug}`}
-                                                    className="font-medium text-gray-700"
-                                                >
-                                                    {subscription.title}
-                                                    <p className="text-gray-500 font-normal">
-                                                        {subscription.description}
-                                                    </p>
-                                                </label>
-                                            </div>
+                                            <Label htmlFor={`subscriptions-${subscription.slug}`}>
+                                                {subscription.title}
+                                                <p className="text-gray-500 dark:text-gray-300">
+                                                    {subscription.description}
+                                                </p>
+                                            </Label>
                                         </div>
                                     ))}
                                 </div>
