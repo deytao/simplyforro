@@ -1,3 +1,4 @@
+import { Badge, Button, Card, Label, Toast } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { unstable_getServerSession } from "next-auth/next";
@@ -5,7 +6,6 @@ import { useEffect, useState } from "react";
 import { HiArrowRight, HiOutlineCheckCircle, HiOutlineXMark } from "react-icons/hi2";
 import { Event, Role } from "@prisma/client";
 
-import { Modal } from "components/Modal";
 import { GetPendingEvents } from "lib/calendar";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
@@ -32,8 +32,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 title: event.title,
                 url: event.url,
                 location: `${event.city}, ${event.country}`,
-                start_at: moment(event.start_at).format("YYYY-MM-DD"),
-                end_at: event.end_at ? moment(event.end_at).format("YYYY-MM-DD") : null,
+                start_at: moment(event.start_at).format("Do MMM YYYY"),
+                end_at: event.end_at ? moment(event.end_at).format("Do MMM YYYY") : null,
                 categories: event.categories,
             })),
         },
@@ -41,14 +41,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Pendings: NextPage<Props> = ({ events }) => {
-    const [modal, setModal] = useState({
-        isOpen: false,
-        status: "",
-        title: "",
-        message: "",
-    });
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
     const statuteEvent = (e: any) => {
-        const button = e.target;
+        const button = e.currentTarget;
         const validation_status = {
             reject: "rejected",
             validate: "validated",
@@ -89,113 +84,74 @@ const Pendings: NextPage<Props> = ({ events }) => {
                         element.remove();
                     }
                 });
-                setModal({
-                    isOpen: true,
-                    status: "success",
-                    title: "Success!",
-                    message: "",
-                });
+                setToastMessage("Event updated.");
+                setTimeout(() => setToastMessage(null), 2000);
             })
             .catch((errors) => {
                 if (!errors) {
                     return;
                 }
-                setModal({
-                    isOpen: true,
-                    status: "error",
-                    title: "Fail!",
-                    message: "",
-                });
+                setToastMessage("An error occured, please try again later");
+                setTimeout(() => setToastMessage(null), 2000);
             });
     };
 
     return (
         <>
+            <Toast duration={100} className={`absolute z-50 top-10 ${toastMessage ? "" : "hidden"}`}>
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
+                    <HiOutlineCheckCircle className="h-5 w-5 -mt-1 inline" />
+                </div>
+                <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+                <Toast.Toggle />
+            </Toast>
+
             <h1 className="text-xl md:text-6xl font-bold py-4 text-center">Pendings</h1>
 
-            <Modal modal={modal} setModal={setModal} />
-
-            <table className="w-full table-fixed text-sm md:text-base">
-                <thead>
-                    <tr>
-                        <th className="border-b font-medium p-1 md:p-2 text-left">Title</th>
-                        <th className="border-b font-medium p-1 md:p-2 text-left">Date</th>
-                        <th className="border-b font-medium p-1 md:p-2 text-left">Categories</th>
-                        <th className="border-b font-medium p-1 md:p-2 text-left">Location</th>
-                        <th className="border-b font-medium p-1 md:p-2 text-left">Url</th>
-                        <th className="border-b font-medium p-1 md:p-2 text-left flex gap-x-px justify-center">
-                            <button
-                                type="button"
-                                className="btn btn-emerald lg:before:content-['Validate_all']"
+            <div className="flex flex-wrap justify-center gap-2">
+                {events.map((event: any, idx: number) => (
+                    <Card key={event.id} data-row-event-id={event.id} className="w-80">
+                        <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                            <a href={event.url}>{event.title}</a>
+                        </h5>
+                        <div className="flex font-normal text-gray-700 dark:text-gray-400">
+                            <div>{event.start_at}</div>
+                            {event.end_at && <div><HiArrowRight className="h-3 w-3 -mt-1 inline" /></div>}
+                            <div>{event.end_at}</div>
+                        </div>
+                        <p className="font-normal text-gray-700 dark:text-gray-400">{event.location}</p>
+                        <div className="flex gap-2">
+                            {event.categories?.map((category: string, idx: number) => (
+                                <Badge key={`${idx}`} color={category}>
+                                    {category}
+                                </Badge>
+                            ))}
+                        </div>
+                        <div className="flex space-x-3">
+                            <Button
+                                color="success"
+                                size="sm"
                                 onClick={statuteEvent}
                                 onKeyPress={statuteEvent}
                                 data-event-action="validate"
-                                data-event-all={true}
+                                data-event-id={event.id}
                             >
-                                <HiOutlineCheckCircle className="h-3 w-3 lg:hidden" />
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-red lg:before:content-['Reject_all']"
+                                <HiOutlineCheckCircle className="h-5 w-5" />
+                            </Button>
+                            <Button
+                                color="failure"
+                                size="sm"
                                 onClick={statuteEvent}
                                 onKeyPress={statuteEvent}
                                 data-event-action="reject"
-                                data-event-all={true}
+                                data-event-id={event.id}
                             >
-                                <HiOutlineXMark className="h-3 w-3 lg:hidden" />
-                            </button>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {events.map((event: any, idx: number) => (
-                        <tr key={event.id} data-row-event-id={event.id}>
-                            <td className="border-b border-slate-100 p-1 md:p-2">{event.title}</td>
-                            <td className="border-b border-slate-100 p-1 md:p-2">
-                                {event.start_at}
-                                {event.end_at && <HiArrowRight className="h-5 w-5 -mt-1 inline" />}
-                                {event.end_at}
-                            </td>
-                            <td className="border-b border-slate-100 p-1 md:p-2">
-                                {event.categories.map((category: any, idx: number) => (
-                                    <span
-                                        key={idx}
-                                        className={`event-tag-${category} px-2 rounded lowercase text-sm mr-1 md:text-base`}
-                                    >
-                                        {category}
-                                    </span>
-                                ))}
-                            </td>
-                            <td className="border-b border-slate-100 p-1 md:p-2">{event.location}</td>
-                            <td className="border-b border-slate-100 p-1 md:p-2">
-                                <a href={event.url}>{event.url}</a>
-                            </td>
-                            <td className="border-b border-slate-100 p-1 md:p-2 flex gap-x-px justify-center">
-                                <button
-                                    type="button"
-                                    className="btn btn-emerald lg:before:content-['Validate']"
-                                    onClick={statuteEvent}
-                                    onKeyPress={statuteEvent}
-                                    data-event-action="validate"
-                                    data-event-id={event.id}
-                                >
-                                    <HiOutlineCheckCircle className="h-3 w-3 lg:hidden" />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-red lg:before:content-['Reject'] justify-center"
-                                    onClick={statuteEvent}
-                                    onKeyPress={statuteEvent}
-                                    data-event-action="reject"
-                                    data-event-id={event.id}
-                                >
-                                    <HiOutlineXMark className="h-3 w-3 lg:hidden" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                                <HiOutlineXMark className="h-5 w-5" />
+                            </Button>
+                        </div>
+                    </Card>
+                ))}
+            </div>
         </>
     );
 };
