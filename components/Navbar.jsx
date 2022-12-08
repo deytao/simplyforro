@@ -35,8 +35,10 @@ export function Navbar() {
                                     <span className="block text-sm">Signed in as</span>
                                     <span className="block truncate text-sm font-medium">{session.user.name}</span>
                                 </Dropdown.Header>
-                                <Dropdown.Item onClick={() => document.location.assign("/my")}>
-                                    My Profile
+                                <Dropdown.Item>
+                                    <Link href="/my">
+                                        My Profile
+                                    </Link>
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>

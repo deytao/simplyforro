@@ -78,7 +78,7 @@ const Toolbar = ({
     };
     return (
         <>
-            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white dark:bg-gray-900">
+            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white dark:bg-gray-800">
                 <div className="flex items-center">
                     <Button
                         color=""
@@ -271,7 +271,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         <div className="col-span-2">
                             <fieldset className="mt-2">
-                                <legend className="text-base font-medium text-gray-900">Subscriptions</legend>
+                                <legend className="text-base font-medium text-gray-900 dark:text-white">Subscriptions</legend>
                                 <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
                                 <div className="mt-2 space-y-4">
                                     {subscriptions.map((subscription: Subscription) => (

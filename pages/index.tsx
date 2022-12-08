@@ -46,21 +46,21 @@ const Home: NextPage<Props> = ({ events }) => {
                 <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {events.map((event: any, idx: number) => (
                         <li key={idx} className="py-3 sm:py-4">
-                          <div className="flex items-center space-x-4">
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                                {event.title}
-                              </p>
-                              <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                                {event.location}
-                              </p>
+                            <div className="flex items-center space-x-4">
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        {event.title}
+                                    </p>
+                                    <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                                        {event.location}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">
+                                    <div>{event.start_at}</div>
+                                    <div>{event.end_at && <HiArrowRight className="h-3 w-3" />}</div>
+                                    <div>{event.end_at}</div>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">
-                                <div>{event.start_at}</div>
-                                <div>{event.end_at && <HiArrowRight className="h-3 w-3" />}</div>
-                                <div>{event.end_at}</div>
-                            </div>
-                          </div>
                         </li>
                     ))}
                 </ul>
