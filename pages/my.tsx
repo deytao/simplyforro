@@ -1,4 +1,4 @@
-import { Button, Toast } from "flowbite-react";
+import { Button, Checkbox, Label, TextInput, Toast } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
@@ -141,70 +141,49 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                     onSubmit={handleUserSubmit(submitForm)}
                     action={`/api/users/${user.id}`}
                     data-schema="user"
+                    className="flex flex-col gap-2"
                 >
                     <input type="hidden" {...registerUser("id")} id="user-id" />
-                    <div className="grid grid-cols-2 gap-2 px-4 py-5">
-                        <div className="col-span-2">
-                            <label htmlFor="event-title" className="block text-sm font-medium text-gray-700">
-                                Name
-                            </label>
-                            <div className="mt-1 flex rounded-md shadow-sm">
-                                <input
-                                    type="text"
-                                    {...registerUser("name")}
-                                    id="user-name"
-                                    className={`${userErrors.name ? "border-red-500" : ""}`}
-                                />
-                            </div>
+                    <div>
+                        <div className="mb-1">
+                            <Label htmlFor="user-name" value="Name" />
                         </div>
-                        <div className="col-span-2">
-                            <label htmlFor="event-email" className="block text-sm font-medium text-gray-700">
-                                Email
-                            </label>
-                            <div className="mt-1 flex rounded-md shadow-sm">
-                                <input
-                                    type="text"
-                                    {...registerUser("email")}
-                                    id="user-email"
-                                    className={`${userErrors.email ? "border-red-500" : ""}`}
-                                />
-                            </div>
+                        <TextInput
+                            {...registerUser("name")}
+                            id="user-name"
+                            className={`${userErrors.name ? "border-red-500" : ""}`}
+                        />
+                    </div>
+                    <div>
+                        <div className="mb-1">
+                            <Label htmlFor="user-email" value="Email" />
                         </div>
-                        {user.roles.includes(Role.admin) && (
-                            <fieldset>
-                                <legend className="text-base font-medium text-gray-900">Roles</legend>
-                                <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
-                                <div className="mt-4 space-y-4">
-                                    {Object.keys(Role).map((role: string, idx: number) => (
-                                        <div key={idx} className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id={`roles-${role}`}
-                                                    {...registerUser("roles")}
-                                                    value={role}
-                                                    className={userErrors.roles ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor={`roles-${role}`}
-                                                    className="font-medium text-gray-700 capitalize"
-                                                >
-                                                    {role}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </fieldset>
-                        )}
+                        <TextInput
+                            {...registerUser("email")}
+                            id="user-email"
+                            className={`${userErrors.email ? "border-red-500" : ""}`}
+                        />
                     </div>
-                    <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
-                        <Button type="submit" color="purple">
-                            Save
-                        </Button>
-                    </div>
+                    {user.roles.includes(Role.admin) && (
+                        <fieldset id="roles">
+                            <legend className="text-base font-medium text-gray-900 dark:text-white">Roles</legend>
+                            <p className="text-red-500 text-xs italic">{userErrors.roles?.message}</p>
+                            <div className="flex flex-col gap-2">
+                                {Object.keys(Role).map((role: string, idx: number) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <Checkbox
+                                            id={`roles-${role}`}
+                                            {...registerUser("roles")}
+                                            value={role}
+                                            className={userErrors.roles ? "border-red-500" : ""}
+                                        />
+                                        <Label htmlFor={`roles-${role}`} className="capitalize" value={role} />
+                                    </div>
+                                ))}
+                            </div>
+                        </fieldset>
+                    )}
+                    <Button type="submit" color="purple">Save</Button>
                 </form>
             </div>
 
@@ -215,43 +194,49 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                     onSubmit={handleSubscriptionsSubmit(submitForm)}
                     action={`/api/users/${user.id}/subscriptions`}
                     data-schema="subscriptions"
+                    className="flex flex-col gap-2"
                 >
                     <input type="hidden" {...registerSubscriptions("id")} id="user-id" />
-                    <div className="grid grid-cols-2 gap-2 px-4 py-5">
-                        <fieldset>
-                            <legend className="text-base font-medium text-gray-900">Roles</legend>
-                            <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
-                            <div className="mt-4 space-y-4">
-                                {subscriptions.map((subscription: Subscription, idx: number) => (
-                                    <div key={idx} className="flex items-start">
-                                        <div className="flex items-center h-5">
-                                            <input
-                                                type="checkbox"
-                                                id={`subscriptions-${subscription.slug}`}
-                                                {...registerSubscriptions("subscriptions")}
-                                                value={subscription.slug}
-                                                className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
-                                            />
-                                        </div>
-                                        <div className="ml-3 text-sm">
-                                            <label
-                                                htmlFor={`subscriptions-${subscription.slug}`}
-                                                className="font-medium text-gray-700"
-                                            >
-                                                {subscription.title}
-                                                <p className="text-gray-500 font-normal">{subscription.description}</p>
-                                            </label>
-                                        </div>
+                    <fieldset>
+                        <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
+                        <div className="flex flex-col gap-2">
+                            {subscriptions.map((subscription: Subscription, idx: number) => (
+<<<<<<< HEAD
+                                <div key={idx} className="flex gap-2">
+                                <Checkbox
+                                    id={`subscriptions-${subscription.slug}`}
+                                    {...registerSubscriptions("subscriptions")}
+                                    value={subscription.slug}
+                                    className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
+                                />
+                                <div className="flex flex-col">
+                                    <Label htmlFor={`subscriptions-${subscription.slug}`} className="capitalize" value={subscription.title} />
+                                    <p className="text-xs font-normal text-gray-500 dark:text-gray-300">{subscription.description}</p>
+                                </div>
+=======
+                                <div key={idx} className="flex items-center gap-2">
+                                    <Checkbox
+                                        id={`subscriptions-${subscription.slug}`}
+                                        {...registerSubscriptions("subscriptions")}
+                                        value={subscription.slug}
+                                        className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
+                                    />
+                                    <div className="flex flex-col">
+                                        <Label
+                                            htmlFor={`subscriptions-${subscription.slug}`}
+                                            className="capitalize"
+                                            value={subscription.title}
+                                        />
+                                        <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
+                                            {subscription.description}
+                                        </p>
                                     </div>
-                                ))}
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div className="px-4 py-3 bg-gray-100 sm:px-6 flex gap-x-1 justify-end items-center">
-                        <Button type="submit" color="purple">
-                            Save
-                        </Button>
-                    </div>
+>>>>>>> 8bd295e (fixup! feat(dark): Update My form to dark mode)
+                                </div>
+                            ))}
+                        </div>
+                    </fieldset>
+                    <Button type="submit" color="purple">Save</Button>
                 </form>
             </div>
         </>
