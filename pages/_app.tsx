@@ -15,6 +15,9 @@ export default function SimplyForro({ Component, pageProps }: AppProps) {
                             hidden: "hidden",
                         },
                     },
+                    footer: {
+                        base: "w-full bg-white shadow flex justify-between dark:bg-gray-800",
+                    },
                 },
             }}
         >
