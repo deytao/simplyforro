@@ -78,7 +78,7 @@ const Toolbar = ({
     };
     return (
         <>
-            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white dark:bg-gray-800">
+            <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
                 <div className="flex items-center">
                     <Button
                         color=""
