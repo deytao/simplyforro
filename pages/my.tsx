@@ -183,7 +183,9 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                             </div>
                         </fieldset>
                     )}
-                    <Button type="submit" color="purple">Save</Button>
+                    <Button type="submit" color="purple">
+                        Save
+                    </Button>
                 </form>
             </div>
 
@@ -201,19 +203,6 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                         <p className="text-red-500 text-xs italic">{subscriptionsErrors.subscriptions?.message}</p>
                         <div className="flex flex-col gap-2">
                             {subscriptions.map((subscription: Subscription, idx: number) => (
-<<<<<<< HEAD
-                                <div key={idx} className="flex gap-2">
-                                <Checkbox
-                                    id={`subscriptions-${subscription.slug}`}
-                                    {...registerSubscriptions("subscriptions")}
-                                    value={subscription.slug}
-                                    className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
-                                />
-                                <div className="flex flex-col">
-                                    <Label htmlFor={`subscriptions-${subscription.slug}`} className="capitalize" value={subscription.title} />
-                                    <p className="text-xs font-normal text-gray-500 dark:text-gray-300">{subscription.description}</p>
-                                </div>
-=======
                                 <div key={idx} className="flex items-center gap-2">
                                     <Checkbox
                                         id={`subscriptions-${subscription.slug}`}
@@ -231,12 +220,13 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                                             {subscription.description}
                                         </p>
                                     </div>
->>>>>>> 8bd295e (fixup! feat(dark): Update My form to dark mode)
                                 </div>
                             ))}
                         </div>
                     </fieldset>
-                    <Button type="submit" color="purple">Save</Button>
+                    <Button type="submit" color="purple">
+                        Save
+                    </Button>
                 </form>
             </div>
         </>

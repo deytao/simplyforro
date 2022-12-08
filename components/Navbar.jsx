@@ -36,9 +36,7 @@ export function Navbar() {
                                     <span className="block truncate text-sm font-medium">{session.user.name}</span>
                                 </Dropdown.Header>
                                 <Dropdown.Item>
-                                    <Link href="/my">
-                                        My Profile
-                                    </Link>
+                                    <Link href="/my">My Profile</Link>
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>

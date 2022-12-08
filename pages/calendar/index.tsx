@@ -149,9 +149,7 @@ const Toolbar = ({
                                         data-filters-categories={true}
                                     />
                                     <Label htmlFor={`categories-${category}`} className="capitalize">
-                                        <Badge color={category}>
-                                            {category}
-                                        </Badge>
+                                        <Badge color={category}>{category}</Badge>
                                     </Label>
                                 </div>
                             ))}
@@ -270,7 +268,9 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         <div className="col-span-2">
                             <fieldset className="mt-2">
-                                <legend className="text-base font-medium text-gray-900 dark:text-white">Subscriptions</legend>
+                                <legend className="text-base font-medium text-gray-900 dark:text-white">
+                                    Subscriptions
+                                </legend>
                                 <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
                                 <div className="mt-2 space-y-4">
                                     {subscriptions.map((subscription: Subscription) => (
@@ -418,11 +418,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                     <br />
                                     {event.city}, {event.country}
                                     <div className="flex gap-1">
-                                    {event.categories?.map((category, idx) => (
-                                        <Badge key={`${idx}`} color={category}>
-                                            {category}
-                                        </Badge>
-                                    ))}
+                                        {event.categories?.map((category, idx) => (
+                                            <Badge key={`${idx}`} color={category}>
+                                                {category}
+                                            </Badge>
+                                        ))}
                                     </div>
                                     {event.url && (
                                         <a
