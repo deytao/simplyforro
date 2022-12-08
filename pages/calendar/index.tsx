@@ -1,4 +1,4 @@
-import { Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
+import { Badge, Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -148,11 +148,10 @@ const Toolbar = ({
                                         checked={selectedCategories.includes(category)}
                                         data-filters-categories={true}
                                     />
-                                    <Label
-                                        htmlFor={`categories-${category}`}
-                                        className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}
-                                    >
-                                        {category}
+                                    <Label htmlFor={`categories-${category}`} className="capitalize">
+                                        <Badge color={category}>
+                                            {category}
+                                        </Badge>
                                     </Label>
                                 </div>
                             ))}
@@ -414,17 +413,17 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             status: "neutral",
                             title: event.title,
                             message: (
-                                <>
+                                <div className="text-black dark:text-white">
                                     {moment(event.start_at).format("dddd Do MMMM YYYY")}
                                     <br />
                                     {event.city}, {event.country}
-                                    <br />
+                                    <div className="flex gap-1">
                                     {event.categories?.map((category, idx) => (
-                                        <span key={`${idx}`} className={`event-tag event-tag-${category}`}>
+                                        <Badge key={`${idx}`} color={category}>
                                             {category}
-                                        </span>
+                                        </Badge>
                                     ))}
-                                    <br />
+                                    </div>
                                     {event.url && (
                                         <a
                                             href={event.url}
@@ -435,7 +434,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
                                         </a>
                                     )}
-                                </>
+                                </div>
                             ),
                         };
                         if (session?.user.roles.includes(Role.contributor)) {
