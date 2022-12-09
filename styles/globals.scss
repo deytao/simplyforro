@@ -99,7 +99,7 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
 
 .rbc-month-header {
     @extend .rbc-month-header;
-    @apply sticky top-[250px] md:top-[250px] lg:top-[210px] z-40;
+    @apply sticky top-[250px] md:top-[250px] lg:top-[210px] z-30;
     @apply bg-white;
     @apply dark:bg-gray-700;
 }

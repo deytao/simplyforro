@@ -1,5 +1,6 @@
 import { Badge, Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
+import Link from "next/link";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
@@ -11,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
-import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiPlus, HiRss } from "react-icons/hi2";
+import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiOutlineEllipsisHorizontal, HiPlus, HiRss } from "react-icons/hi2";
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
@@ -53,6 +54,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Toolbar = ({
     label,
     onNavigate,
+    session,
     selectedCategories,
     ftsValue,
     showForm,
@@ -60,6 +62,7 @@ const Toolbar = ({
 }: {
     label: string;
     onNavigate: any;
+    session: any;
     selectedCategories: string[];
     ftsValue: string;
     showForm: any;
@@ -156,12 +159,24 @@ const Toolbar = ({
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
-                        <Button color="purple" size="xs" onClick={showForm} onKeyPress={showForm}>
-                            <HiRss className="h-4 w-6" />
-                        </Button>
-                        <Button color="purple" size="xs" href="/calendar/form">
-                            <HiPlus className="h-4 w-6" />
-                        </Button>
+                        <Dropdown
+                            label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
+                            arrowIcon={false}
+                            color="purple"
+                            size="xs"
+                        >
+                            <Dropdown.Item onClick={showForm} onKeyPress={showForm}>
+                                Subscriptions
+                            </Dropdown.Item>
+                            {session?.user.roles.includes(Role.contributor) && (
+                                <Dropdown.Item>
+                                    <Link href="/calendar/pendings">View pendings</Link>
+                                </Dropdown.Item>
+                            )}
+                            <Dropdown.Item>
+                                <Link href="/calendar/form">Add new event</Link>
+                            </Dropdown.Item>
+                        </Dropdown>
                     </div>
                 </div>
             </div>
@@ -379,7 +394,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 <BigCalendar
                     components={{
                         event: EventDetailsSimple,
-                        toolbar: (args) => Toolbar({ ...args, selectedCategories, ftsValue, showForm, status }),
+                        toolbar: (args) => Toolbar({ ...args, session, selectedCategories, ftsValue, showForm, status }),
                     }}
                     defaultDate={currentDate}
                     defaultView="month"
