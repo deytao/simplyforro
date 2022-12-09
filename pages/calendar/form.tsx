@@ -1,4 +1,4 @@
-import { Button, Spinner } from "flowbite-react";
+import { Button, Checkbox, Label, Select, Spinner, TextInput, Toast } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -18,6 +18,14 @@ import { eventSchema } from "schemas/event";
 interface Props {
     event: Event;
 }
+
+const categories = {
+    party: "Event where a DJ and/or a band is playing the music",
+    pratica: "Event where participants are handling the music and practicing steps",
+    class: "Regular event where a teacher is showing new steps or concepts",
+    workshop: "Ponctual event where a guest teacher is handling the class",
+    festival: "Event generally happening over few days with workshops and parties",
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await unstable_getServerSession(context.req, context.res, authOptions);
@@ -49,8 +57,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     };
 };
-
-const commonClassnames = "flex-1 block";
 
 const CalendarForm: NextPage<Props> = ({ event }) => {
     const formOptions = {
@@ -164,316 +170,160 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
 
             <div className="relative md:grid md:grid-cols-4 md:gap-4">
                 <div className="md:col-span-2">
-                    <form onSubmit={handleSubmit(submitForm)} method="POST">
+                    <form onSubmit={handleSubmit(submitForm)} method="POST" className="flex flex-col gap-2">
                         <input type="hidden" {...register("id")} id="event-id" />
-                        <div className="shadow sm:rounded-md sm:overflow-hidden">
-                            <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-                                <div className="grid grid-cols-4 gap-4">
-                                    <div className="col-span-4 md:col-span-2">
-                                        <label
-                                            htmlFor="event-title"
-                                            className="block text-sm font-medium text-gray-700"
-                                        >
-                                            Title
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                type="text"
-                                                {...register("title")}
-                                                id="event-title"
-                                                className={`${commonClassnames} ${
-                                                    errors.title ? "border-red-500" : ""
-                                                }`}
-                                                placeholder={`${placeholderEvent.title}`}
-                                            />
-                                        </div>
-                                        <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
-                                    </div>
+                        <div>
+                            <Label htmlFor="event-title" value="Title" />
+                            <TextInput
+                                {...register("title")}
+                                id="event-title"
+                                className={`${errors.name ? "border-red-500" : ""}`}
+                                placeholder={`${placeholderEvent.title}`}
+                            />
+                            <p className="text-red-500 text-xs italic">{errors.title?.message}</p>
+                        </div>
 
-                                    <div className="col-span-4">
-                                        <label htmlFor="event-url" className="block text-sm font-medium text-gray-700">
-                                            {" "}
-                                            Tickets / Infos{" "}
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                type="text"
-                                                {...register("url")}
-                                                id="event-url"
-                                                className={`${commonClassnames} ${errors.url ? "border-red-500" : ""}`}
-                                                placeholder={`${placeholderEvent.url}`}
-                                            />
-                                        </div>
-                                        <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
-                                    </div>
+                        <div>
+                            <Label htmlFor="event-url" value="Tickets / Infos" />
+                            <TextInput
+                                {...register("url")}
+                                id="event-url"
+                                className={`${errors.url ? "border-red-500" : ""}`}
+                                placeholder={`${placeholderEvent.url}`}
+                            />
+                            <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
+                        </div>
 
-                                    <div className="col-span-2 md:col-span-1">
-                                        <label
-                                            htmlFor="event-start-date"
-                                            className="block text-sm font-medium text-gray-700"
-                                        >
-                                            From
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                type="date"
-                                                {...register("start_at")}
-                                                id="event-start-date"
-                                                className={`${commonClassnames} ${
-                                                    errors.start_at ? "border-red-500" : ""
-                                                }`}
-                                                placeholder={`${placeholderEvent.start_at}`}
-                                            />
-                                        </div>
-                                        <p className="text-red-500 text-xs italic">{errors.start_at?.message}</p>
-                                    </div>
-
-                                    <div className="col-span-2 md:col-span-1">
-                                        <label
-                                            htmlFor="event-end-date"
-                                            className="block text-sm font-medium text-gray-700"
-                                        >
-                                            To
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <input
-                                                type="date"
-                                                {...register("end_at")}
-                                                id="event-end-date"
-                                                className={`${commonClassnames} ${
-                                                    errors.end_at ? "border-red-500" : ""
-                                                }`}
-                                                placeholder={`${placeholderEvent.end_at}`}
-                                            />
-                                        </div>
-                                        <p className="text-red-500 text-xs italic">{errors.end_at?.message}</p>
-                                    </div>
-
-                                    <div className="col-span-4 md:col-span-2">
-                                        <label
-                                            htmlFor="event-frequency"
-                                            className="block text-sm font-medium text-gray-700"
-                                        >
-                                            Frequency
-                                        </label>
-                                        <div className="mt-1 flex rounded-md shadow-sm">
-                                            <select
-                                                {...register("frequency")}
-                                                id="event-frequency"
-                                                className={`${commonClassnames}`}
-                                            >
-                                                <option value="" />
-                                                <option value="daily">Daily</option>
-                                                <option value="weekly">Weekly</option>
-                                                <option value="biweekly">Biweekly</option>
-                                                <option value="monthly">Monthly</option>
-                                            </select>
-                                        </div>
-                                        <p className="text-red-500 text-xs italic">{errors.frequency?.message}</p>
-                                    </div>
-
-                                    <div className="col-span-4 grid grid-cols-2 gap-4">
-                                        <div className="col-span-1">
-                                            <label
-                                                htmlFor="event-city"
-                                                className="block text-sm font-medium text-gray-700"
-                                            >
-                                                City
-                                            </label>
-                                            <div className="mt-1 flex rounded-md shadow-sm">
-                                                <input
-                                                    type="text"
-                                                    {...register("city")}
-                                                    id="event-city"
-                                                    className={`${commonClassnames} ${
-                                                        errors.city ? "border-red-500" : ""
-                                                    }`}
-                                                    placeholder={`${placeholderEvent.city}`}
-                                                />
-                                            </div>
-                                            <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
-                                        </div>
-
-                                        <div className="col-span-1">
-                                            <label
-                                                htmlFor="event-country"
-                                                className="block text-sm font-medium text-gray-700"
-                                            >
-                                                Country
-                                            </label>
-                                            <div className="mt-1 flex rounded-md shadow-sm">
-                                                <input
-                                                    type="text"
-                                                    {...register("country")}
-                                                    id="event-country"
-                                                    className={`${commonClassnames} ${
-                                                        errors.country ? "border-red-500" : ""
-                                                    }`}
-                                                    placeholder={`${placeholderEvent.country}`}
-                                                />
-                                            </div>
-                                            <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <fieldset>
-                                    <legend className="text-base font-medium text-gray-900">Category</legend>
-                                    <p className="text-red-500 text-xs italic">{errors.categories?.message}</p>
-                                    <div className="mt-4 space-y-4">
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id="categories-party"
-                                                    {...register("categories")}
-                                                    value="party"
-                                                    className={errors.categories ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label htmlFor="categories-party" className="font-medium text-gray-700">
-                                                    Party
-                                                    <p className="text-gray-500 font-normal">
-                                                        Event where a DJ and/or a band is playing the music
-                                                    </p>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id="categories-pratica"
-                                                    {...register("categories")}
-                                                    value="pratica"
-                                                    className={errors.categories ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor="categories-pratica"
-                                                    className="font-medium text-gray-700"
-                                                >
-                                                    Pratica
-                                                    <p className="text-gray-500 font-normal">
-                                                        Event where participants are handling the music and practicing
-                                                        steps
-                                                    </p>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id="categories-class"
-                                                    {...register("categories")}
-                                                    value="class"
-                                                    className={errors.categories ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label htmlFor="categories-class" className="font-medium text-gray-700">
-                                                    Class
-                                                    <p className="text-gray-500 font-normal">
-                                                        Regular event where a teacher is showing new steps or concepts
-                                                    </p>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id="categories-workshop"
-                                                    {...register("categories")}
-                                                    value="workshop"
-                                                    className={errors.categories ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor="categories-workshop"
-                                                    className="font-medium text-gray-700"
-                                                >
-                                                    Workshop
-                                                    <p className="text-gray-500 font-normal">
-                                                        Ponctual event where a guest teacher is handling the class
-                                                    </p>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start">
-                                            <div className="flex items-center h-5">
-                                                <input
-                                                    type="checkbox"
-                                                    id="categories-festival"
-                                                    {...register("categories")}
-                                                    value="festival"
-                                                    className={errors.categories ? "border-red-500" : ""}
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label
-                                                    htmlFor="categories-festival"
-                                                    className="font-medium text-gray-700"
-                                                >
-                                                    Festival
-                                                    <p className="text-gray-500 font-normal">
-                                                        Event generally happening over few days with workshops and
-                                                        parties
-                                                    </p>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-1">
+                                <Label htmlFor="event-start-date" value="From" />
+                                <TextInput
+                                    {...register("start_at")}
+                                    id="event-start-date"
+                                    type="date"
+                                    className={`${errors.start_at ? "border-red-500" : ""}`}
+                                    placeholder={`${placeholderEvent.start_at}`}
+                                />
+                                <p className="text-red-500 text-xs italic">{errors.start_at?.message}</p>
                             </div>
 
-                            <div className="px-4 py-3 bg-gray-50 text-right sm:px-6 flex gap-2">
-                                <Button
-                                    color="light"
-                                    size="sm"
-                                    onClick={togglePreview}
-                                    onKeyPress={togglePreview}
-                                    className="md:hidden"
-                                    data-preview-panel="event-preview"
-                                >
-                                    Preview
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    color="purple"
-                                    size="sm"
-                                    className={`${isSubmitting && "cursor-not-allowed"}`}
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting && (
-                                        <div className="mr-3">
-                                            <Spinner size="sm" light={true} />
-                                        </div>
-                                    )}
-                                    {isSubmitting ? "Processing" : "Send"}
-                                </Button>
+                            <div className="col-span-1">
+                                <Label htmlFor="event-end-date" value="To" />
+                                <TextInput
+                                    {...register("end_at")}
+                                    id="event-end-date"
+                                    type="date"
+                                    className={`${errors.end_at ? "border-red-500" : ""}`}
+                                    placeholder={`${placeholderEvent.end_at}`}
+                                />
+                                <p className="text-red-500 text-xs italic">{errors.end_at?.message}</p>
                             </div>
+                        </div>
+
+                        <div>
+                            <Label htmlFor="event-frequency" value="Frequency" />
+                            <Select {...register("frequency")} id="event-frequency">
+                                <option value="" />
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Biweekly</option>
+                                <option value="monthly">Monthly</option>
+                            </Select>
+                            <p className="text-red-500 text-xs italic">{errors.frequency?.message}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-1">
+                                <Label htmlFor="event-city" value="City" />
+                                <TextInput
+                                    {...register("city")}
+                                    id="event-city"
+                                    className={`${errors.end_at ? "border-red-500" : ""}`}
+                                    placeholder={`${placeholderEvent.city}`}
+                                />
+                                <p className="text-red-500 text-xs italic">{errors.city?.message}</p>
+                            </div>
+
+                            <div className="col-span-1">
+                                <Label htmlFor="event-country" value="Country" />
+                                <TextInput
+                                    {...register("country")}
+                                    id="event-country"
+                                    className={`${errors.end_at ? "border-red-500" : ""}`}
+                                    placeholder={`${placeholderEvent.country}`}
+                                />
+                                <p className="text-red-500 text-xs italic">{errors.country?.message}</p>
+                            </div>
+                        </div>
+
+                        <fieldset id="categories">
+                            <legend className="text-base font-medium text-gray-900 dark:text-gray-300">Category</legend>
+                            <p className="text-red-500 text-xs italic">{errors.categories?.message}</p>
+                            <div className="flex flex-col gap-2 mt-2">
+                                {Object.entries(categories).map(([name, description], idx: number) => (
+                                    <div key={idx} className="flex items-center gap-2">
+                                        <Checkbox
+                                            id={`categories-${name}`}
+                                            {...register(name)}
+                                            value={name}
+                                            className={errors.categories ? "border-red-500" : ""}
+                                        />
+                                        <div className="flex flex-col">
+                                            <Label htmlFor={`categories-${name}`} className="capitalize">
+                                                {name}
+                                                <p className="text-xs font-normal text-gray-500 dark:text-gray-300 normal-case">
+                                                    {description}
+                                                </p>
+                                            </Label>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </fieldset>
+
+                        <div className="flex justify-end gap-2 my-5">
+                            <Button
+                                color="light"
+                                size="sm"
+                                onClick={togglePreview}
+                                onKeyPress={togglePreview}
+                                className="basis-1/2 md:hidden"
+                                data-preview-panel="event-preview"
+                            >
+                                Preview
+                            </Button>
+                            <Button
+                                type="submit"
+                                color="purple"
+                                size="sm"
+                                className={`grow ${isSubmitting && "cursor-not-allowed"}`}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting && (
+                                    <div className="mr-3">
+                                        <Spinner size="sm" light={true} />
+                                    </div>
+                                )}
+                                {isSubmitting ? "Processing" : "Send"}
+                            </Button>
                         </div>
                     </form>
                 </div>
+
                 <div className="hidden relative shadow p-2 md:block md:col-span-2">
                     <EventPreview eventData={previewState} />
                 </div>
 
                 <div
                     data-event-preview={true}
-                    className="hidden fixed inset-0 bg-black/20"
+                    className="hidden fixed inset-0 bg-black/20 z-20"
                     aria-hidden="true"
                     onClick={togglePreview}
                     onKeyPress={togglePreview}
                 />
                 <div
                     data-event-preview={true}
-                    className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white p-1 rounded-l-md shadow-xl z-20"
+                    className="hidden w-11/12 h-screen fixed bottom-0 right-0 bg-white dark:bg-gray-800 p-1 rounded-l-md shadow-xl z-20"
                 >
                     <HiOutlineXMark
                         className="h-8 w-8 absolute top-16 right-0 inline cursor-pointer"
