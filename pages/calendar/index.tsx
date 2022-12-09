@@ -12,7 +12,14 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
-import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiOutlineEllipsisHorizontal, HiPlus, HiRss } from "react-icons/hi2";
+import {
+    HiArrowTopRightOnSquare,
+    HiChevronLeft,
+    HiChevronRight,
+    HiOutlineEllipsisHorizontal,
+    HiPlus,
+    HiRss,
+} from "react-icons/hi2";
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
@@ -174,7 +181,7 @@ const Toolbar = ({
                                 </Dropdown.Item>
                             )}
                             <Dropdown.Item>
-                                <Link href="/calendar/form">Add new event</Link>
+                                <Link href="/calendar/form">Add event</Link>
                             </Dropdown.Item>
                         </Dropdown>
                     </div>
@@ -394,7 +401,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 <BigCalendar
                     components={{
                         event: EventDetailsSimple,
-                        toolbar: (args) => Toolbar({ ...args, session, selectedCategories, ftsValue, showForm, status }),
+                        toolbar: (args) =>
+                            Toolbar({ ...args, session, selectedCategories, ftsValue, showForm, status }),
                     }}
                     defaultDate={currentDate}
                     defaultView="month"

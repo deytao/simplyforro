@@ -135,7 +135,7 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
             <h1 className="text-xl md:text-6xl font-bold py-4">My</h1>
 
             <div className="w-full pr-2 pl-2">
-                <h2 className="text-lg md:text-4xl font-bold justify-self-start">Identity</h2>
+                <h2 className="text-lg md:text-4xl font-bold justify-self-start my-3">Identity</h2>
                 <form
                     method="POST"
                     onSubmit={handleUserSubmit(submitForm)}
@@ -183,14 +183,14 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                             </div>
                         </fieldset>
                     )}
-                    <Button type="submit" color="purple">
+                    <Button type="submit" color="purple" className="my-5">
                         Save
                     </Button>
                 </form>
             </div>
 
-            <div className="w-full pr-2 pl-2 mt-5">
-                <h2 className="text-lg md:text-4xl font-bold justify-self-start">Subscriptions</h2>
+            <div className="w-full pr-2 pl-2">
+                <h2 className="text-lg md:text-4xl font-bold justify-self-start mb-3">Subscriptions</h2>
                 <form
                     method="POST"
                     onSubmit={handleSubscriptionsSubmit(submitForm)}
@@ -211,14 +211,12 @@ const My: NextPage<Props> = ({ subscriptions, user }) => {
                                         className={subscriptionsErrors.subscriptions ? "border-red-500" : ""}
                                     />
                                     <div className="flex flex-col">
-                                        <Label
-                                            htmlFor={`subscriptions-${subscription.slug}`}
-                                            className="capitalize"
-                                            value={subscription.title}
-                                        />
-                                        <p className="text-xs font-normal text-gray-500 dark:text-gray-300">
-                                            {subscription.description}
-                                        </p>
+                                        <Label htmlFor={`subscriptions-${subscription.slug}`} className="capitalize">
+                                            {subscription.title}
+                                            <p className="text-xs font-normal text-gray-500 dark:text-gray-300 normal-case">
+                                                {subscription.description}
+                                            </p>
+                                        </Label>
                                     </div>
                                 </div>
                             ))}

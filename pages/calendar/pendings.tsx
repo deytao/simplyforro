@@ -116,7 +116,11 @@ const Pendings: NextPage<Props> = ({ events }) => {
                         </h5>
                         <div className="flex font-normal text-gray-700 dark:text-gray-400">
                             <div>{event.start_at}</div>
-                            {event.end_at && <div><HiArrowRight className="h-3 w-3 -mt-1 inline" /></div>}
+                            {event.end_at && (
+                                <div>
+                                    <HiArrowRight className="h-3 w-3 -mt-1 inline" />
+                                </div>
+                            )}
                             <div>{event.end_at}</div>
                         </div>
                         <p className="font-normal text-gray-700 dark:text-gray-400">{event.location}</p>
