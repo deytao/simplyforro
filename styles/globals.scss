@@ -22,23 +22,23 @@
 }
 
 .event-tag-party {
-    @apply text-red-900 bg-red-100;
+    @apply text-red-900 bg-red-100 dark:text-red-900 dark:bg-red-100;
 }
 
 .event-tag-pratica {
-    @apply text-blue-900 bg-blue-100;
+    @apply text-blue-900 bg-blue-100 dark:text-blue-900 dark:bg-blue-100;
 }
 
 .event-tag-class {
-    @apply text-purple-900 bg-purple-100;
+    @apply text-purple-900 bg-purple-100 dark:text-purple-900 dark:bg-purple-100;
 }
 
 .event-tag-workshop {
-    @apply text-orange-900 bg-orange-100;
+    @apply text-orange-900 bg-orange-100 dark:text-orange-900 dark:bg-orange-100;
 }
 
 .event-tag-festival {
-    @apply text-green-900 bg-green-100;
+    @apply text-green-900 bg-green-100 dark:text-green-900 dark:bg-green-100;
 }
 
 .btn {
@@ -71,12 +71,48 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
 
 .rbc-today {
     @extend .rbc-today;
-    @apply bg-violet-300;
+    @apply bg-purple-700;
+    @apply dark:bg-purple-600;
+}
+
+.rbc-now {
+    @extend .rbc-now;
+    @apply text-white;
+}
+
+.rbc-off-range-bg {
+    @extend .rbc-off-range-bg;
+    @apply bg-gray-300;
+    @apply dark:bg-stone-700;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+    @apply border-gray-200;
+    @apply dark:border-gray-600;
+}
+
+.rbc-month-view {
+    @extend .rbc-month-view;
+    @apply border-gray-200;
+    @apply dark:border-gray-600;
 }
 
 .rbc-month-header {
     @extend .rbc-month-header;
-    @apply sticky top-[243px] md:top-[245px] lg:top-[206px] z-40 bg-white;
+    @apply sticky top-[250px] md:top-[250px] lg:top-[210px] z-30;
+    @apply bg-white;
+    @apply dark:bg-gray-700;
+}
+
+.rbc-header {
+    @extend .rbc-header;
+    @apply border-b-gray-200;
+    @apply dark:border-b-gray-600;
+
+    & + & {
+        @apply border-l-gray-200;
+        @apply dark:border-l-gray-600;
+    }
 }
 
 .rbc-month-row {
@@ -86,18 +122,20 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
     min-height: 130px;
     height: max-content;
 
-    &:nth-child(odd) {
-        @apply bg-slate-100;
-    }
+    @apply odd:bg-white even:bg-gray-50;
+    @apply odd:dark:bg-gray-800 even:dark:bg-gray-700;
 
-    &:nth-child(even) {
-        @apply bg-slate-50;
+    & + & {
+        @apply border-t-gray-200;
+        @apply dark:border-t-gray-600;
     }
 }
 
 .rbc-event {
     @extend .rbc-event;
-    @apply cursor-default border border-gray-200 border-solid mb-1 shadow;
+    @apply cursor-default border border-solid mb-1 shadow;
+    @apply bg-white border-gray-200;
+    @apply dark:bg-gray-700 dark:border-gray-600;
 
     &.rbc-selected {
       background: $event-bg !important;

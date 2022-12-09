@@ -1,3 +1,4 @@
+import { Badge } from "flowbite-react";
 import moment from "moment";
 import { useState } from "react";
 
@@ -11,11 +12,13 @@ export const EventDetailsSimple = ({ event, className = "", style = {} }) => (
         <div className="text-sm">
             {event.city}, {event.country}
         </div>
-        {event.categories?.map((category, idx) => (
-            <span key={`${idx}`} className={`event-tag event-tag-${category}`}>
-                {category}
-            </span>
-        ))}
+        <div className="flex gap-1">
+            {event.categories?.map((category, idx) => (
+                <Badge key={`${idx}`} color={category}>
+                    {category}
+                </Badge>
+            ))}
+        </div>
     </div>
 );
 

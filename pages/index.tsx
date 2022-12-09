@@ -1,3 +1,4 @@
+import { Card } from "flowbite-react";
 import moment from "moment";
 import type { NextPage } from "next";
 import Link from "next/link";
@@ -12,7 +13,7 @@ interface Props {
 
 export const getStaticProps = async () => {
     const lbound = moment(new Date());
-    const ubound = moment(new Date()).add(7, "days").endOf("week");
+    const ubound = moment(new Date()).add(7, "days");
     const events = await GetEvents(lbound, ubound, ["party"]);
 
     return {
@@ -21,8 +22,8 @@ export const getStaticProps = async () => {
                 title: event.title,
                 url: event.url,
                 location: `${event.city}, ${event.country}`,
-                start_at: moment(event.start_at).format("YYYY-MM-DD"),
-                end_at: event.end_at ? moment(event.end_at).format("YYYY-MM-DD") : null,
+                start_at: moment(event.start_at).format("DD/MM"),
+                end_at: event.end_at ? moment(event.end_at).format("DD/MM") : null,
             })),
         },
         // Next.js will attempt to re-generate the page:
@@ -34,43 +35,37 @@ export const getStaticProps = async () => {
 
 const Home: NextPage<Props> = ({ events }) => {
     return (
-        <div className="mt-6 grid grid-cols-2 gap-4 max-w-4xl sm:w-full">
-            <div className="rounded-xl border p-6 text-left">
-                <h3 className="text-2xl font-bold">Next week events</h3>
-                <div className="overflow-y-auto h-60 rounded p-2 border bg-gray-100">
-                    {events.map((event: any, idx: number) => (
-                        <div key={idx} className="p-2 rounded hover:bg-gray-200 focus:bg-gray-200">
-                            <a
-                                href={event.url}
-                                className="hover:text-blue-600 focus:text-blue-600"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {event.title}
-                            </a>
-                            <br />
-                            {event.start_at}
-                            <HiArrowRight className="h-6 w-6 -mt-1 inline" />
-                            {event.end_at}
-                            <br />
-                            {event.location}
-                            <br />
-                        </div>
-                    ))}
-                </div>
-                <Link href="/calendar" className="mt-4 text-xl hover:text-blue-600 focus:text-blue-600">
+        <Card className="mt-1">
+            <div className="mb-4 flex items-center justify-between">
+                <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">Next week events</h5>
+                <Link href="/calendar" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
                     See all
                 </Link>
             </div>
-
-            <Link
-                href="/calendar/form"
-                className="rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-            >
-                <h3 className="text-2xl font-bold">Add events</h3>
-                <p className="mt-4 text-xl">Help us inform the community about the next dances.</p>
-            </Link>
-        </div>
+            <div className="flow-root overflow-y-auto h-60">
+                <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {events.map((event: any, idx: number) => (
+                        <li key={idx} className="py-3 sm:py-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                        {event.title}
+                                    </p>
+                                    <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                                        {event.location}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1 text-sm font-semibold text-gray-900 dark:text-white">
+                                    <div>{event.start_at}</div>
+                                    <div>{event.end_at && <HiArrowRight className="h-3 w-3" />}</div>
+                                    <div>{event.end_at}</div>
+                                </div>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </Card>
     );
 };
 

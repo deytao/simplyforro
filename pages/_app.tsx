@@ -10,10 +10,22 @@ export default function SimplyForro({ Component, pageProps }: AppProps) {
         <Flowbite
             theme={{
                 theme: {
+                    badge: {
+                        color: {
+                            party: "event-tag-party",
+                            pratica: "event-tag-pratica",
+                            class: "event-tag-class",
+                            workshop: "event-tag-workshop",
+                            festival: "event-tag-festival",
+                        },
+                    },
                     dropdown: {
                         floating: {
                             hidden: "hidden",
                         },
+                    },
+                    footer: {
+                        base: "w-full bg-white shadow flex justify-between dark:bg-gray-800",
                     },
                 },
             }}

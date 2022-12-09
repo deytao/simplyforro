@@ -1,5 +1,6 @@
-import { Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
+import { Badge, Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
+import Link from "next/link";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { unstable_getServerSession } from "next-auth/next";
@@ -11,7 +12,14 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
-import { HiArrowTopRightOnSquare, HiChevronLeft, HiChevronRight, HiPlus, HiRss } from "react-icons/hi2";
+import {
+    HiArrowTopRightOnSquare,
+    HiChevronLeft,
+    HiChevronRight,
+    HiOutlineEllipsisHorizontal,
+    HiPlus,
+    HiRss,
+} from "react-icons/hi2";
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
@@ -53,6 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Toolbar = ({
     label,
     onNavigate,
+    session,
     selectedCategories,
     ftsValue,
     showForm,
@@ -60,6 +69,7 @@ const Toolbar = ({
 }: {
     label: string;
     onNavigate: any;
+    session: any;
     selectedCategories: string[];
     ftsValue: string;
     showForm: any;
@@ -78,7 +88,7 @@ const Toolbar = ({
     };
     return (
         <>
-            <div className="sticky top-[68px] md:top-[82px] lg:top-[86px] z-40 bg-white">
+            <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
                 <div className="flex items-center">
                     <Button
                         color=""
@@ -148,23 +158,32 @@ const Toolbar = ({
                                         checked={selectedCategories.includes(category)}
                                         data-filters-categories={true}
                                     />
-                                    <Label
-                                        htmlFor={`categories-${category}`}
-                                        className={`event-tag-${category} px-2 rounded capitalize text-sm md:text-base`}
-                                    >
-                                        {category}
+                                    <Label htmlFor={`categories-${category}`} className="capitalize">
+                                        <Badge color={category}>{category}</Badge>
                                     </Label>
                                 </div>
                             ))}
                         </div>
                     </div>
                     <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
-                        <Button color="purple" size="xs" onClick={showForm} onKeyPress={showForm}>
-                            <HiRss className="h-4 w-6" />
-                        </Button>
-                        <Button color="purple" size="xs" href="/calendar/form">
-                            <HiPlus className="h-4 w-6" />
-                        </Button>
+                        <Dropdown
+                            label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
+                            arrowIcon={false}
+                            color="purple"
+                            size="xs"
+                        >
+                            <Dropdown.Item onClick={showForm} onKeyPress={showForm}>
+                                Subscriptions
+                            </Dropdown.Item>
+                            {session?.user.roles.includes(Role.contributor) && (
+                                <Dropdown.Item>
+                                    <Link href="/calendar/pendings">View pendings</Link>
+                                </Dropdown.Item>
+                            )}
+                            <Dropdown.Item>
+                                <Link href="/calendar/form">Add event</Link>
+                            </Dropdown.Item>
+                        </Dropdown>
                     </div>
                 </div>
             </div>
@@ -271,7 +290,9 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         )}
                         <div className="col-span-2">
                             <fieldset className="mt-2">
-                                <legend className="text-base font-medium text-gray-900">Subscriptions</legend>
+                                <legend className="text-base font-medium text-gray-900 dark:text-white">
+                                    Subscriptions
+                                </legend>
                                 <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
                                 <div className="mt-2 space-y-4">
                                     {subscriptions.map((subscription: Subscription) => (
@@ -380,7 +401,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                 <BigCalendar
                     components={{
                         event: EventDetailsSimple,
-                        toolbar: (args) => Toolbar({ ...args, selectedCategories, ftsValue, showForm, status }),
+                        toolbar: (args) =>
+                            Toolbar({ ...args, session, selectedCategories, ftsValue, showForm, status }),
                     }}
                     defaultDate={currentDate}
                     defaultView="month"
@@ -414,17 +436,17 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             status: "neutral",
                             title: event.title,
                             message: (
-                                <>
+                                <div className="text-black dark:text-white">
                                     {moment(event.start_at).format("dddd Do MMMM YYYY")}
                                     <br />
                                     {event.city}, {event.country}
-                                    <br />
-                                    {event.categories?.map((category, idx) => (
-                                        <span key={`${idx}`} className={`event-tag event-tag-${category}`}>
-                                            {category}
-                                        </span>
-                                    ))}
-                                    <br />
+                                    <div className="flex gap-1">
+                                        {event.categories?.map((category, idx) => (
+                                            <Badge key={`${idx}`} color={category}>
+                                                {category}
+                                            </Badge>
+                                        ))}
+                                    </div>
                                     {event.url && (
                                         <a
                                             href={event.url}
@@ -435,7 +457,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                             More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
                                         </a>
                                     )}
-                                </>
+                                </div>
                             ),
                         };
                         if (session?.user.roles.includes(Role.contributor)) {

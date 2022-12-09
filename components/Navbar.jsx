@@ -1,4 +1,4 @@
-import { Dropdown } from "flowbite-react";
+import { DarkThemeToggle, Dropdown } from "flowbite-react";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { HiCalendar, HiOutlineUserCircle } from "react-icons/hi2";
@@ -19,6 +19,7 @@ export function Navbar() {
                 </Link>
             </div>
             <div className="flex">
+                <DarkThemeToggle />
                 <Link className="px-3 py-2 text-violet-200 hover:text-white" href="/calendar">
                     <HiCalendar className="h-5 w-5" />
                 </Link>
@@ -34,8 +35,8 @@ export function Navbar() {
                                     <span className="block text-sm">Signed in as</span>
                                     <span className="block truncate text-sm font-medium">{session.user.name}</span>
                                 </Dropdown.Header>
-                                <Dropdown.Item onClick={() => document.location.assign("/my")}>
-                                    My Profile
+                                <Dropdown.Item>
+                                    <Link href="/my">My Profile</Link>
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => signOut()} onKeyPress={() => signOut()}>

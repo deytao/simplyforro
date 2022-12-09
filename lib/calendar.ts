@@ -97,6 +97,7 @@ export async function GetEvents(
             )`
                     : Prisma.empty
             }
+            ORDER BY start_at, end_at NULLS LAST, city, country
         `;
         return events;
     } catch (e) {
