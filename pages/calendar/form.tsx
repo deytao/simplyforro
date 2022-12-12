@@ -264,7 +264,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                     <div key={idx} className="flex items-center gap-2">
                                         <Checkbox
                                             id={`categories-${name}`}
-                                            {...register(name)}
+                                            {...register("categories")}
                                             value={name}
                                             className={errors.categories ? "border-red-500" : ""}
                                         />
