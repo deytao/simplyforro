@@ -436,27 +436,32 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             status: "neutral",
                             title: event.title,
                             message: (
-                                <div className="text-black dark:text-white">
-                                    {moment(event.start_at).format("dddd Do MMMM YYYY")}
-                                    <br />
-                                    {event.city}, {event.country}
-                                    <div className="flex gap-1">
-                                        {event.categories?.map((category, idx) => (
-                                            <Badge key={`${idx}`} color={category}>
-                                                {category}
-                                            </Badge>
-                                        ))}
+                                <div className="flex justify-around gap-2">
+                                    <div>
+                                        {event.image_data_url && <img src={event.image_data_url} alt={event.title} />}
                                     </div>
-                                    {event.url && (
-                                        <a
-                                            href={event.url}
-                                            className="text-blue-400 hover:text-blue-500"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
-                                        </a>
-                                    )}
+                                    <div className="text-black dark:text-white">
+                                        {moment(event.start_at).format("dddd Do MMMM YYYY")}
+                                        <br />
+                                        {event.city}, {event.country}
+                                        <div className="flex gap-1">
+                                            {event.categories?.map((category, idx) => (
+                                                <Badge key={`${idx}`} color={category}>
+                                                    {category}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        {event.url && (
+                                            <a
+                                                href={event.url}
+                                                className="text-blue-400 hover:text-blue-500"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             ),
                         };
