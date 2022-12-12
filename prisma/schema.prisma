@@ -49,6 +49,7 @@ model Event {
   frequency         Frequency?
   excluded_on       DateTime[]       @db.Date
   url               String?
+  imageDataURL      String?          @map("image_data_url")
   city              String           @db.VarChar(255)
   country           String           @db.VarChar(255)
   categories        Category[]

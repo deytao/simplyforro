@@ -1,4 +1,4 @@
-import { Button, Checkbox, Label, Select, Spinner, TextInput, Toast } from "flowbite-react";
+import { Button, Checkbox, FileInput, Label, Select, Spinner, TextInput, Toast } from "flowbite-react";
 import moment from "moment";
 import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -46,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                       id: event.id,
                       title: event.title,
                       url: event.url,
+                      imageDataURL: event.imageDataURL,
                       city: event.city,
                       country: event.country,
                       frequency: event.frequency ? event.frequency : "",
@@ -63,13 +64,14 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         resolver: yupResolver(eventSchema),
         defaultValues: event,
     };
-    const { register, handleSubmit, formState, watch } = useForm(formOptions);
+    const { register, handleSubmit, formState, setValue, watch } = useForm(formOptions);
     const { errors } = formState;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [popup, setPopup] = useState<IPopup>({ isOpen: false });
     const placeholderEvent = {
         title: "FENFIT",
         url: "https://www.example.com",
+        imageDataURL: "",
         start_at: "2022-04-23",
         end_at: "",
         frequency: "",
@@ -98,12 +100,21 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         setPreviewState(newEvent);
     });
 
-    async function submitForm(formData: object) {
+    const uploadToClient = (e: any) => {
+        if (e.target.files) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setValue("imageDataURL", reader.result);
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+
+    async function submitForm(event: any) {
         if (isSubmitting) {
             return false;
         }
         setIsSubmitting(true);
-        const event = eventSchema.cast(formData);
         const { id: eventId, ...eventData } = event;
         const endpoint = `/api/events/${eventId}`;
         const JSONdata = JSON.stringify(eventData);
@@ -151,7 +162,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         return false;
     }
 
-    const togglePreview = (el: any) => {
+    const togglePreview = (e: any) => {
         const elements = document.querySelectorAll("[data-event-preview]") as NodeListOf<HTMLElement>;
         elements.forEach((el) => {
             if (el.offsetParent) {
@@ -192,6 +203,18 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                 placeholder={`${placeholderEvent.url}`}
                             />
                             <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
+                        </div>
+
+                        <div>
+                            <input type="hidden" {...register("imageDataURL")} id="event-image-data-url" />
+                            <Label htmlFor="event-image" value="Flyer" />
+                            <FileInput
+                                id="event-image"
+                                color="purple"
+                                className={`${errors.imageDataURL ? "border-red-500" : ""}`}
+                                onChange={uploadToClient}
+                            />
+                            <p className="text-red-500 text-xs italic">{errors.imageDataURL?.message}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -305,7 +328,6 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                 color="purple"
                                 size="sm"
                                 className={`grow ${isSubmitting && "cursor-not-allowed"}`}
-                                disabled={isSubmitting}
                             >
                                 {isSubmitting && (
                                     <div className="mr-3">

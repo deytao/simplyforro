@@ -6,6 +6,14 @@ import { Category, Event, Role, ValidationStatus } from "@prisma/client";
 import { CreateEvent, GetEvents } from "lib/calendar";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: "4mb",
+        },
+    },
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         const session = await unstable_getServerSession(req, res, authOptions);

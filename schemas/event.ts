@@ -45,6 +45,28 @@ export const eventSchema = yup.object({
         .transform((curr, orig) => (orig === false ? null : curr))
         .required("You need to choose at least one category"),
     url: yup.string().url().nullable(),
+    imageDataURL: yup
+        .string()
+        .trim()
+        .matches(/data:([-\w]+\/[-+\w.]+)?(;?\w+=[-\w]+)*(;base64)?,.*/gu, "Image is not valid")
+        .test("is-data-uri", "Image is not valid", (value, context) => {
+            if (!value) {
+                return true;
+            }
+            let data = value.split(",");
+            if (data.length !== 2) {
+                return false;
+            }
+            const attributes = data.shift()!.trim().split(";");
+            const schemeAndMediaType = attributes.shift();
+            if (schemeAndMediaType!.substr(0, 5) !== "data:") {
+                return false;
+            }
+            const mediaType = schemeAndMediaType!.substr(5);
+            if (!mediaType.startsWith("image/")) {
+                return false;
+            }
+            return true;
+        })
+        .nullable(),
 });
-
-export interface EventInter extends yup.InferType<typeof eventSchema> {}
