@@ -12,8 +12,10 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import { IoLocationOutline } from "react-icons/io5";
 import {
     HiArrowTopRightOnSquare,
+    HiCalendar,
     HiChevronLeft,
     HiChevronRight,
     HiOutlineEllipsisHorizontal,
@@ -436,14 +438,27 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             status: "neutral",
                             title: event.title,
                             message: (
-                                <div className="flex justify-around gap-2">
-                                    <div>
-                                        {event.imageDataUrl && <img src={event.imageDataUrl} alt={event.title} />}
-                                    </div>
-                                    <div className="text-black dark:text-white">
-                                        {moment(event.start_at).format("dddd Do MMMM YYYY")}
-                                        <br />
-                                        {event.city}, {event.country}
+                                <div className="flex items-center justify-around gap-2">
+                                    {event.imageDataUrl && (
+                                        <div className="basis-1/2 grid bg-slate-300 dark:bg-gray-600 rounded-lg overflow-hidden">
+                                            <img
+                                                src={event.imageDataUrl}
+                                                alt={event.title}
+                                                className="h-48 justify-self-center object-contain"
+                                            />
+                                        </div>
+                                    )}
+                                    <div className="basis-1/2 grow flex flex-col gap-1 text-sm md:text-base text-black dark:text-white">
+                                        <div className="flex gap-1 items-center">
+                                            <HiCalendar className="h-5 w-5 text-purple-700 dark:text-white" />
+                                            <div>{moment(event.start_at).format("MMM Do, YYYY")}</div>
+                                        </div>
+                                        <div className="flex gap-1 items-center">
+                                            <IoLocationOutline className="h-5 w-5 text-purple-700 dark:text-white" />
+                                            <div>
+                                                {event.city}, {event.country}
+                                            </div>
+                                        </div>
                                         <div className="flex gap-1">
                                             {event.categories?.map((category, idx) => (
                                                 <Badge key={`${idx}`} color={category}>
