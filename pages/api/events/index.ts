@@ -29,6 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
         const lbound = moment(req.query.lbound);
         const ubound = moment(req.query.ubound);
+        if (lbound.isAfter(ubound)) {
+            res.status(400).json({"message": "Invalid dates"});
+            return ;
+        }
+        if (ubound.diff(lbound, "days") > 42) {
+            res.status(400).json({"message": "Too many days"});
+            return ;
+        }
         const categories = req.query.categories as Category[];
         const searchedText = req.query.q as string;
         const events = await GetEvents(lbound, ubound, categories, searchedText);
