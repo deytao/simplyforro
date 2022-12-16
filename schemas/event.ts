@@ -48,10 +48,12 @@ export const eventSchema = yup.object({
     imageDataUrl: yup
         .string()
         .trim()
-        .matches(/data:([-\w]+\/[-+\w.]+)?(;?\w+=[-\w]+)*(;base64)?,.*/gu, "Image is not valid")
         .test("is-data-uri", "Image is not valid", (value, context) => {
             if (!value) {
                 return true;
+            }
+            if (!/data:(image\/[-+\w.]+)?(;?\w+=[-\w]+)*(;base64)?,.*/gu.test(value)) {
+                return false;
             }
             let data = value.split(",");
             if (data.length !== 2) {
@@ -60,10 +62,6 @@ export const eventSchema = yup.object({
             const attributes = data.shift()!.trim().split(";");
             const schemeAndMediaType = attributes.shift();
             if (schemeAndMediaType!.substr(0, 5) !== "data:") {
-                return false;
-            }
-            const mediaType = schemeAndMediaType!.substr(5);
-            if (!mediaType.startsWith("image/")) {
                 return false;
             }
             return true;
