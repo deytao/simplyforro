@@ -4,6 +4,7 @@ import { unstable_getServerSession } from "next-auth/next";
 import { Category, Event, Role } from "@prisma/client";
 
 import { DeleteEvent, UpdateEvent } from "lib/calendar";
+import prisma from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
 const allowedMethods = ["POST", "PATCH", "DELETE"];
