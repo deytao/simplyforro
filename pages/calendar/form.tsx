@@ -201,6 +201,10 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                     {...register("start_at")}
                                     id="event-start-date"
                                     type="date"
+                                    onChange={(e) =>
+                                        ((document.getElementById("event-end-date") as HTMLInputElement)!.min =
+                                            e.currentTarget.value)
+                                    }
                                     className={`${errors.start_at ? "border-red-500" : ""}`}
                                     placeholder={`${placeholderEvent.start_at}`}
                                 />
@@ -213,6 +217,10 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                     {...register("end_at")}
                                     id="event-end-date"
                                     type="date"
+                                    onChange={(e) =>
+                                        ((document.getElementById("event-start-date") as HTMLInputElement)!.max =
+                                            e.currentTarget.value)
+                                    }
                                     className={`${errors.end_at ? "border-red-500" : ""}`}
                                     placeholder={`${placeholderEvent.end_at}`}
                                 />
