@@ -46,8 +46,8 @@ export function Navbar() {
                         )}
                         {!session && (
                             <>
-                                <Dropdown.Item onClick={() => signIn()} onKeyPress={() => signIn()}>
-                                    Signin
+                                <Dropdown.Item>
+                                    <Link href="/auth/signin">Signin</Link>
                                 </Dropdown.Item>
                             </>
                         )}
