@@ -434,7 +434,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         setCurrentDate(newDate);
                     }}
                     onSelectEvent={(event: Event) => {
-                        const defaultImgClasses = ["h-48", "justify-self-center"]
+                        const defaultImgClasses = ["h-48", "justify-self-center"];
                         let state: IModal = {
                             isOpen: true,
                             status: "neutral",
@@ -445,18 +445,25 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         <div
                                             className="relative basis-1/2 hover:cursor-zoom-in grid bg-slate-300 dark:bg-gray-600 rounded-lg overflow-hidden"
                                             onClick={(e) => {
-                                                const zoomImgClasses = ["fixed", "left-0", "top-0", "w-screen", "h-screen", "bg-black", "hover:cursor-zoom-out"]
+                                                const zoomImgClasses = [
+                                                    "fixed",
+                                                    "left-0",
+                                                    "top-0",
+                                                    "w-screen",
+                                                    "h-screen",
+                                                    "bg-black",
+                                                    "hover:cursor-zoom-out",
+                                                ];
                                                 const img = document.getElementById(`event-img-${event.id}`)!;
                                                 const classes = img.classList;
                                                 if (img.dataset.isZoomed === "yes") {
-                                                    classes.remove(...zoomImgClasses)
-                                                    classes.add(...defaultImgClasses)
-                                                    img.dataset.isZoomed = "no"
-                                                }
-                                                else {
-                                                    classes.remove(...defaultImgClasses)
-                                                    classes.add(...zoomImgClasses)
-                                                    img.dataset.isZoomed = "yes"
+                                                    classes.remove(...zoomImgClasses);
+                                                    classes.add(...defaultImgClasses);
+                                                    img.dataset.isZoomed = "no";
+                                                } else {
+                                                    classes.remove(...defaultImgClasses);
+                                                    classes.add(...zoomImgClasses);
+                                                    img.dataset.isZoomed = "yes";
                                                 }
                                             }}
                                         >
