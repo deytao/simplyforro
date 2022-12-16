@@ -438,7 +438,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                             message: (
                                 <div className="flex justify-around gap-2">
                                     <div>
-                                        {event.image_data_url && <img src={event.image_data_url} alt={event.title} />}
+                                        {event.imageDataUrl && <img src={event.imageDataUrl} alt={event.title} />}
                                     </div>
                                     <div className="text-black dark:text-white">
                                         {moment(event.start_at).format("dddd Do MMMM YYYY")}

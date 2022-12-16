@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: event.id,
                 title: event.title,
                 url: event.url,
-                imageDataURL: event.imageDataURL,
+                imageDataUrl: event.imageDataUrl,
                 location: `${event.city}, ${event.country}`,
                 start_at: moment(event.start_at).format("Do MMM YYYY"),
                 end_at: event.end_at ? moment(event.end_at).format("Do MMM YYYY") : null,
@@ -111,7 +111,7 @@ const Pendings: NextPage<Props> = ({ events }) => {
 
             <div className="flex flex-wrap justify-center gap-2">
                 {events.map((event: any, idx: number) => (
-                    <Card key={event.id} imgSrc={event.imageDataURL} data-row-event-id={event.id} className="w-80">
+                    <Card key={event.id} imgSrc={event.imageDataUrl} data-row-event-id={event.id} className="w-80">
                         <h5 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                             <a href={event.url}>{event.title}</a>
                         </h5>

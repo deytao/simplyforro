@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                       id: event.id,
                       title: event.title,
                       url: event.url,
-                      imageDataURL: event.imageDataURL,
+                      imageDataUrl: event.imageDataUrl,
                       city: event.city,
                       country: event.country,
                       frequency: event.frequency ? event.frequency : "",

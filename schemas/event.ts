@@ -45,7 +45,7 @@ export const eventSchema = yup.object({
         .transform((curr, orig) => (orig === false ? null : curr))
         .required("You need to choose at least one category"),
     url: yup.string().url().nullable(),
-    imageDataURL: yup
+    imageDataUrl: yup
         .string()
         .trim()
         .matches(/data:([-\w]+\/[-+\w.]+)?(;?\w+=[-\w]+)*(;base64)?,.*/gu, "Image is not valid")
