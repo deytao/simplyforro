@@ -12,14 +12,17 @@ import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
+import { FiZoomIn } from "react-icons/fi";
 import {
     HiArrowTopRightOnSquare,
+    HiCalendar,
     HiChevronLeft,
     HiChevronRight,
     HiOutlineEllipsisHorizontal,
     HiPlus,
     HiRss,
 } from "react-icons/hi2";
+import { IoLocationOutline } from "react-icons/io5";
 
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
@@ -431,32 +434,78 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                         setCurrentDate(newDate);
                     }}
                     onSelectEvent={(event: Event) => {
+                        const defaultImgClasses = ["h-48", "justify-self-center"];
                         let state: IModal = {
                             isOpen: true,
                             status: "neutral",
                             title: event.title,
                             message: (
-                                <div className="text-black dark:text-white">
-                                    {moment(event.start_at).format("dddd Do MMMM YYYY")}
-                                    <br />
-                                    {event.city}, {event.country}
-                                    <div className="flex gap-1">
-                                        {event.categories?.map((category, idx) => (
-                                            <Badge key={`${idx}`} color={category}>
-                                                {category}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                    {event.url && (
-                                        <a
-                                            href={event.url}
-                                            className="text-blue-400 hover:text-blue-500"
-                                            target="_blank"
-                                            rel="noreferrer"
+                                <div className="flex items-center justify-around gap-2">
+                                    {event.imageDataUrl && (
+                                        <div
+                                            className="relative basis-1/2 hover:cursor-zoom-in grid bg-slate-300 dark:bg-gray-600 rounded-lg overflow-hidden"
+                                            onClick={(e) => {
+                                                const zoomImgClasses = [
+                                                    "fixed",
+                                                    "left-0",
+                                                    "top-0",
+                                                    "w-screen",
+                                                    "h-screen",
+                                                    "bg-black",
+                                                    "hover:cursor-zoom-out",
+                                                ];
+                                                const img = document.getElementById(`event-img-${event.id}`)!;
+                                                const classes = img.classList;
+                                                if (img.dataset.isZoomed === "yes") {
+                                                    classes.remove(...zoomImgClasses);
+                                                    classes.add(...defaultImgClasses);
+                                                    img.dataset.isZoomed = "no";
+                                                } else {
+                                                    classes.remove(...defaultImgClasses);
+                                                    classes.add(...zoomImgClasses);
+                                                    img.dataset.isZoomed = "yes";
+                                                }
+                                            }}
                                         >
-                                            More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
-                                        </a>
+                                            <img
+                                                id={`event-img-${event.id}`}
+                                                src={event.imageDataUrl}
+                                                alt={event.title}
+                                                className={`object-contain ${defaultImgClasses.join(" ")}`}
+                                                data-is-zoomed="no"
+                                            />
+                                            <FiZoomIn className="h-7 w-7 text-white opacity-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                                        </div>
                                     )}
+                                    <div className="basis-1/2 grow flex flex-col gap-1 text-sm md:text-base text-black dark:text-white">
+                                        <div className="flex gap-1 items-center">
+                                            <HiCalendar className="h-5 w-5 text-purple-700 dark:text-white" />
+                                            <div>{moment(event.start_at).format("MMM Do, YYYY")}</div>
+                                        </div>
+                                        <div className="flex gap-1 items-center">
+                                            <IoLocationOutline className="h-5 w-5 text-purple-700 dark:text-white" />
+                                            <div>
+                                                {event.city}, {event.country}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            {event.categories?.map((category, idx) => (
+                                                <Badge key={`${idx}`} color={category}>
+                                                    {category}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                        {event.url && (
+                                            <a
+                                                href={event.url}
+                                                className="text-blue-400 hover:text-blue-500"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                More <HiArrowTopRightOnSquare className="h-3 w-3 inline" />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             ),
                         };

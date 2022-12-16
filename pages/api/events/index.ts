@@ -6,6 +6,14 @@ import { Category, Event, Role, ValidationStatus } from "@prisma/client";
 import { CreateEvent, GetEvents } from "lib/calendar";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: "4mb",
+        },
+    },
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         const session = await unstable_getServerSession(req, res, authOptions);
@@ -30,12 +38,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const lbound = moment(req.query.lbound);
         const ubound = moment(req.query.ubound);
         if (lbound.isAfter(ubound)) {
-            res.status(400).json({"message": "Invalid dates"});
-            return ;
+            res.status(400).json({ message: "Invalid dates" });
+            return;
         }
         if (ubound.diff(lbound, "days") > 42) {
-            res.status(400).json({"message": "Too many days"});
-            return ;
+            res.status(400).json({ message: "Too many days" });
+            return;
         }
         const categories = req.query.categories as Category[];
         const searchedText = req.query.q as string;

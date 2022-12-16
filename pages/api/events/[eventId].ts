@@ -8,6 +8,14 @@ import { authOptions } from "pages/api/auth/[...nextauth]";
 
 const allowedMethods = ["POST", "PATCH", "DELETE"];
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: "4mb",
+        },
+    },
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await unstable_getServerSession(req, res, authOptions);
     if (!session?.user.roles.includes(Role.contributor)) {

@@ -72,6 +72,10 @@ function text({ url, host }: { url: string; host: string }) {
 
 async function sendVerificationRequest(params: SendVerificationRequestParams) {
     const { identifier, url, provider, theme } = params;
+    if (process.env.NODE_ENV !== "production") {
+        console.log(url);
+        return;
+    }
     const { host } = new URL(url);
     const transport = createTransport(provider.server);
     const result = await transport.sendMail({

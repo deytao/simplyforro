@@ -138,10 +138,11 @@ $event-color: rgba(var(--colors-primary-rgb), var(--tw-text-opacity));
     @apply dark:bg-gray-700 dark:border-gray-600;
 
     &.rbc-selected {
-      background: $event-bg !important;
+        @apply bg-white border-gray-200;
+        @apply dark:bg-gray-700 dark:border-gray-600;
     }
 
     &:focus {
-      outline: none !important;
+        outline: none !important;
     }
 }

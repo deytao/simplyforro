@@ -10,7 +10,7 @@ interface Props {
     providers: Provider[];
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
     const providers = await getProviders();
     return {
         props: { providers },
