@@ -71,7 +71,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
     const placeholderEvent = {
         title: "FENFIT",
         url: "https://www.example.com",
-        imageDataURL: "",
+        imageDataUrl: "",
         start_at: "2022-04-23",
         end_at: "",
         frequency: "",
@@ -104,7 +104,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
         if (e.target.files) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setValue("imageDataURL", reader.result);
+                setValue("imageDataUrl", reader.result);
             };
             reader.readAsDataURL(e.target.files[0]);
         }
@@ -206,15 +206,15 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                         </div>
 
                         <div>
-                            <input type="hidden" {...register("imageDataURL")} id="event-image-data-url" />
+                            <input type="hidden" {...register("imageDataUrl")} id="event-image-data-url" />
                             <Label htmlFor="event-image" value="Flyer" />
                             <FileInput
                                 id="event-image"
                                 color="purple"
-                                className={`${errors.imageDataURL ? "border-red-500" : ""}`}
+                                className={`${errors.imageDataUrl ? "border-red-500" : ""}`}
                                 onChange={uploadToClient}
                             />
-                            <p className="text-red-500 text-xs italic">{errors.imageDataURL?.message}</p>
+                            <p className="text-red-500 text-xs italic">{errors.imageDataUrl?.message}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -328,6 +328,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                                 color="purple"
                                 size="sm"
                                 className={`grow ${isSubmitting && "cursor-not-allowed"}`}
+                                disabled={isSubmitting}
                             >
                                 {isSubmitting && (
                                     <div className="mr-3">
