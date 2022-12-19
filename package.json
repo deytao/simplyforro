@@ -1,6 +1,6 @@
 {
   "name": "simplyforro",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "engines": {
     "node": "19.x",
     "npm": "9.2.x",
@@ -12,8 +12,8 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "heroku-postbuild": "npm run build",
+    "build": "npx genversion --es6 -d -s version.ts && next build",
+    "heroku-postbuild": "npx genversion --es6 -d -s version.ts && npm run build",
     "prepare": "npx prisma migrate deploy",
     "start": "next start -p $PORT"
   },
@@ -56,6 +56,7 @@
     "@types/react": "17.0.38",
     "@types/react-big-calendar": "^0.38.0",
     "autoprefixer": "^10.4.0",
+    "genversion": "^3.1.1",
     "rome": "^10.0.0",
     "sass": "^1.52.3"
   }
