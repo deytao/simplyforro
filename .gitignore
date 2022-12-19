@@ -37,6 +37,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# build version
+version.ts
+
 # dump from heroku
 latest.dump
 
