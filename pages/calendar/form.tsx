@@ -205,7 +205,7 @@ const CalendarForm: NextPage<Props> = ({ event }) => {
                             <p className="text-red-500 text-xs italic">{errors.url?.message}</p>
                         </div>
 
-                        <div className="hidden">
+                        <div>
                             <input type="hidden" {...register("imageDataUrl")} id="event-image-data-url" />
                             <Label htmlFor="event-image" value="Flyer" />
                             <FileInput
