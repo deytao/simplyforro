@@ -5,11 +5,7 @@ import { Event, Role } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Select, { ActionMeta, MultiValue } from "react-select";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-    HiChevronLeft,
-    HiChevronRight,
-    HiOutlineEllipsisHorizontal,
-} from "react-icons/hi2";
+import { HiChevronLeft, HiChevronRight, HiOutlineEllipsisHorizontal } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
 
 import { frequencyIntervals } from "lib/calendar";
@@ -158,7 +154,9 @@ export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: T
                     >
                         <HiChevronLeft className="h-8 w-8" />
                     </Button>
-                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">{moment(calendar.props.date).format("MMMM YYYY")}</h1>
+                    <h1 className="basis-1/2 lg:grow text-xl md:text-4xl font-bold py-4 text-center">
+                        {moment(calendar.props.date).format("MMMM YYYY")}
+                    </h1>
                     <Button
                         color=""
                         size="sm"
@@ -182,7 +180,13 @@ export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: T
                         >
                             <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
                         </Button>
-                        <Button color="purple" size="sm" onClick={changeDate} onKeyPress={changeDate} data-month="current">
+                        <Button
+                            color="purple"
+                            size="sm"
+                            onClick={changeDate}
+                            onKeyPress={changeDate}
+                            data-month="current"
+                        >
                             Today
                         </Button>
                         <Button
@@ -227,7 +231,7 @@ export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: T
                                 option: (styles, { data, isFocused, isSelected }) => ({
                                     ...styles,
                                     color: data.color,
-                                    backgroundColor: isFocused ? data.backgroundColor: undefined,
+                                    backgroundColor: isFocused ? data.backgroundColor : undefined,
                                     opacity: isSelected ? 0.5 : undefined,
                                     ":active": {
                                         ...styles[":active"],

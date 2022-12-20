@@ -14,10 +14,7 @@ import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import { FiZoomIn } from "react-icons/fi";
-import {
-    HiArrowTopRightOnSquare,
-    HiCalendar,
-} from "react-icons/hi2";
+import { HiArrowTopRightOnSquare, HiCalendar } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
 import { loadEvents, Toolbar } from "components/CalendarToolbar";
 import { EventDetailsSimple } from "components/EventPreview";
