@@ -211,6 +211,8 @@ export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: T
                     </div>
                     <div className="col-span-5 lg:col-span-3 order-3">
                         <Select
+                            className="select-container"
+                            classNamePrefix="select"
                             styles={{
                                 container: (styles) => ({
                                     ...styles,
