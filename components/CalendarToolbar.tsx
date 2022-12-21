@@ -138,7 +138,7 @@ export const Toolbar = ({ calendar, showForm, status, setEvents, session }: Tool
 
     return (
         <>
-            <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 bg-white dark:bg-gray-800">
+            <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 pb-2 bg-white dark:bg-gray-800">
                 <div className="flex items-center">
                     <Button
                         color=""
@@ -164,119 +164,119 @@ export const Toolbar = ({ calendar, showForm, status, setEvents, session }: Tool
                         <HiChevronRight className="h-8 w-8" />
                     </Button>
                 </div>
-                <div className="relative grid grid-cols-7 gap-x-4 gap-y-1 mb-2">
-                    <div className="col-span-3 md:col-span-2 lg:col-span-1 flex items-center order-1">
-                        <Button
-                            color=""
-                            size="sm"
-                            onClick={changeDate}
-                            onKeyPress={changeDate}
-                            className="hidden lg:block"
-                            data-month="previous"
-                        >
-                            <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
-                        </Button>
-                        <Button
-                            color="purple"
-                            size="sm"
-                            onClick={changeDate}
-                            onKeyPress={changeDate}
-                            data-month="current"
-                        >
-                            Today
-                        </Button>
-                        <Button
-                            color=""
-                            size="sm"
-                            onClick={changeDate}
-                            onKeyPress={changeDate}
-                            className="hidden lg:block"
-                            data-month="next"
-                        >
-                            <HiChevronRight className="h-3 md:h-6 w-6 md:w-12" />
-                        </Button>
-                    </div>
-                    <div className="col-span-4 lg:col-span-2 flex justify-center order-2">
-                        <TextInput
-                            key="fts-field"
-                            onChange={changeFTS}
-                            placeholder="Search..."
-                            defaultValue={ftsValue}
-                            data-filters-fts={true}
-                        />
-                    </div>
-                    <div className="col-span-5 lg:col-span-3 order-3">
-                        <Select
-                            className="select-container"
-                            classNamePrefix="select"
-                            styles={{
-                                container: (styles) => ({
-                                    ...styles,
-                                    zIndex: "30",
-                                }),
-                                multiValue: (styles, { data }) => ({
-                                    ...styles,
-                                    color: data.color,
+                <div className="flex flex-col gap-1">
+                    <Select
+                        className="select-container"
+                        classNamePrefix="select"
+                        styles={{
+                            container: (styles) => ({
+                                ...styles,
+                                zIndex: "30",
+                            }),
+                            multiValue: (styles, { data }) => ({
+                                ...styles,
+                                color: data.color,
+                                backgroundColor: data.backgroundColor,
+                            }),
+                            multiValueRemove: (styles, { data }) => ({
+                                ...styles,
+                                color: data.color,
+                                ":hover": {
                                     backgroundColor: data.backgroundColor,
-                                }),
-                                multiValueRemove: (styles, { data }) => ({
-                                    ...styles,
-                                    color: data.color,
-                                    ":hover": {
-                                        backgroundColor: data.backgroundColor,
-                                    },
-                                }),
-                                option: (styles, { data, isFocused, isSelected }) => ({
-                                    ...styles,
-                                    color: data.color,
-                                    backgroundColor: isFocused ? data.backgroundColor : undefined,
-                                    opacity: isSelected ? 0.5 : undefined,
-                                    ":active": {
-                                        ...styles[":active"],
-                                        backgroundColor: data.backgroundColor,
-                                    },
-                                }),
-                                valueContainer: (styles) => ({
-                                    ...styles,
-                                    flexWrap: "nowrap",
-                                }),
-                            }}
-                            closeMenuOnSelect={false}
-                            data-filters-categories={true}
-                            defaultValue={selectedCategories}
-                            hideSelectedOptions={false}
-                            isClearable={false}
-                            isMulti={true}
-                            isSearchable={false}
-                            name="categories"
-                            onChange={(newValue: MultiValue<CategoryOption>) => setSelectedCategories(newValue)}
-                            options={categories.map((category: any, idx: number) => ({
-                                value: category,
-                                label: category,
-                                ...categoriesStyles[category],
-                            }))}
-                            placeholder="Categories"
-                        />
-                    </div>
-                    <div className="col-start-6 md:col-end-8 col-span-2 md:col-span-1 order-4 flex items-center justify-end gap-1">
-                        <Dropdown
-                            label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
-                            arrowIcon={false}
-                            color="purple"
-                            size="xs"
-                        >
-                            <Dropdown.Item onClick={showForm} onKeyPress={showForm}>
-                                Subscriptions
-                            </Dropdown.Item>
-                            {session?.user.roles.includes(Role.contributor) && (
-                                <Dropdown.Item>
-                                    <Link href="/calendar/pendings">View pendings</Link>
+                                },
+                            }),
+                            option: (styles, { data, isFocused, isSelected }) => ({
+                                ...styles,
+                                color: data.color,
+                                backgroundColor: isFocused ? data.backgroundColor : undefined,
+                                opacity: isSelected ? 0.5 : undefined,
+                                ":active": {
+                                    ...styles[":active"],
+                                    backgroundColor: data.backgroundColor,
+                                },
+                            }),
+                            valueContainer: (styles) => ({
+                                ...styles,
+                                flexWrap: "nowrap",
+                            }),
+                        }}
+                        closeMenuOnSelect={false}
+                        data-filters-categories={true}
+                        defaultValue={selectedCategories}
+                        hideSelectedOptions={false}
+                        isClearable={false}
+                        isMulti={true}
+                        isSearchable={false}
+                        name="categories"
+                        onChange={(newValue: MultiValue<CategoryOption>) => setSelectedCategories(newValue)}
+                        options={categories.map((category: any, idx: number) => ({
+                            value: category,
+                            label: category,
+                            ...categoriesStyles[category],
+                        }))}
+                        placeholder="Categories"
+                    />
+                    <div className="flex gap-1">
+                        <div className="flex items-center">
+                            <Button
+                                color=""
+                                size="sm"
+                                onClick={changeDate}
+                                onKeyPress={changeDate}
+                                className="hidden lg:block"
+                                data-month="previous"
+                            >
+                                <HiChevronLeft className="h-3 md:h-6 w-6 md:w-12" />
+                            </Button>
+                            <Button
+                                color="purple"
+                                size="sm"
+                                onClick={changeDate}
+                                onKeyPress={changeDate}
+                                data-month="current"
+                            >
+                                Today
+                            </Button>
+                            <Button
+                                color=""
+                                size="sm"
+                                onClick={changeDate}
+                                onKeyPress={changeDate}
+                                className="hidden lg:block"
+                                data-month="next"
+                            >
+                                <HiChevronRight className="h-3 md:h-6 w-6 md:w-12" />
+                            </Button>
+                        </div>
+                        <div className="grow flex justify-center">
+                            <TextInput
+                                key="fts-field"
+                                onChange={changeFTS}
+                                placeholder="Search..."
+                                defaultValue={ftsValue}
+                                data-filters-fts={true}
+                            />
+                        </div>
+                        <div className="flex items-center justify-end gap-1">
+                            <Dropdown
+                                label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
+                                arrowIcon={false}
+                                color="purple"
+                                size="sm"
+                            >
+                                <Dropdown.Item onClick={showForm} onKeyPress={showForm}>
+                                    Subscriptions
                                 </Dropdown.Item>
-                            )}
-                            <Dropdown.Item>
-                                <Link href="/calendar/form">Add event</Link>
-                            </Dropdown.Item>
-                        </Dropdown>
+                                {session?.user.roles.includes(Role.contributor) && (
+                                    <Dropdown.Item>
+                                        <Link href="/calendar/pendings">View pendings</Link>
+                                    </Dropdown.Item>
+                                )}
+                                <Dropdown.Item>
+                                    <Link href="/calendar/form">Add event</Link>
+                                </Dropdown.Item>
+                            </Dropdown>
+                        </div>
                     </div>
                 </div>
             </div>
