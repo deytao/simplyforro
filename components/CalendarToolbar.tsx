@@ -21,7 +21,7 @@ interface CategoryOption {
 }
 
 interface ToolbarProps {
-    calendarRef: any;
+    calendar: any;
     showForm: any;
     status: string;
     setEvents: Function;
@@ -100,11 +100,7 @@ export const loadEvents = (
         });
 };
 
-export const Toolbar = ({ calendarRef, showForm, status, setEvents, session }: ToolbarProps) => {
-    if (!calendarRef.current) {
-        return <></>;
-    }
-    const calendar = calendarRef.current;
+export const Toolbar = ({ calendar, showForm, status, setEvents, session }: ToolbarProps) => {
     const [currentDate, setCurrentDate] = useState(moment(calendar.props.date));
     const changeCategories = () => calendar.handleNavigate();
     let taskId: ReturnType<typeof setTimeout>;

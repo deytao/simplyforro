@@ -7,7 +7,7 @@ import { unstable_getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import type { Session } from "next-auth/core/types";
 import { Event, Role } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Select, { ActionMeta, MultiValue } from "react-select";
 import { useForm } from "react-hook-form";
 import { LEFT, RIGHT, SwipeEventData, useSwipeable } from "react-swipeable";
@@ -65,6 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { data: session, status } = useSession();
+    const [calendar, setCalendar] = useState(null);
     const [events, setEvents] = useState([]);
     const [modal, setModal] = useState<IModal>({
         isOpen: false,
@@ -74,7 +75,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { errors } = formState;
     const router = useRouter();
 
-    const calendarRef = useRef(null);
+    const calendarRef = useCallback((node) => setCalendar(node), []);
 
     async function submitForm(formData: object) {
         const endpoint = "/api/subscribers";
@@ -226,13 +227,15 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
             <Modal modal={modal} setModal={setModal} />
             <Popup popup={popup} setPopup={setPopup} />
             <div {...swipeHandlers} style={{ width: "100%" }}>
-                <Toolbar
-                    calendarRef={calendarRef}
-                    session={session}
-                    showForm={showForm}
-                    status={status}
-                    setEvents={setEvents}
-                />
+                {calendar && (
+                    <Toolbar
+                        calendar={calendar}
+                        session={session}
+                        showForm={showForm}
+                        status={status}
+                        setEvents={setEvents}
+                    />
+                )}
                 <BigCalendar
                     ref={calendarRef}
                     components={{
