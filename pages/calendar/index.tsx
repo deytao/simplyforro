@@ -286,6 +286,28 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                                     img.dataset.isZoomed = "yes";
                                                 }
                                             }}
+                                            onKeyPress={(e) => {
+                                                const zoomImgClasses = [
+                                                    "fixed",
+                                                    "left-0",
+                                                    "top-0",
+                                                    "w-screen",
+                                                    "h-screen",
+                                                    "bg-black",
+                                                    "hover:cursor-zoom-out",
+                                                ];
+                                                const img = document.getElementById(`event-img-${event.id}`)!;
+                                                const classes = img.classList;
+                                                if (img.dataset.isZoomed === "yes") {
+                                                    classes.remove(...zoomImgClasses);
+                                                    classes.add(...defaultImgClasses);
+                                                    img.dataset.isZoomed = "no";
+                                                } else {
+                                                    classes.remove(...defaultImgClasses);
+                                                    classes.add(...zoomImgClasses);
+                                                    img.dataset.isZoomed = "yes";
+                                                }
+                                            }}
                                         >
                                             <img
                                                 id={`event-img-${event.id}`}
