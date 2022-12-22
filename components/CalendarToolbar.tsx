@@ -1,14 +1,18 @@
 import { Badge, Button, Checkbox, Dropdown, Label, TextInput } from "flowbite-react";
 import moment from "moment";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Event, Role } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import Select, { ActionMeta, MultiValue } from "react-select";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { HiChevronLeft, HiChevronRight, HiOutlineEllipsisHorizontal } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
 
+import { IModal, Modal } from "components/Modal";
 import { frequencyIntervals } from "lib/calendar";
+import { Subscription } from "lib/prisma";
 import { categories } from "schemas/event";
 import { GetSubscriptions } from "lib/subscription";
 import { subscriberSchema } from "schemas/subscriber";
@@ -22,10 +26,8 @@ interface CategoryOption {
 
 interface ToolbarProps {
     calendar: any;
-    showForm: any;
-    status: string;
     setEvents: Function;
-    session: any;
+    subscriptions: Subscription[];
 }
 
 const categoriesStyles: { [key: string]: { color: string; backgroundColor: string } } = {
@@ -100,9 +102,14 @@ export const loadEvents = (
         });
 };
 
-export const Toolbar = ({ calendar, showForm, status, setEvents, session }: ToolbarProps) => {
+export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) => {
+    const { data: session } = useSession();
     const [currentDate, setCurrentDate] = useState(moment(calendar.props.date));
-    const changeCategories = () => calendar.handleNavigate();
+    const [modal, setModal] = useState<IModal>({
+        isOpen: false,
+    });
+    const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(subscriberSchema) });
+    const { errors } = formState;
     let taskId: ReturnType<typeof setTimeout>;
     const changeDate = (e: any) => {
         const actions: { [key: string]: [string, Function] } = {
@@ -131,6 +138,130 @@ export const Toolbar = ({ calendar, showForm, status, setEvents, session }: Tool
     );
     const [ftsValue, setFTSValue] = useState("");
 
+    const reloadFailSubmit = (errors: Object) => {
+        setModal({ isOpen: false });
+        showForm(errors);
+    };
+
+    const showForm = (errors: any = {}) => {
+        const userSubscriptionSlugs = session?.user.subscriptions?.map((subscription) => subscription.slug);
+        setModal({
+            isOpen: true,
+            status: "neutral",
+            title: "Configuration",
+            content: (
+                <>
+                    <div className="grid grid-cols-2 gap-1">
+                        {!session && (
+                            <>
+                                <div className="col-span-1">
+                                    <div className="mt-1 flex rounded-md shadow-sm">
+                                        <TextInput
+                                            {...register("name")}
+                                            placeholder="John Doe"
+                                            className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+                                        />
+                                    </div>
+                                    <div className="text-red-500 text-xs italic">{errors.name?.message}</div>
+                                </div>
+
+                                <div className="col-span-1">
+                                    <div className="mt-1 flex rounded-md shadow-sm">
+                                        <TextInput
+                                            {...register("email")}
+                                            placeholder="john.doe@email.com"
+                                            className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+                                        />
+                                    </div>
+                                    <div className="text-red-500 text-xs italic">{errors.email?.message}</div>
+                                </div>
+                            </>
+                        )}
+                        {session && (
+                            <>
+                                <input type="hidden" {...register("name", { value: session?.user.name })} />
+                                <input type="hidden" {...register("email", { value: session?.user.email })} />
+                            </>
+                        )}
+                        <div className="col-span-2">
+                            <fieldset className="mt-2">
+                                <legend className="text-base font-medium text-gray-900 dark:text-white">
+                                    Subscriptions
+                                </legend>
+                                <p className="text-red-500 text-xs italic">{errors.subscriptions?.message}</p>
+                                <div className="mt-2 space-y-4">
+                                    {subscriptions.map((subscription: Subscription) => (
+                                        <div key={subscription.slug} className="flex items-start gap-2">
+                                            <div className="flex items-center h-5">
+                                                <Checkbox
+                                                    id={`subscriptions-${subscription.slug}`}
+                                                    {...register("subscriptions")}
+                                                    value={subscription.slug}
+                                                    defaultChecked={userSubscriptionSlugs?.includes(subscription.slug)}
+                                                />
+                                            </div>
+                                            <Label htmlFor={`subscriptions-${subscription.slug}`}>
+                                                {subscription.title}
+                                                <p className="text-gray-500 dark:text-gray-300">
+                                                    {subscription.description}
+                                                </p>
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </>
+            ),
+            customButtons: [
+                {
+                    callback: (e: React.MouseEvent<HTMLElement>) => handleSubmit(submitForm, reloadFailSubmit)(e),
+                    color: "success",
+                    title: "Submit",
+                },
+            ],
+        });
+    };
+
+    async function submitForm(formData: object) {
+        const endpoint = "/api/subscribers";
+        const subscriber = subscriberSchema.cast(formData);
+        const JSONdata = JSON.stringify(subscriber);
+
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSONdata,
+        };
+        await fetch(endpoint, options)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("An error occured, please try again later.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setModal({
+                    isOpen: true,
+                    status: "success",
+                    title: "Subscriptions updated!",
+                    message: "Your subscriptions settings have updated.",
+                });
+            })
+            .catch((error) => {
+                setModal({
+                    isOpen: true,
+                    status: "error",
+                    title: "Error",
+                    message: error.message,
+                });
+            });
+        return false;
+    }
+
     useEffect(
         () => loadEvents(currentDate, selectedCategories, ftsValue, setEvents),
         [currentDate, selectedCategories, ftsValue],
@@ -138,6 +269,7 @@ export const Toolbar = ({ calendar, showForm, status, setEvents, session }: Tool
 
     return (
         <>
+            <Modal modal={modal} setModal={setModal} />
             <div className="sticky top-[72px] md:top-[88px] lg:top-[88px] z-40 pb-2 bg-white dark:bg-gray-800">
                 <div className="flex items-center">
                     <Button
