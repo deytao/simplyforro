@@ -53,7 +53,7 @@ const categoriesStyles: { [key: string]: { color: string; backgroundColor: strin
     },
 };
 
-export const loadEvents = (
+const loadEvents = (
     date: moment.Moment,
     selectedCategories: MultiValue<CategoryOption>,
     q: string,

@@ -15,7 +15,7 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import { FiZoomIn } from "react-icons/fi";
 import { HiArrowTopRightOnSquare, HiCalendar } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
-import { loadEvents, Toolbar } from "components/CalendarToolbar";
+import { Toolbar } from "components/CalendarToolbar";
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
 import { IPopup, Popup } from "components/Popup";
@@ -240,7 +240,6 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         return response.json();
                                     })
                                     .then((data) => {
-                                        loadEvents();
                                         setModal({ isOpen: false });
                                     })
                                     .catch((error) => {
