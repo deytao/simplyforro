@@ -243,8 +243,8 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         const { date, categories, q } = filters!;
                                         fetcherEvents(["/api/events", date, categories, q]).then((events) => {
                                             setEvents(events);
-                                            setModal({ isOpen: false });
                                         });
+                                        setModal({ isOpen: false });
                                     })
                                     .catch((error) => {
                                         setModal({

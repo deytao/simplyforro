@@ -209,8 +209,7 @@ export const Toolbar = ({ calendar, setEvents, setFilters, subscriptions }: Tool
     }
 
     const { data: events } = useSWR(["/api/events", currentDate, selectedCategories, ftsValue], fetcherEvents);
-    setEvents(events);
-
+    useEffect(() => setEvents(events), [events]);
     useEffect(
         () =>
             setFilters({
