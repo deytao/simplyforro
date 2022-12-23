@@ -9,24 +9,19 @@ import Select, { ActionMeta, MultiValue } from "react-select";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { HiChevronLeft, HiChevronRight, HiOutlineEllipsisHorizontal } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
+import useSWR from "swr";
 
 import { IModal, Modal } from "components/Modal";
-import { frequencyIntervals } from "lib/calendar";
+import { fetcherEvents, frequencyIntervals, ICategoryOption } from "lib/calendar";
 import { Subscription } from "lib/prisma";
 import { categories } from "schemas/event";
 import { GetSubscriptions } from "lib/subscription";
 import { subscriberSchema } from "schemas/subscriber";
 
-interface CategoryOption {
-    label: string;
-    value: string;
-    color: string;
-    backgroundColor: string;
-}
-
 interface ToolbarProps {
     calendar: any;
     setEvents: Function;
+    setFilters: Function;
     subscriptions: Subscription[];
 }
 
@@ -53,56 +48,7 @@ const categoriesStyles: { [key: string]: { color: string; backgroundColor: strin
     },
 };
 
-const loadEvents = (
-    date: moment.Moment,
-    selectedCategories: MultiValue<CategoryOption>,
-    q: string,
-    setEvents: Function,
-) => {
-    let lbound = moment(date).startOf("month").startOf("week");
-    let ubound = moment(date).endOf("month").endOf("week");
-    let dates = [
-        `lbound=${encodeURIComponent(lbound.format("YYYY-MM-DD"))}`,
-        `ubound=${encodeURIComponent(ubound.format("YYYY-MM-DD"))}`,
-    ];
-    let params = [
-        ...dates,
-        ...[...selectedCategories].map((category) => `categories=${encodeURIComponent(category.value)}`),
-        `q=${encodeURIComponent(q)}`,
-    ];
-    fetch(`/api/events?${params.join("&")}`)
-        .then((res) => res.json())
-        .then((data) => {
-            let events = data
-                .map((event: Event) => {
-                    if (!event.frequency) {
-                        return event;
-                    }
-                    let eventDate = moment(event.start_at);
-                    let lastDate =
-                        event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
-                    let events: Event[] = [];
-                    while (eventDate.isSameOrBefore(lastDate)) {
-                        let isExcluded = event.excluded_on?.filter((excluded_date) => {
-                            return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
-                        });
-                        if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
-                            events.push({
-                                ...event,
-                                start_at: eventDate.toDate(),
-                                end_at: eventDate.toDate(),
-                            });
-                        }
-                        eventDate.add(frequencyIntervals[event.frequency]);
-                    }
-                    return events;
-                })
-                .flat(1);
-            setEvents(events);
-        });
-};
-
-export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) => {
+export const Toolbar = ({ calendar, setEvents, setFilters, subscriptions }: ToolbarProps) => {
     const { data: session } = useSession();
     const [currentDate, setCurrentDate] = useState(moment(calendar.props.date));
     const [modal, setModal] = useState<IModal>({
@@ -129,7 +75,7 @@ export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) =>
         taskId = setTimeout(() => setFTSValue(e.target.value), 800);
     };
 
-    const [selectedCategories, setSelectedCategories] = useState<MultiValue<CategoryOption>>(
+    const [selectedCategories, setSelectedCategories] = useState<MultiValue<ICategoryOption>>(
         categories.map((category: any, idx: number) => ({
             value: category,
             label: category,
@@ -262,8 +208,16 @@ export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) =>
         return false;
     }
 
+    const { data: events } = useSWR(["/api/events", currentDate, selectedCategories, ftsValue], fetcherEvents);
+    setEvents(events);
+
     useEffect(
-        () => loadEvents(currentDate, selectedCategories, ftsValue, setEvents),
+        () =>
+            setFilters({
+                date: currentDate,
+                categories: selectedCategories,
+                q: ftsValue,
+            }),
         [currentDate, selectedCategories, ftsValue],
     );
 
@@ -340,7 +294,7 @@ export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) =>
                         isMulti={true}
                         isSearchable={false}
                         name="categories"
-                        onChange={(newValue: MultiValue<CategoryOption>) => setSelectedCategories(newValue)}
+                        onChange={(newValue: MultiValue<ICategoryOption>) => setSelectedCategories(newValue)}
                         options={categories.map((category: any, idx: number) => ({
                             value: category,
                             label: category,
@@ -391,7 +345,9 @@ export const Toolbar = ({ calendar, setEvents, subscriptions }: ToolbarProps) =>
                         </div>
                         <div className="flex items-center justify-end gap-1">
                             <Dropdown
-                                label={<HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />}
+                                label={
+                                    <HiOutlineEllipsisHorizontal className="h-5 w-5 text-violet-200 hover:text-white" />
+                                }
                                 arrowIcon={false}
                                 color="purple"
                                 size="sm"

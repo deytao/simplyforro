@@ -15,11 +15,12 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import { FiZoomIn } from "react-icons/fi";
 import { HiArrowTopRightOnSquare, HiCalendar } from "react-icons/hi2";
 import { IoLocationOutline } from "react-icons/io5";
+
 import { Toolbar } from "components/CalendarToolbar";
 import { EventDetailsSimple } from "components/EventPreview";
 import { IModal, Modal } from "components/Modal";
 import { IPopup, Popup } from "components/Popup";
-import { frequencyIntervals } from "lib/calendar";
+import { fetcherEvents, frequencyIntervals, ICategoryOption } from "lib/calendar";
 import { Subscription } from "lib/prisma";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import { categories } from "schemas/event";
@@ -38,13 +39,10 @@ interface Props {
     subscriptions: Subscription[];
 }
 
-interface IMessageDialog {
-    isOpen: boolean;
-    status?: string;
-    title?: string;
-    message?: any;
-    content?: any;
-    customButtons?: object[];
+interface IFilters {
+    date: moment.Moment;
+    categories: MultiValue<ICategoryOption>;
+    q: string;
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -66,6 +64,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
     const { data: session, status } = useSession();
     const [calendar, setCalendar] = useState(null);
     const [events, setEvents] = useState([]);
+    const [filters, setFilters] = useState<IFilters>();
     const [modal, setModal] = useState<IModal>({
         isOpen: false,
     });
@@ -104,6 +103,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                     <Toolbar
                         calendar={calendar}
                         setEvents={setEvents}
+                        setFilters={setFilters}
                         subscriptions={subscriptions}
                     />
                 )}
@@ -115,7 +115,7 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                     toolbar={false}
                     defaultDate={new Date()}
                     defaultView="month"
-                    events={events.map((event: any, idx: number) => {
+                    events={events?.map((event: any, idx: number) => {
                         return {
                             ...event,
                             start_at: moment(event.start_at),
@@ -240,7 +240,11 @@ const Calendar: NextPage<Props> = ({ subscriptions }) => {
                                         return response.json();
                                     })
                                     .then((data) => {
-                                        setModal({ isOpen: false });
+                                        const { date, categories, q } = filters!;
+                                        fetcherEvents(["/api/events", date, categories, q]).then((events) => {
+                                            setEvents(events);
+                                            setModal({ isOpen: false });
+                                        });
                                     })
                                     .catch((error) => {
                                         setModal({
