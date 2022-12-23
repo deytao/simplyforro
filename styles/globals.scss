@@ -16,15 +16,14 @@
     /* .my-react-select-container {
     } */
     .select-container .select__control {
-        @apply border-2;
         @apply bg-white border-neutral-300;
         @apply dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500;
     }
 
     .select-container .select__control--is-focused {
         @apply shadow-none;
-        @apply border-neutral-500 hover:border-neutral-500;
-        @apply dark:border-neutral-400 dark:hover:border-neutral-400 shadow-none;
+        @apply border-neutral-500;
+        @apply dark:border-neutral-400;
     }
 
     .select-container .select__menu {
