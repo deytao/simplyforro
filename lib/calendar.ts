@@ -1,13 +1,70 @@
 import moment from "moment";
 import { Category, Event, Frequency, Prisma, ValidationStatus } from "@prisma/client";
+import { MultiValue } from "react-select";
 
 import prisma from "lib/prisma";
+
+export interface ICategoryOption {
+    label: string;
+    value: string;
+    color: string;
+    backgroundColor: string;
+}
 
 export const frequencyIntervals: { [key: string]: object } = {
     daily: { days: 1 },
     weekly: { weeks: 1 },
     biweekly: { weeks: 2 },
     monthly: { weeks: 4 },
+};
+
+export const fetcherEvents = ([url, date, categories, q]: [
+    url: string,
+    date: moment.Moment,
+    categories: MultiValue<ICategoryOption>,
+    q: string,
+]) => {
+    let lbound = moment(date).startOf("month").startOf("week");
+    let ubound = moment(date).endOf("month").endOf("week");
+    let dates = [
+        `lbound=${encodeURIComponent(lbound.format("YYYY-MM-DD"))}`,
+        `ubound=${encodeURIComponent(ubound.format("YYYY-MM-DD"))}`,
+    ];
+    let params = [
+        ...dates,
+        ...[...categories].map((category) => `categories=${encodeURIComponent(category.value)}`),
+        `q=${encodeURIComponent(q)}`,
+    ];
+    return fetch(`${url}?${params.join("&")}`)
+        .then((res) => res.json())
+        .then((data) => {
+            const events = data
+                .map((event: Event) => {
+                    if (!event.frequency) {
+                        return event;
+                    }
+                    let eventDate = moment(event.start_at);
+                    let lastDate =
+                        event.end_at && moment(event.end_at) < ubound ? moment(event.end_at).utc(true) : ubound;
+                    let events: Event[] = [];
+                    while (eventDate.isSameOrBefore(lastDate)) {
+                        let isExcluded = event.excluded_on?.filter((excluded_date) => {
+                            return moment(excluded_date).format("YYYY-MM-DD") === eventDate.format("YYYY-MM-DD");
+                        });
+                        if (eventDate.isSameOrAfter(lbound) && !isExcluded?.length) {
+                            events.push({
+                                ...event,
+                                start_at: eventDate.toDate(),
+                                end_at: eventDate.toDate(),
+                            });
+                        }
+                        eventDate.add(frequencyIntervals[event.frequency]);
+                    }
+                    return events;
+                })
+                .flat(1);
+            return events;
+        });
 };
 
 export async function CreateEvent(event: Event) {

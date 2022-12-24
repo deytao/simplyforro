@@ -35,8 +35,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         res.status(status).json(content);
     } else {
-        const lbound = moment(req.query.lbound);
-        const ubound = moment(req.query.ubound);
+        const { categories: _categories, lbound: _lbound, ubound: _ubound, q } = req.query;
+        const lbound = moment(_lbound);
+        const ubound = moment(_ubound);
         if (lbound.isAfter(ubound)) {
             res.status(400).json({ message: "Invalid dates" });
             return;
@@ -45,9 +46,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             res.status(400).json({ message: "Too many days" });
             return;
         }
-        const categories = req.query.categories as Category[];
-        const searchedText = req.query.q as string;
-        const events = await GetEvents(lbound, ubound, categories, searchedText);
+        let categories: string[] = [];
+        if (_categories) {
+            if (typeof _categories === "string") {
+                categories.push(_categories);
+            } else {
+                categories = _categories;
+            }
+        }
+        const events = await GetEvents(lbound, ubound, categories as Category[], q as string);
         res.status(200).json(events);
     }
 }
