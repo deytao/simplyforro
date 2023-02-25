@@ -1,8 +1,8 @@
 # SimplyForró
 
 ## Project
-This project aims at displaying an interactive calendar.
-...
+
+Manage the SimplyForró community and provide informations for the members
 
 ## Requirements
 
