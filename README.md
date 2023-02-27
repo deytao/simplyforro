@@ -2,7 +2,7 @@
 
 ## Project
 
-...
+Manage communities such as Simply Forró and provide informations for the members.
 
 ## Requirements
 
@@ -11,7 +11,7 @@
 * NPM 9
 * Env vars
 
-```
+```bash
 BASE_URL=http://localhost:3000
 
 NOTION_ACCESS_TOKEN=<token>
@@ -30,6 +30,25 @@ DATABASE_URL=postgresql://simplyforro:@localhost:5432/simplyforro_dev
 
 NEXTAUTH_SECRET=<cron_secret>
 ```
+
+## Installation TODO
+```bash
+# Clone this project
+git clone git@github.com:deytao/simplyforro.git
+
+# Install required node modules from package.json
+npm i
+```
+
+## Project typescript compilation? TODO
+```bash
+tsc -p tsconfig.json
+```
+
+## Project content? TODO
+JavaScript libraries.
+Components.
+
 
 ## Local development
 
