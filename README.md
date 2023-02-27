@@ -2,7 +2,7 @@
 
 ## Project
 
-Manage the SimplyForró community and provide informations for the members
+Manage communities such as Simply Forró and provide informations for the members.
 
 ## Requirements
 
